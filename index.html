@@ -587,16 +587,18 @@ h1,h2,h3,h4,.btn,.pill,.badge{font-family:var(--display)}
 
 /* ===== Tutorial: Scheinwerfer, Finger, Erklär-Box ===== */
 .tblock{position:fixed;inset:0;z-index:399}
-/* Scheinwerfer: fester Abdunkel-Schatten (wird nicht animiert → kein Flackern auf schwachen Grafikchips),
-   nur der Leuchtrahmen pulsiert über die Deckkraft. Position per transform. */
-.tspot{position:fixed;left:0;top:0;z-index:400;pointer-events:none;border-radius:18px;box-shadow:0 0 0 200vmax rgba(6,4,24,.68);
-  will-change:transform;transition:opacity .3s}
-.tspot.glide{transition:transform .45s cubic-bezier(.3,.7,.3,1),width .45s cubic-bezier(.3,.7,.3,1),height .45s cubic-bezier(.3,.7,.3,1),opacity .3s}
-.tspot::after{content:"";position:absolute;inset:-4px;border-radius:22px;border:4px solid var(--yellow);box-shadow:0 0 26px 4px rgba(255,210,63,.5);
+/* Scheinwerfer: 4 Abdunkel-Flächen + Leuchtrahmen. Alles bewegt sich nur per transform/opacity
+   (Grafikkarte, kein Neuzeichnen) → ruhige, flackerfreie Übergänge auch auf schwachen Smartboards. */
+.tspotlayer{position:fixed;inset:0;z-index:400;pointer-events:none;overflow:hidden}
+.tdim{position:absolute;left:0;top:0;width:100vw;height:100vh;background:rgba(6,4,24,.68);transform-origin:0 0;will-change:transform;backface-visibility:hidden}
+.tdim.l,.tdim.r{height:1px}
+.tspotlayer.glide .tdim{transition:transform .42s cubic-bezier(.3,.7,.3,1)}
+.tring{position:absolute;left:0;top:0;border-radius:16px;will-change:transform,opacity;transition:opacity .2s ease}
+.tring.hide{opacity:0}
+.tring::after{content:"";position:absolute;inset:-4px;border-radius:20px;border:4px solid var(--yellow);box-shadow:0 0 22px 3px rgba(255,210,63,.45);
   will-change:opacity;animation:ringpulse 2.4s ease-in-out infinite}
-@keyframes ringpulse{50%{opacity:.45}}
-.tspot.off{opacity:0}
-@media (prefers-reduced-motion:reduce){.tspot::after{animation:none}}
+@keyframes ringpulse{50%{opacity:.5}}
+@media (prefers-reduced-motion:reduce){.tring::after{animation:none}}
 .tfinger{position:fixed;z-index:402;left:50%;top:110%;font-size:clamp(44px,7vmin,72px);line-height:1;pointer-events:none;transform:translate(-30%,-10%);opacity:0;
   transition:left .7s cubic-bezier(.3,.7,.3,1),top .7s cubic-bezier(.3,.7,.3,1),opacity .3s;filter:drop-shadow(0 4px 6px rgba(0,0,0,.5))}
 .tfinger.on{opacity:1}
@@ -605,6 +607,8 @@ h1,h2,h3,h4,.btn,.pill,.badge{font-family:var(--display)}
 .tcap{position:fixed;z-index:403;left:50%;top:auto;bottom:calc(14px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);width:min(1000px,calc(100% - 32px));
   background:linear-gradient(160deg,var(--c1),var(--c2));border:3px solid rgba(255,255,255,.6);border-radius:22px;padding:14px 20px;display:flex;flex-direction:column;gap:10px;
   box-shadow:0 14px 40px rgba(0,0,0,.55);text-align:center}
+.tcap{transition:opacity .18s ease}
+.tcap.fade{opacity:0}
 .tcap.attop{bottom:auto;top:calc(14px + env(safe-area-inset-top,0px))}
 .tcap.atleft,.tcap.atright{bottom:auto;top:50%;transform:translateY(-50%);width:min(560px,44vw)}
 .tcap.atleft{left:16px}.tcap.atright{left:auto;right:16px}
@@ -2109,7 +2113,12 @@ async function tutorial(g) {
   TUT = { stop: false, paused: false, skip: false };
   /* Ebenen: Klick-Sperre, Scheinwerfer, Finger, Erklär-Box */
   const block = h("div", { class: "tblock" });
-  const spot = h("div", { class: "tspot off" });
+  /* Abdunkelung aus 4 Flächen (oben/unten/links/rechts) + Leuchtrahmen. Die Flächen bewegen sich nur per
+     transform (Grafikkarte, kein Neuzeichnen) und bleiben IMMER sichtbar – auch wenn das Ziel beim
+     Schrittwechsel kurz verschwindet. So gibt es kein Hell-Dunkel-Flackern mehr. */
+  const dims = ["t", "b", "l", "r"].map(k => h("div", { class: "tdim " + k }));
+  const ring = h("div", { class: "tring" });
+  const spot = h("div", { class: "tspotlayer" }, dims, ring);
   const finger = h("div", { class: "tfinger" }, "👆");
   const txt = h("div", { class: "tctext" });
   const cnt = h("span", { class: "tccount" });
@@ -2121,27 +2130,71 @@ async function tutorial(g) {
       h("button", { class: "btn ghost small", onclick: () => { TUT.skip = true; } }, "⏭ Nächster Schritt"),
       h("button", { class: "btn small", onclick: () => { TUT.stop = true; } }, "✕ Beenden")));
   document.body.append(block, spot, finger, cap);
-  /* Scheinwerfer: wird nur neu gesetzt, wenn sich das Ziel wirklich bewegt. Gleiten gibt es nur beim
-     Wechsel auf ein neues Element – sonst springt er ohne Übergang mit (verhindert Flackern). */
-  let target = null, raf = 0, placedFor = null, last = "", glideT = 0;
+  let target = null, raf = 0, placedFor = undefined, last = "", glideT = 0, ringT = 0, capPos = "", cand = "", candN = 0;
+  function placeDims(x, y, w, hh) {
+    const W = innerWidth, H = innerHeight;
+    dims[0].style.transform = `translate3d(0,${y - H}px,0)`;
+    dims[1].style.transform = `translate3d(0,${y + hh}px,0)`;
+    dims[2].style.transform = `translate3d(${x - W}px,${y}px,0) scaleY(${Math.max(0, hh)})`;
+    dims[3].style.transform = `translate3d(${x + w}px,${y}px,0) scaleY(${Math.max(0, hh)})`;
+  }
+  function placeRing(x, y, w, hh) { ring.style.transform = `translate3d(${x}px,${y}px,0)`; ring.style.width = w + "px"; ring.style.height = hh + "px"; }
+  function setCapPos(pos) { // Seite der Erklär-Box – wird nur gesetzt, während die Box ausgeblendet ist
+    if (pos === capPos) return; capPos = pos;
+    cap.classList.remove("attop", "atbottom", "atleft", "atright"); cap.classList.add(pos);
+  }
+  function glide() { // Flächen gleiten immer sanft – auch wenn sich das Ziel nur verschiebt
+    spot.classList.add("glide"); clearTimeout(glideT); glideT = setTimeout(() => spot.classList.remove("glide"), 450);
+  }
+  let coverN = 0, covered = false, coverFor = null;
+  const own = [block, spot, finger, cap];
+  function isCovered(el) { // liegt in der Mitte des Ziels etwas anderes obenauf (Tutorial-Ebenen ausgenommen)?
+    const r = el.getBoundingClientRect(); if (!r.width) return false;
+    const top = document.elementsFromPoint(r.left + r.width / 2, r.top + r.height / 2).find(e => !own.some(o => o.contains(e)));
+    return !!top && !el.contains(top) && !top.contains(el);
+  }
+  placeDims(innerWidth / 2, innerHeight / 2, 0, 0); // Start: ganzer Bildschirm abgedunkelt
   (function follow() {
     raf = requestAnimationFrame(follow);
-    if (!target || !target.isConnected) { if (!spot.classList.contains("off")) { spot.classList.add("off"); placedFor = null; } return; }
+    if (target === null && placedFor !== null) { // kein Ziel (z. B. Schlusssatz): Loch schließt sich sanft
+      placedFor = null; last = ""; cand = ""; ring.classList.add("hide"); glide();
+      placeDims(innerWidth / 2, innerHeight / 2, 0, 0);
+      return;
+    }
+    if (!target || !target.isConnected) return; // Ziel kurz weg (Ansicht wird neu aufgebaut) → alles bleibt einfach stehen
+    if (++coverN % 8 === 0 || coverFor !== target) { covered = isCovered(target); coverFor = target; }
+    if (covered) { // Ziel liegt unter einem aufgegangenen Fenster → kein Rahmen über fremdem Inhalt, Loch schließt sich
+      if (placedFor !== "covered") { placedFor = "covered"; last = ""; cand = ""; ring.classList.add("hide"); glide(); placeDims(innerWidth / 2, innerHeight / 2, 0, 0); }
+      return;
+    }
     const r = target.getBoundingClientRect(), p = 10;
+    if (!r.width && !r.height) return;
     const x = Math.round(r.left - p), y = Math.round(r.top - p), w = Math.round(r.width + 2 * p), hh = Math.round(r.height + 2 * p);
     const key = x + "," + y + "," + w + "," + hh;
-    if (key !== last) {
-      const fresh = placedFor !== target && placedFor !== null;
-      if (fresh) { spot.classList.add("glide"); clearTimeout(glideT); glideT = setTimeout(() => spot.classList.remove("glide"), 500); }
-      spot.style.transform = `translate(${x}px,${y}px)`; spot.style.width = w + "px"; spot.style.height = hh + "px";
-      last = key; placedFor = target;
+    if (key === last && placedFor === target) { cand = ""; return; }
+    // erst bewegen, wenn das Ziel ruhig steht (Aufpopp-Animationen, Neuaufbau) – sonst springt alles hin und her
+    if (key !== cand) { cand = key; candN = 0; return; }
+    if (++candN < 6) return;
+    const isNew = placedFor !== target;
+    if (isNew) { // neues Ziel: Rahmen blendet aus und erst am Ziel wieder ein
+      ring.classList.add("hide"); clearTimeout(ringT);
+      ringT = setTimeout(() => ring.classList.remove("hide"), 420);
+      const tall = r.height > innerHeight * 0.55, side = tall && r.width < innerWidth * 0.55;
+      cap.dataset.want = side ? (r.left + r.width / 2 < innerWidth / 2 ? "atright" : "atleft") : (r.top + r.height / 2 > innerHeight / 2 ? "attop" : "atbottom");
     }
-    spot.classList.remove("off");
-    // Erklär-Box dorthin, wo sie das hervorgehobene Element nicht verdeckt
-    const tall = r.height > innerHeight * 0.55, side = tall && r.width < innerWidth * 0.55;
-    const pos = side ? (r.left + r.width / 2 < innerWidth / 2 ? "atright" : "atleft") : (r.top + r.height / 2 > innerHeight / 2 ? "attop" : "atbottom");
-    if (cap.dataset.pos !== pos) { cap.classList.remove("attop", "atbottom", "atleft", "atright"); cap.classList.add(pos); cap.dataset.pos = pos; }
+    glide(); placeDims(x, y, w, hh); placeRing(x, y, w, hh);
+    last = key; placedFor = target; cand = "";
   })();
+  // Schrittwechsel geordnet: Box aus → Ziel setzen → warten, bis der Ausschnitt dort ist → Box mit neuem Text an passender Seite ein
+  async function showStep(newTarget, text, count) {
+    cap.classList.add("fade"); await sleep(190);
+    target = newTarget;
+    if (newTarget) { const t0 = Date.now(); while (placedFor !== newTarget && Date.now() - t0 < 900 && !TUT.stop) await sleep(40); }
+    else await sleep(250);
+    setCapPos(newTarget && cap.dataset.want ? cap.dataset.want : "atbottom");
+    if (text != null) { txt.textContent = text; if (count != null) cnt.textContent = count; }
+    cap.classList.remove("fade");
+  }
   async function moveFinger(el) {
     const r = el.getBoundingClientRect();
     finger.classList.add("on");
@@ -2161,19 +2214,18 @@ async function tutorial(g) {
       const el = st.el ? await until(() => pick(st.el)) : null;
       if (TUT.stop) break;
       if (st.el && !el) console.warn("Tutorial: Element fehlt", g.id, "Schritt", i + 1);
-      target = el;
-      cnt.textContent = (i + 1) + " / " + steps.length;
-      txt.textContent = st.say; txt.classList.remove("in"); void txt.offsetWidth; txt.classList.add("in");
+      await showStep(el, st.say, (i + 1) + " / " + steps.length);
+      if (TUT.stop) break;
       const speech = sayAsync(st.say);
       preloadNarration(steps[i + 1] ? steps[i + 1].say : "Jetzt seid ihr dran! Viel Spaß beim Spielen!");
       if (st.act && el) { await sleep(700); if (!TUT.stop) { await moveFinger(el); if (!TUT.stop) await st.act(el); } finger.classList.remove("on"); }
-      if (st.focus) { const f = await until(() => pick(st.focus), 3000); if (f) target = f; } // danach etwas anderes hervorheben
+      if (st.focus) { const f = await until(() => pick(st.focus), 3000); if (f && f !== target) await showStep(f); } // danach etwas anderes hervorheben
       await speech;
       if (st.wait && !TUT.skip) await sleep(st.wait);
       while (TUT.paused && !TUT.stop) await sleep(200);
     }
     if (!TUT.stop) {
-      target = null; txt.textContent = "Jetzt seid ihr dran! Viel Spaß beim Spielen! 🎉"; cnt.textContent = "";
+      await showStep(null, "Jetzt seid ihr dran! Viel Spaß beim Spielen! 🎉", "");
       sfx.fan(); await sayAsync("Jetzt seid ihr dran! Viel Spaß beim Spielen!");
     }
   } finally {
