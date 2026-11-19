@@ -164,8 +164,8 @@ h1,h2,h3,h4,.btn,.pill,.badge{font-family:var(--display)}
 .vinfo{display:flex;gap:12px;align-items:center;flex-wrap:wrap;justify-content:center}
 
 /* große Lösung */
-.ansbox{display:flex;justify-content:center;min-height:0}
-.reveal{font-family:var(--display);font-weight:700;font-size:clamp(40px,10vmin,120px);line-height:1.05;color:#06361a;text-align:center;
+.ansbox{display:flex;justify-content:center;align-items:center;flex-shrink:0} /* Lösungskasten darf nie gequetscht werden */
+.reveal{font-family:var(--display);font-weight:700;font-size:clamp(30px,min(10vmin,10vh),120px);flex-shrink:0;text-wrap:balance;line-height:1.05;color:#06361a;text-align:center;
   background:linear-gradient(180deg,#5ef0a0,#22c55e);padding:.15em .55em;border-radius:.3em;border:.06em solid #fff;
   box-shadow:0 .08em 0 #11743d,0 0 1em rgba(61,220,132,.6);max-width:94vw}
 .dim{position:fixed;inset:0;z-index:290;background:rgba(8,5,30,.7);pointer-events:none}
@@ -284,8 +284,8 @@ h1,h2,h3,h4,.btn,.pill,.badge{font-family:var(--display)}
 .why{font-size:clamp(18px,3.2vmin,34px);font-weight:700;min-height:1.2em}
 
 /* ---------- Bilderrätsel ---------- */
-.picwrap{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;width:100%}
-.pic{width:min(90vw,52vh*1.5);max-width:100%;aspect-ratio:3/2;position:relative;container-type:size;border-radius:3vmin;overflow:hidden;background:linear-gradient(160deg,#fff,#dbeafe);box-shadow:0 1vmin 0 rgba(0,0,0,.3)}
+.picwrap{flex:1;min-height:120px;display:flex;align-items:center;justify-content:center;width:100%;container-type:size} /* Bild passt sich dem freien Platz an */
+.pic{width:min(90vw,52vh*1.5,100cqw,100cqh*1.5);max-width:100%;aspect-ratio:3/2;position:relative;container-type:size;border-radius:3vmin;overflow:hidden;background:linear-gradient(160deg,#fff,#dbeafe);box-shadow:0 1vmin 0 rgba(0,0,0,.3)}
 .pic .em{position:absolute;inset:0;display:grid;place-items:center;font-size:68cqh;line-height:1}
 .tiles{position:absolute;inset:0;display:grid;grid-template-columns:repeat(6,1fr);grid-template-rows:repeat(4,1fr)}
 .tile{background:linear-gradient(135deg,#8b5cf6,#ec4899);border:1px solid rgba(255,255,255,.35);transition:opacity .45s,transform .45s;cursor:pointer}
@@ -590,9 +590,9 @@ h1,h2,h3,h4,.btn,.pill,.badge{font-family:var(--display)}
 /* Scheinwerfer: 4 Abdunkel-Flächen + Leuchtrahmen. Alles bewegt sich nur per transform/opacity
    (Grafikkarte, kein Neuzeichnen) → ruhige, flackerfreie Übergänge auch auf schwachen Smartboards. */
 .tspotlayer{position:fixed;inset:0;z-index:400;pointer-events:none;overflow:hidden}
-.tdim{position:absolute;left:0;top:0;width:100vw;height:100vh;background:rgba(6,4,24,.68);transform-origin:0 0;will-change:transform;backface-visibility:hidden}
-.tdim.l,.tdim.r{height:1px}
-.tspotlayer.glide .tdim{transition:transform .42s cubic-bezier(.3,.7,.3,1)}
+.tdim{position:absolute;left:0;top:0;width:100vw;height:100vh;background:rgba(6,4,24,.68);will-change:transform}
+.tdim.l,.tdim.r{height:0} /* echte Höhe per JS – nicht hochskaliert, sonst verschmiert die Kante auf manchen Grafikkarten */
+
 .tring{position:absolute;left:0;top:0;border-radius:16px;will-change:transform,opacity;transition:opacity .2s ease}
 .tring.hide{opacity:0}
 .tring::after{content:"";position:absolute;inset:-4px;border-radius:20px;border:4px solid var(--yellow);box-shadow:0 0 22px 3px rgba(255,210,63,.45);
@@ -1448,6 +1448,8 @@ function confetti(n = 45) {
 function bigReveal(holder, text, extraClass) {
   const el = h("div", { class: "reveal" + (extraClass ? " " + extraClass : "") }, text);
   holder.replaceChildren(el);
+  // sehr lange Wörter: Schrift verkleinern, bis das Wort in den Kasten passt
+  for (let fs = parseFloat(getComputedStyle(el).fontSize), i = 0; el.scrollWidth > el.clientWidth + 1 && fs > 18 && i < 20; i++) { fs *= 0.9; el.style.fontSize = fs + "px"; }
   sfx.tada();
   if (REDUCED) return el;
   const r = el.getBoundingClientRect();
@@ -2152,21 +2154,35 @@ async function tutorial(g) {
       h("button", { class: "btn ghost small", onclick: () => { TUT.skip = true; } }, "⏭ Nächster Schritt"),
       h("button", { class: "btn small", onclick: () => { TUT.stop = true; } }, "✕ Beenden")));
   document.body.append(block, spot, finger, cap);
-  let target = null, raf = 0, placedFor = undefined, last = "", glideT = 0, ringT = 0, capPos = "", cand = "", candN = 0, candT = 0, spec = null, goneT = 0;
+  let target = null, raf = 0, placedFor = undefined, last = "", ringT = 0, capPos = "", cand = "", candN = 0, candT = 0, spec = null, goneT = 0;
   function placeDims(x, y, w, hh) {
     const W = innerWidth, H = innerHeight;
     dims[0].style.transform = `translate3d(0,${y - H}px,0)`;
     dims[1].style.transform = `translate3d(0,${y + hh}px,0)`;
-    dims[2].style.transform = `translate3d(${x - W}px,${y}px,0) scaleY(${Math.max(0, hh)})`;
-    dims[3].style.transform = `translate3d(${x + w}px,${y}px,0) scaleY(${Math.max(0, hh)})`;
+    const sh = Math.max(0, hh) + "px";
+    dims[2].style.transform = `translate3d(${x - W}px,${y}px,0)`; dims[2].style.height = sh;
+    dims[3].style.transform = `translate3d(${x + w}px,${y}px,0)`; dims[3].style.height = sh;
   }
   function placeRing(x, y, w, hh) { ring.style.transform = `translate3d(${x}px,${y}px,0)`; ring.style.width = w + "px"; ring.style.height = hh + "px"; }
   function setCapPos(pos) { // Seite der Erklär-Box – wird nur gesetzt, während die Box ausgeblendet ist
     if (pos === capPos) return; capPos = pos;
     cap.classList.remove("attop", "atbottom", "atleft", "atright"); cap.classList.add(pos);
   }
-  function glide() { // Flächen gleiten immer sanft – auch wenn sich das Ziel nur verschiebt
-    spot.classList.add("glide"); clearTimeout(glideT); glideT = setTimeout(() => spot.classList.remove("glide"), 450);
+  // Loch gleitet per Rechnung: in jedem Bild EINE Lochposition, daraus alle vier Flächen und der Rahmen.
+  // (Eigene CSS-Übergänge je Fläche liefen bei Zielwechseln mitten im Gleiten auseinander → dunkle Balken.)
+  let cur = { x: innerWidth / 2, y: innerHeight / 2, w: 0, h: 0 }, from = null, goal = null, tw0 = 0;
+  const ease = t => 1 - Math.pow(1 - t, 3);
+  function moveTo(x, y, w, hh) {
+    if (goal && goal.x === x && goal.y === y && goal.w === w && goal.h === hh) return;
+    from = { ...cur }; goal = { x, y, w, h: hh }; tw0 = performance.now();
+  }
+  function closeHole() { moveTo(innerWidth / 2, innerHeight / 2, 0, 0); }
+  function tick(now) {
+    if (!goal) return;
+    const t = Math.min(1, (now - tw0) / 420), e = ease(t);
+    for (const k of ["x", "y", "w", "h"]) cur[k] = from[k] + (goal[k] - from[k]) * e;
+    placeDims(cur.x, cur.y, cur.w, cur.h); placeRing(cur.x, cur.y, cur.w, cur.h);
+    if (t >= 1) goal = null;
   }
   let coverN = 0, covered = false, coverFor = null;
   const own = [block, spot, finger, cap];
@@ -2182,11 +2198,11 @@ async function tutorial(g) {
     return !!top && !el.contains(top) && !top.contains(el);
   }
   placeDims(innerWidth / 2, innerHeight / 2, 0, 0); // Start: ganzer Bildschirm abgedunkelt
-  (function follow() {
+  (function follow(ts) {
     raf = requestAnimationFrame(follow);
+    tick(ts || performance.now());
     if (target === null && placedFor !== null) { // kein Ziel (z. B. Schlusssatz): Loch schließt sich sanft
-      placedFor = null; last = ""; cand = ""; ring.classList.add("hide"); glide();
-      placeDims(innerWidth / 2, innerHeight / 2, 0, 0);
+      placedFor = null; last = ""; cand = ""; ring.classList.add("hide"); closeHole();
       return;
     }
     if (!target) return;
@@ -2196,7 +2212,7 @@ async function tutorial(g) {
       else {
         if (!goneT) goneT = performance.now();
         if (performance.now() - goneT > 250 && placedFor !== "gone") { // gibt es nicht mehr → Rahmen weg, Loch schließt sich sanft
-          placedFor = "gone"; last = ""; cand = ""; ring.classList.add("hide"); glide(); placeDims(innerWidth / 2, innerHeight / 2, 0, 0);
+          placedFor = "gone"; last = ""; cand = ""; ring.classList.add("hide"); closeHole();
         }
         return;
       }
@@ -2204,7 +2220,7 @@ async function tutorial(g) {
     goneT = 0;
     if (++coverN % 8 === 0 || coverFor !== target) { covered = isCovered(target); coverFor = target; }
     if (covered) { // Ziel liegt unter einem aufgegangenen Fenster → kein Rahmen über fremdem Inhalt, Loch schließt sich
-      if (placedFor !== "covered") { placedFor = "covered"; last = ""; cand = ""; ring.classList.add("hide"); glide(); placeDims(innerWidth / 2, innerHeight / 2, 0, 0); }
+      if (placedFor !== "covered") { placedFor = "covered"; last = ""; cand = ""; ring.classList.add("hide"); closeHole(); }
       return;
     }
     const r = target.getBoundingClientRect(), p = 10;
@@ -2224,7 +2240,7 @@ async function tutorial(g) {
       const tall = r.height > innerHeight * 0.55, side = tall && r.width < innerWidth * 0.55;
       cap.dataset.want = side ? (r.left + r.width / 2 < innerWidth / 2 ? "atright" : "atleft") : (r.top + r.height / 2 > innerHeight / 2 ? "attop" : "atbottom");
     }
-    glide(); placeDims(x, y, w, hh); placeRing(x, y, w, hh);
+    moveTo(x, y, w, hh);
     last = key; placedFor = target; cand = "";
   })();
   // Schrittwechsel geordnet: Box aus → Ziel setzen → warten, bis der Ausschnitt dort ist → Box mit neuem Text an passender Seite ein
