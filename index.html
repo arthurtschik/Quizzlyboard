@@ -69,7 +69,8 @@ h1,h2,h3,h4,.btn,.pill,.badge{font-family:var(--display)}
 .gt-memory .card{display:inline-grid;place-items:center;width:.95em;height:1.2em;background:#fff;color:#7c3aed;border-radius:.16em;font-size:.8em;
   box-shadow:0 .08em 0 rgba(0,0,0,.35);animation:cflip 6s ease-in-out var(--d) infinite}
 .gt-memory .card:nth-child(3n){color:#e11d48}
-@keyframes cflip{0%,86%,100%{transform:rotateY(0)}93%{transform:rotateY(180deg);background:#a855f7;color:transparent}}
+/* nur Drehung (transform) – Farbwechsel in der Animation ließen schwache Grafikchips ständig neu zeichnen */
+@keyframes cflip{0%,85%{transform:rotateY(0)}100%{transform:rotateY(360deg)}}
 .gt-bild{gap:.06em}
 .gt-bild .tl{position:relative;display:inline-grid;place-items:center;width:.85em;height:1.1em;background:rgba(255,255,255,.12);border-radius:.12em;color:var(--pink);font-size:.85em}
 .gt-bild .tl.cov::after{content:"";position:absolute;inset:0;border-radius:.12em;background:linear-gradient(135deg,#8b5cf6,#ec4899);animation:cov 7s ease-in-out var(--d) infinite}
@@ -258,7 +259,7 @@ h1,h2,h3,h4,.btn,.pill,.badge{font-family:var(--display)}
 .lwrap{flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;gap:1.5vmin;padding:.6vmin 3vmin 1.6vmin;text-align:center;overflow:auto}
 .lwrap .q{font-family:var(--display);font-size:clamp(24px,5vmin,60px);font-weight:600;line-height:1.15;max-width:1300px}
 .bar{height:1.8vmin;width:min(900px,100%);border-radius:99px;background:rgba(255,255,255,.15);overflow:hidden;flex:none}
-.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--pink),var(--yellow),var(--green))}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--pink),var(--yellow),var(--green));transform-origin:left center;will-change:transform}
 .zones{display:grid;gap:2.4vmin;flex:1;min-height:0;width:100%;max-width:1400px;padding:1vmin}
 .zone{border-radius:3vmin;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1vmin;padding:1.6vmin;font-family:var(--display);font-weight:700;
   background:linear-gradient(160deg,var(--z1),var(--z2));box-shadow:0 1vmin 0 rgba(0,0,0,.3);min-height:0;min-width:0;position:relative;
@@ -266,10 +267,17 @@ h1,h2,h3,h4,.btn,.pill,.badge{font-family:var(--display)}
 .zone .num{font-size:clamp(46px,14vmin,160px);line-height:1;text-shadow:0 .6vmin 0 rgba(0,0,0,.25)}
 .zone .txt{font-size:clamp(20px,4.4vmin,52px);line-height:1.1}
 /* ruhiges, weiches Leuchten – kein hartes Blinken (fotosensibel-freundlich) */
-.zone.lit{transform:scale(1.04);box-shadow:0 0 0 .8vmin #fff,0 0 7vmin 1.5vmin var(--z1);filter:brightness(1.15)}
-.zones.dark .zone{filter:brightness(.3) saturate(.5)}
-.zones.dark .zone.lit{filter:brightness(1.1)}
-.zone.win{filter:brightness(1.15)!important;transform:scale(1.05);z-index:2;box-shadow:0 0 0 1.2vmin #fff,0 0 14vmin 4vmin var(--z1)}
+/* Leuchten & Abdunkeln nur über die Deckkraft fertiger Ebenen (::after = Glanz, ::before = Schatten) –
+   das kann die Grafikkarte ohne Neuzeichnen, flackert also auch auf schwachen Smartboards nicht */
+.zone::before,.zone::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;opacity:0;will-change:opacity;transition:opacity .25s ease}
+.zone::before{background:rgba(6,4,24,.72)}
+.zone::after{box-shadow:0 0 0 .8vmin #fff,0 0 7vmin 1.5vmin var(--z1),inset 0 0 0 999px rgba(255,255,255,.08)}
+.zone.lit{transform:scale(1.04)}
+.zone.lit::after{opacity:1}
+.zones.dark .zone::before{opacity:1}
+.zones.dark .zone.lit::before,.zones .zone.win::before,.zones.dark .zone.win::before{opacity:0}
+.zone.win{transform:scale(1.05);z-index:2}
+.zone.win::after{opacity:1;box-shadow:0 0 0 1.2vmin #fff,0 0 14vmin 4vmin var(--z1)}
 .zone.win .num{animation:breathe 2.4s ease-in-out infinite}
 .zone.lose{opacity:.25}
 @keyframes breathe{50%{transform:scale(1.08)}}
@@ -371,7 +379,7 @@ h1,h2,h3,h4,.btn,.pill,.badge{font-family:var(--display)}
 .btn.tbtn.picked{outline:4px solid #fff;outline-offset:3px}
 .pill.nr{background:rgba(255,255,255,.08);border:2px solid rgba(255,255,255,.3);font-size:clamp(13px,1.9vmin,19px)}
 .pill.turn{background:var(--c);color:#1a1040}
-.zone{transition:transform .25s ease,box-shadow .25s ease,filter .25s ease,opacity .5s ease}
+.zone{transition:transform .25s ease,opacity .5s ease}
 
 /* Klassen-Pillen (Themen, Duell, Spickzettel) */
 .kpills{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
@@ -579,10 +587,16 @@ h1,h2,h3,h4,.btn,.pill,.badge{font-family:var(--display)}
 
 /* ===== Tutorial: Scheinwerfer, Finger, Erklär-Box ===== */
 .tblock{position:fixed;inset:0;z-index:399}
-.tspot{position:fixed;z-index:400;pointer-events:none;border-radius:18px;box-shadow:0 0 0 200vmax rgba(6,4,24,.68);outline:4px solid var(--yellow);
-  transition:left .5s cubic-bezier(.3,.7,.3,1),top .5s cubic-bezier(.3,.7,.3,1),width .5s cubic-bezier(.3,.7,.3,1),height .5s cubic-bezier(.3,.7,.3,1),opacity .3s;animation:spotglow 2.4s ease-in-out infinite}
-.tspot.off{left:50%!important;top:50%!important;width:0!important;height:0!important;outline-color:transparent;opacity:0;animation:none}
-@keyframes spotglow{50%{outline-color:#fff3b0;box-shadow:0 0 0 200vmax rgba(6,4,24,.68),0 0 40px 6px rgba(255,210,63,.55)}}
+/* Scheinwerfer: fester Abdunkel-Schatten (wird nicht animiert → kein Flackern auf schwachen Grafikchips),
+   nur der Leuchtrahmen pulsiert über die Deckkraft. Position per transform. */
+.tspot{position:fixed;left:0;top:0;z-index:400;pointer-events:none;border-radius:18px;box-shadow:0 0 0 200vmax rgba(6,4,24,.68);
+  will-change:transform;transition:opacity .3s}
+.tspot.glide{transition:transform .45s cubic-bezier(.3,.7,.3,1),width .45s cubic-bezier(.3,.7,.3,1),height .45s cubic-bezier(.3,.7,.3,1),opacity .3s}
+.tspot::after{content:"";position:absolute;inset:-4px;border-radius:22px;border:4px solid var(--yellow);box-shadow:0 0 26px 4px rgba(255,210,63,.5);
+  will-change:opacity;animation:ringpulse 2.4s ease-in-out infinite}
+@keyframes ringpulse{50%{opacity:.45}}
+.tspot.off{opacity:0}
+@media (prefers-reduced-motion:reduce){.tspot::after{animation:none}}
 .tfinger{position:fixed;z-index:402;left:50%;top:110%;font-size:clamp(44px,7vmin,72px);line-height:1;pointer-events:none;transform:translate(-30%,-10%);opacity:0;
   transition:left .7s cubic-bezier(.3,.7,.3,1),top .7s cubic-bezier(.3,.7,.3,1),opacity .3s;filter:drop-shadow(0 4px 6px rgba(0,0,0,.5))}
 .tfinger.on{opacity:1}
@@ -1343,7 +1357,9 @@ async function playClip(id) {
    (siehe tools/voice.js), wird die Aufnahme gespielt. VOICE wird beim Bauen erzeugt. */
 function vkey(text) { let h = 0x811c9dc5; for (const ch of String(text).trim()) { h ^= ch.codePointAt(0); h = Math.imul(h, 0x01000193) >>> 0; } return h.toString(16).padStart(8, "0"); }
 let voiceAudio = null, speakToken = 0;
-function stopSpeech() { speakToken++; try { speechSynthesis.cancel(); } catch (e) {} if (voiceAudio) { try { voiceAudio.pause(); } catch (e) {} voiceAudio = null; } }
+// Während eines Tutorials gehört die Sprachausgabe allein dem Tutorial (eigener Kanal in tutorials.js):
+// Spiele dürfen sie dann weder starten noch abbrechen.
+function stopSpeech() { speakToken++; if (!TUT) { try { speechSynthesis.cancel(); } catch (e) {} } if (voiceAudio) { try { voiceAudio.pause(); } catch (e) {} voiceAudio = null; } }
 function speakOne(text, rate = 0.9) {
   return new Promise(res => {
     if (S.muted) return res();
@@ -1362,7 +1378,7 @@ function speakOne(text, rate = 0.9) {
     } else browser();
   });
 }
-async function speakSeq(list) { stopSpeech(); const my = speakToken; for (const t of list) { if (my !== speakToken) return; await speakOne(t); } }
+async function speakSeq(list) { if (TUT) return; stopSpeech(); const my = speakToken; for (const t of list) { if (my !== speakToken) return; await speakOne(t); } }
 function speak(text) { speakSeq([text]); }
 
 /* =====================================================================
@@ -2035,18 +2051,52 @@ function pointerTap(el) {
   el.dispatchEvent(new PointerEvent("pointerdown", o)); window.dispatchEvent(new PointerEvent("pointerup", o));
 }
 
+/* ---------- Eigener Sprachkanal fürs Tutorial ----------
+   Spiele, die im Tutorial simuliert werden, rufen stopSpeech() auf (z. B. beim Timer-Start oder
+   beim Schließen eines Fensters). Damit Livia dabei nicht abgeschnitten wird, nutzt das Tutorial
+   ein eigenes Audio-Element, das nur das Tutorial selbst stoppt. */
+let tutAudio = null, tutUtter = false;
+const hasVoice = text => typeof VOICE !== "undefined" && VOICE.has(vkey(text));
+function stopNarration() {
+  if (tutAudio) { try { tutAudio.pause(); } catch (e) {} tutAudio = null; }
+  if (tutUtter) { try { speechSynthesis.cancel(); } catch (e) {} tutUtter = false; }
+}
+/* Nächste Aufnahme schon vorladen (langsames Schul-WLAN) */
+const preloaded = new Map();
+function preloadNarration(text) {
+  if (!text || !hasVoice(text) || preloaded.has(text)) return;
+  const a = new Audio(); a.preload = "auto"; a.src = "voice/" + vkey(text) + ".mp3"; preloaded.set(text, a);
+}
 /* Langsam vorlesen; löst auf, wenn fertig, übersprungen oder beendet */
 function sayAsync(text) {
   return new Promise(res => {
-    let done = false; const fin = () => { if (!done) { done = true; res(); } };
-    const minT = 1800 + text.length * 55, maxT = 4500 + text.length * 110;
-    const t0 = Date.now();
-    (function poll() { if (TUT && (TUT.skip || TUT.stop)) { stopSpeech(); return fin(); } if (done) return; setTimeout(poll, 120); })();
-    if (S.muted || (!window.speechSynthesis && !(typeof VOICE !== "undefined" && VOICE.has(vkey(text))))) { setTimeout(fin, minT); return; }
-    stopSpeech();
-    // Livia-Aufnahme, falls vorhanden – sonst Browser-Stimme (langsamer)
-    speakOne(text, 0.85).then(() => setTimeout(fin, Math.max(500, 600 - (Date.now() - t0))));
-    setTimeout(fin, maxT); // Sicherheitsnetz
+    let done = false, safety = 0;
+    const fin = () => { if (!done) { done = true; clearTimeout(safety); res(); } };
+    const after = () => setTimeout(fin, 600); // kurze Pause nach jedem Satz
+    (function poll() { if (TUT && (TUT.skip || TUT.stop)) { stopNarration(); return fin(); } if (done) return; setTimeout(poll, 120); })();
+    const browserVoice = () => {
+      if (!window.speechSynthesis) { safety = setTimeout(fin, 1800 + text.length * 60); return; }
+      try {
+        speechSynthesis.cancel(); tutUtter = true;
+        const u = new SpeechSynthesisUtterance(text); u.lang = "de-DE"; u.rate = 0.85; u.volume = S.volume / 100;
+        u.onend = after; u.onerror = after; speechSynthesis.speak(u);
+        safety = setTimeout(fin, 6000 + text.length * 120); // falls „onend“ ausbleibt (bekannter Browser-Fehler)
+      } catch (e) { safety = setTimeout(fin, 1800 + text.length * 60); }
+    };
+    if (S.muted) { safety = setTimeout(fin, 1800 + text.length * 55); return; }
+    stopNarration();
+    if (!hasVoice(text)) return browserVoice();
+    // Livia-Aufnahme: Das Sicherheitsnetz startet erst, wenn die Aufnahme wirklich läuft –
+    // so schneidet ein langsames Netz den Satz nicht ab.
+    const a = preloaded.get(text) || new Audio("voice/" + vkey(text) + ".mp3");
+    preloaded.delete(text);
+    tutAudio = a; a.currentTime = 0; a.volume = Math.min(1, S.volume / 100);
+    let switched = false;
+    const fallback = () => { if (switched || done) return; switched = true; clearTimeout(safety); if (tutAudio === a) tutAudio = null; browserVoice(); };
+    a.onended = after; a.onerror = fallback;
+    a.onplaying = () => { clearTimeout(safety); safety = setTimeout(fin, ((isFinite(a.duration) ? a.duration : 20) + 3) * 1000); };
+    safety = setTimeout(fallback, 12000); // lädt nach 12 s immer noch nicht → Browser-Stimme
+    const p = a.play(); if (p && p.catch) p.catch(fallback);
   });
 }
 
@@ -2063,7 +2113,7 @@ async function tutorial(g) {
   const finger = h("div", { class: "tfinger" }, "👆");
   const txt = h("div", { class: "tctext" });
   const cnt = h("span", { class: "tccount" });
-  const pauseBtn = h("button", { class: "btn ghost small", onclick: () => { TUT.paused = !TUT.paused; pauseBtn.textContent = TUT.paused ? "▶ Weiter" : "⏸ Pause"; try { if (TUT.paused) { speechSynthesis.pause(); voiceAudio && voiceAudio.pause(); } else { speechSynthesis.resume(); voiceAudio && voiceAudio.play(); } } catch (e) {} } }, "⏸ Pause");
+  const pauseBtn = h("button", { class: "btn ghost small", onclick: () => { TUT.paused = !TUT.paused; pauseBtn.textContent = TUT.paused ? "▶ Weiter" : "⏸ Pause"; try { if (TUT.paused) { speechSynthesis.pause(); tutAudio && tutAudio.pause(); } else { speechSynthesis.resume(); tutAudio && tutAudio.play(); } } catch (e) {} } }, "⏸ Pause");
   const cap = h("div", { class: "tcap", style: `--c1:${g.c1};--c2:${g.c2}` },
     h("div", { class: "tchead" }, h("span", null, "🎬 Tutorial: " + g.t), cnt),
     txt,
@@ -2071,13 +2121,22 @@ async function tutorial(g) {
       h("button", { class: "btn ghost small", onclick: () => { TUT.skip = true; } }, "⏭ Nächster Schritt"),
       h("button", { class: "btn small", onclick: () => { TUT.stop = true; } }, "✕ Beenden")));
   document.body.append(block, spot, finger, cap);
-  let target = null, raf = 0;
+  /* Scheinwerfer: wird nur neu gesetzt, wenn sich das Ziel wirklich bewegt. Gleiten gibt es nur beim
+     Wechsel auf ein neues Element – sonst springt er ohne Übergang mit (verhindert Flackern). */
+  let target = null, raf = 0, placedFor = null, last = "", glideT = 0;
   (function follow() {
     raf = requestAnimationFrame(follow);
-    if (!target || !target.isConnected) { spot.classList.add("off"); return; }
+    if (!target || !target.isConnected) { if (!spot.classList.contains("off")) { spot.classList.add("off"); placedFor = null; } return; }
     const r = target.getBoundingClientRect(), p = 10;
+    const x = Math.round(r.left - p), y = Math.round(r.top - p), w = Math.round(r.width + 2 * p), hh = Math.round(r.height + 2 * p);
+    const key = x + "," + y + "," + w + "," + hh;
+    if (key !== last) {
+      const fresh = placedFor !== target && placedFor !== null;
+      if (fresh) { spot.classList.add("glide"); clearTimeout(glideT); glideT = setTimeout(() => spot.classList.remove("glide"), 500); }
+      spot.style.transform = `translate(${x}px,${y}px)`; spot.style.width = w + "px"; spot.style.height = hh + "px";
+      last = key; placedFor = target;
+    }
     spot.classList.remove("off");
-    Object.assign(spot.style, { left: r.left - p + "px", top: r.top - p + "px", width: r.width + 2 * p + "px", height: r.height + 2 * p + "px" });
     // Erklär-Box dorthin, wo sie das hervorgehobene Element nicht verdeckt
     const tall = r.height > innerHeight * 0.55, side = tall && r.width < innerWidth * 0.55;
     const pos = side ? (r.left + r.width / 2 < innerWidth / 2 ? "atright" : "atleft") : (r.top + r.height / 2 > innerHeight / 2 ? "attop" : "atbottom");
@@ -2093,6 +2152,7 @@ async function tutorial(g) {
   }
   TUT.moveFinger = moveFinger;
   try {
+    preloadNarration(script.steps[0].say);
     (script.start || (() => startGame(g, 1)))();
     await sleep(500);
     const steps = script.steps;
@@ -2105,6 +2165,7 @@ async function tutorial(g) {
       cnt.textContent = (i + 1) + " / " + steps.length;
       txt.textContent = st.say; txt.classList.remove("in"); void txt.offsetWidth; txt.classList.add("in");
       const speech = sayAsync(st.say);
+      preloadNarration(steps[i + 1] ? steps[i + 1].say : "Jetzt seid ihr dran! Viel Spaß beim Spielen!");
       if (st.act && el) { await sleep(700); if (!TUT.stop) { await moveFinger(el); if (!TUT.stop) await st.act(el); } finger.classList.remove("on"); }
       if (st.focus) { const f = await until(() => pick(st.focus), 3000); if (f) target = f; } // danach etwas anderes hervorheben
       await speech;
@@ -2117,7 +2178,7 @@ async function tutorial(g) {
     }
   } finally {
     cancelAnimationFrame(raf);
-    stopSpeech();
+    stopNarration(); preloaded.clear();
     [block, spot, finger, cap].forEach(e => e.remove());
     stopCountdown();
     TUT = null;
@@ -2548,7 +2609,8 @@ function lauf(g, kind) {
     function start() {
       stopSpeech();
       let left = secs; setCtrl("run"); stopBeat = startBeat(); sfx.tick();
-      fill.style.transition = `width ${secs}s linear`; requestAnimationFrame(() => fill.style.width = "0%");
+      // Balken schrumpft per transform (Grafikkarte) statt über die Breite (Neuberechnung bei jedem Bild)
+      fill.style.transition = `transform ${secs}s linear`; requestAnimationFrame(() => requestAnimationFrame(() => fill.style.transform = "scaleX(0)"));
       jump(); glow = setInterval(jump, 400);
       tm = setInterval(() => {
         left--; tnum.textContent = "⏱ " + Math.max(left, 0) + " s";
