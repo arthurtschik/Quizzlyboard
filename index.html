@@ -1453,19 +1453,41 @@ function bigReveal(holder, text, extraClass) {
   const r = el.getBoundingClientRect();
   if (!r.width) return el;
   const clone = el.cloneNode(true); clone.classList.add("flyclone");
-  clone.style.cssText = `position:fixed;left:${r.left}px;top:${r.top}px;width:${r.width}px;height:${r.height}px;margin:0;z-index:300;box-sizing:border-box`;
+  clone.style.cssText = `position:fixed;left:${r.left}px;top:${r.top}px;width:${r.width}px;height:${r.height}px;margin:0;z-index:300;box-sizing:border-box;pointer-events:none`;
   el.style.visibility = "hidden";
   const dx = innerWidth / 2 - (r.left + r.width / 2), dy = innerHeight / 2 - (r.top + r.height / 2);
   const sc = Math.max(1, Math.min(2.2, innerWidth * 0.8 / r.width, innerHeight * 0.4 / r.height));
   const dim = h("div", { class: "dim flyclone" });
   document.body.append(dim, clone);
   const T = 2600;
-  clone.animate([
+  // Phase 1: groß in die Mitte und stehen bleiben
+  const a1 = clone.animate([
     { transform: `translate(${dx}px,${dy}px) scale(.2)`, opacity: 0 },
-    { transform: `translate(${dx}px,${dy}px) scale(${sc})`, opacity: 1, offset: 0.22 },
-    { transform: `translate(${dx}px,${dy}px) scale(${sc})`, opacity: 1, offset: 0.68 },
-    { transform: "none", opacity: 1 }], { duration: T, easing: "cubic-bezier(.3,.7,.3,1)" })
-    .onfinish = () => { clone.remove(); el.style.visibility = ""; };
+    { transform: `translate(${dx}px,${dy}px) scale(${sc})`, opacity: 1, offset: 0.32 },
+    { transform: `translate(${dx}px,${dy}px) scale(${sc})`, opacity: 1 }], { duration: T * 0.68, easing: "cubic-bezier(.3,.7,.3,1)", fill: "forwards" });
+  a1.onfinish = () => {
+      // Phase 2: Zielplatz NEU messen – die Seite hat sich inzwischen oft verschoben (neue Knöpfe, Texte)
+      if (!el.isConnected) { clone.remove(); return; }
+      const q = el.getBoundingClientRect();
+      if (!q.width) { clone.remove(); el.style.visibility = ""; return; }
+      const cx = r.left + r.width / 2 + dx, cy = r.top + r.height / 2 + dy; // aktuelle Mitte des Klons
+      const k = (r.width * sc) / q.width; // gleiche sichtbare Größe beim Umsetzen
+      clone.style.left = q.left + "px"; clone.style.top = q.top + "px"; clone.style.width = q.width + "px"; clone.style.height = q.height + "px";
+      const dx2 = cx - (q.left + q.width / 2), dy2 = cy - (q.top + q.height / 2);
+      a1.cancel();
+      // Landeanflug zielt in jedem Bild neu auf den Kasten – auch wenn die Seite scrollt oder sich noch verschiebt
+      const t0 = performance.now(), D = T * 0.32, ease = t => 1 - Math.pow(1 - t, 3);
+      const set = (tx, ty, s) => clone.style.transform = `translate(${tx}px,${ty}px) scale(${s})`;
+      set(dx2, dy2, k);
+      (function land(now) {
+        if (!clone.isConnected) return;
+        const t = Math.min(1, (now - t0) / D), e = ease(t);
+        const c = el.isConnected ? el.getBoundingClientRect() : q;
+        const ox = c.left - q.left, oy = c.top - q.top; // wie weit der Kasten seit dem Messen gewandert ist
+        set(dx2 + (ox - dx2) * e, dy2 + (oy - dy2) * e, k + (c.width / q.width - k) * e);
+        if (t < 1) requestAnimationFrame(land); else { clone.remove(); el.style.visibility = ""; }
+      })(t0);
+    };
   dim.animate([{ opacity: 0 }, { opacity: 1, offset: 0.2 }, { opacity: 1, offset: 0.65 }, { opacity: 0 }], { duration: T }).onfinish = () => dim.remove();
   return el;
 }
@@ -2130,7 +2152,7 @@ async function tutorial(g) {
       h("button", { class: "btn ghost small", onclick: () => { TUT.skip = true; } }, "⏭ Nächster Schritt"),
       h("button", { class: "btn small", onclick: () => { TUT.stop = true; } }, "✕ Beenden")));
   document.body.append(block, spot, finger, cap);
-  let target = null, raf = 0, placedFor = undefined, last = "", glideT = 0, ringT = 0, capPos = "", cand = "", candN = 0;
+  let target = null, raf = 0, placedFor = undefined, last = "", glideT = 0, ringT = 0, capPos = "", cand = "", candN = 0, candT = 0, spec = null, goneT = 0;
   function placeDims(x, y, w, hh) {
     const W = innerWidth, H = innerHeight;
     dims[0].style.transform = `translate3d(0,${y - H}px,0)`;
@@ -2150,6 +2172,12 @@ async function tutorial(g) {
   const own = [block, spot, finger, cap];
   function isCovered(el) { // liegt in der Mitte des Ziels etwas anderes obenauf (Tutorial-Ebenen ausgenommen)?
     const r = el.getBoundingClientRect(); if (!r.width) return false;
+    // große fliegende Lösung (nicht anklickbar, daher eigens prüfen): solange sie das Ziel überdeckt, kein Rahmen
+    for (const f of document.querySelectorAll(".flyclone:not(.dim)")) {
+      const q = f.getBoundingClientRect();
+      if (q.right > r.left && q.left < r.right && q.bottom > r.top && q.top < r.bottom) return true;
+    }
+    if (document.querySelector(".dim.flyclone")) return true; // Bildschirm ist für die Lösung abgedunkelt
     const top = document.elementsFromPoint(r.left + r.width / 2, r.top + r.height / 2).find(e => !own.some(o => o.contains(e)));
     return !!top && !el.contains(top) && !top.contains(el);
   }
@@ -2161,7 +2189,19 @@ async function tutorial(g) {
       placeDims(innerWidth / 2, innerHeight / 2, 0, 0);
       return;
     }
-    if (!target || !target.isConnected) return; // Ziel kurz weg (Ansicht wird neu aufgebaut) → alles bleibt einfach stehen
+    if (!target) return;
+    if (!target.isConnected) { // Spiel hat neu aufgebaut: dasselbe gemeinte Feld neu suchen
+      const again = spec ? pick(spec) : null;
+      if (again && again.isConnected) { if (placedFor === target) placedFor = again; target = again; }
+      else {
+        if (!goneT) goneT = performance.now();
+        if (performance.now() - goneT > 250 && placedFor !== "gone") { // gibt es nicht mehr → Rahmen weg, Loch schließt sich sanft
+          placedFor = "gone"; last = ""; cand = ""; ring.classList.add("hide"); glide(); placeDims(innerWidth / 2, innerHeight / 2, 0, 0);
+        }
+        return;
+      }
+    }
+    goneT = 0;
     if (++coverN % 8 === 0 || coverFor !== target) { covered = isCovered(target); coverFor = target; }
     if (covered) { // Ziel liegt unter einem aufgegangenen Fenster → kein Rahmen über fremdem Inhalt, Loch schließt sich
       if (placedFor !== "covered") { placedFor = "covered"; last = ""; cand = ""; ring.classList.add("hide"); glide(); placeDims(innerWidth / 2, innerHeight / 2, 0, 0); }
@@ -2172,9 +2212,11 @@ async function tutorial(g) {
     const x = Math.round(r.left - p), y = Math.round(r.top - p), w = Math.round(r.width + 2 * p), hh = Math.round(r.height + 2 * p);
     const key = x + "," + y + "," + w + "," + hh;
     if (key === last && placedFor === target) { cand = ""; return; }
-    // erst bewegen, wenn das Ziel ruhig steht (Aufpopp-Animationen, Neuaufbau) – sonst springt alles hin und her
-    if (key !== cand) { cand = key; candN = 0; return; }
-    if (++candN < 6) return;
+    // erst bewegen, wenn das Ziel ruhig steht (Aufpopp-Animationen) – aber höchstens eine Viertelsekunde warten
+    const now = performance.now();
+    if (!cand) candT = now;
+    if (key !== cand) { cand = key; candN = 0; }
+    if (++candN < 6 && now - candT < 250) return;
     const isNew = placedFor !== target;
     if (isNew) { // neues Ziel: Rahmen blendet aus und erst am Ziel wieder ein
       ring.classList.add("hide"); clearTimeout(ringT);
@@ -2186,10 +2228,10 @@ async function tutorial(g) {
     last = key; placedFor = target; cand = "";
   })();
   // Schrittwechsel geordnet: Box aus → Ziel setzen → warten, bis der Ausschnitt dort ist → Box mit neuem Text an passender Seite ein
-  async function showStep(newTarget, text, count) {
+  async function showStep(newTarget, text, count, sel) {
     cap.classList.add("fade"); await sleep(190);
-    target = newTarget;
-    if (newTarget) { const t0 = Date.now(); while (placedFor !== newTarget && Date.now() - t0 < 900 && !TUT.stop) await sleep(40); }
+    target = newTarget; spec = sel || null; goneT = 0;
+    if (newTarget) { const t0 = Date.now(); while (placedFor !== target && Date.now() - t0 < 900 && !TUT.stop) await sleep(40); }
     else await sleep(250);
     setCapPos(newTarget && cap.dataset.want ? cap.dataset.want : "atbottom");
     if (text != null) { txt.textContent = text; if (count != null) cnt.textContent = count; }
@@ -2204,6 +2246,7 @@ async function tutorial(g) {
     await sleep(250);
   }
   TUT.moveFinger = moveFinger;
+  TUT.debug = () => ({ target, placedFor, covered, spec, fresh: spec ? pick(spec) : null }); // für automatische Tests
   try {
     preloadNarration(script.steps[0].say);
     (script.start || (() => startGame(g, 1)))();
@@ -2214,12 +2257,12 @@ async function tutorial(g) {
       const el = st.el ? await until(() => pick(st.el)) : null;
       if (TUT.stop) break;
       if (st.el && !el) console.warn("Tutorial: Element fehlt", g.id, "Schritt", i + 1);
-      await showStep(el, st.say, (i + 1) + " / " + steps.length);
+      await showStep(el, st.say, (i + 1) + " / " + steps.length, st.el);
       if (TUT.stop) break;
       const speech = sayAsync(st.say);
       preloadNarration(steps[i + 1] ? steps[i + 1].say : "Jetzt seid ihr dran! Viel Spaß beim Spielen!");
       if (st.act && el) { await sleep(700); if (!TUT.stop) { await moveFinger(el); if (!TUT.stop) await st.act(el); } finger.classList.remove("on"); }
-      if (st.focus) { const f = await until(() => pick(st.focus), 3000); if (f && f !== target) await showStep(f); } // danach etwas anderes hervorheben
+      if (st.focus) { const f = await until(() => pick(st.focus), 3000); if (f && f !== target) await showStep(f, null, null, st.focus); } // danach etwas anderes hervorheben
       await speech;
       if (st.wait && !TUT.skip) await sleep(st.wait);
       while (TUT.paused && !TUT.stop) await sleep(200);
