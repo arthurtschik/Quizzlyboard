@@ -395,13 +395,7 @@ h1,h2,h3,h4,.btn,.pill,.badge{font-family:var(--display)}
 .tcheck input{width:22px;height:22px;accent-color:var(--green)}
 
 /* Duell-Modus Banner + Einstellungen */
-.duelbanner{display:flex;align-items:center;gap:16px;width:100%;max-width:1400px;margin:6px auto 0;padding:12px 18px;border-radius:20px;text-align:left;
   background:linear-gradient(110deg,#f59e0b,#ec4899 45%,#7c3aed);box-shadow:0 6px 0 rgba(0,0,0,.25),0 0 30px rgba(236,72,153,.35)}
-.duelbanner .dbico{font-size:clamp(34px,5vmin,52px)}
-.duelbanner .dbtxt{flex:1;display:flex;flex-direction:column}
-.duelbanner b{font-family:var(--display);font-size:clamp(20px,3vmin,30px)}
-.duelbanner small{opacity:.92;font-size:clamp(12px,1.7vmin,16px)}
-.duelbanner .dbgo{font-family:var(--display);font-weight:700;background:#fff;color:#7c3aed;padding:8px 18px;border-radius:99px;font-size:clamp(16px,2.3vmin,22px)}
 .duelset{justify-content:center;gap:2.4vmin}
 .modes{display:flex;gap:14px;flex-wrap:wrap;justify-content:center}
 .mode{display:flex;flex-direction:column;gap:4px;padding:16px 22px;border-radius:18px;background:rgba(255,255,255,.1);border:3px solid transparent;min-width:240px}
@@ -645,6 +639,46 @@ h1,h2,h3,h4,.btn,.pill,.badge{font-family:var(--display)}
 .row.left{justify-content:flex-start}
 .legalfoot{text-align:center;margin:26px 0 6px;font-size:14px;opacity:.75}
 .legalfoot button{text-decoration:underline;font-size:14px}
+
+/* ===== Startseite: kleine Modus-Knöpfe oben links, kleine Gruppen unten nebeneinander ===== */
+.topmode{white-space:nowrap}
+.topmode.duel{background:linear-gradient(135deg,#a855f7,#ec4899)}
+.topmode.split{background:linear-gradient(135deg,#06b6d4,#3b82f6)}
+@media (max-width:700px){.topmode{font-size:12px;padding:6px 10px}}
+/* gleiches Spaltenraster wie oben, damit alle Karten gleich breit sind; Überschriften gleich hoch, Karten auf einer Linie */
+.secrow{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:0 14px;max-width:1400px;margin:0 auto}
+.secrow{align-items:stretch}
+.secgrp{min-width:0;display:flex;flex-direction:column;align-self:stretch}
+.secgrp .sec{margin-left:0;margin-right:0;align-content:flex-end}
+.secgrp .games{margin:0;width:100%}
+
+/* ===== Teams einteilen ===== */
+.gt-teamsplit{gap:.02em}
+.gt-teamsplit .l{--r:0deg;display:inline-block;animation:bob 1.8s ease-in-out var(--d) infinite;text-shadow:0 .06em 0 rgba(0,0,0,.4)}
+.gt-teamsplit .ppl{margin-right:.25em}
+.splitteams{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.splitchip{background:var(--c);color:#141033;font-weight:800;padding:6px 16px;border-radius:99px;font-size:clamp(15px,2.2vmin,22px)}
+.splitn{width:3.2em;font-family:var(--display);font-size:clamp(28px,5vmin,46px);font-weight:700;text-align:center;border:3px solid rgba(255,255,255,.35);
+  border-radius:16px;background:rgba(255,255,255,.1);color:#fff;padding:2px 4px}
+.splitpad{flex:1;min-height:150px;width:min(1000px,94vw);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.6vmin;
+  border-radius:4vmin;border:5px dashed rgba(255,255,255,.35);background:rgba(255,255,255,.06);color:#fff;font-family:var(--display);font-weight:700;
+  cursor:pointer;transition:background-color .3s ease,border-color .3s ease,color .2s ease;-webkit-tap-highlight-color:transparent}
+.splitpad .padtxt{font-size:clamp(36px,10vmin,120px);line-height:1.05;text-align:center}
+.splitpad .padico{--r:0deg;font-size:clamp(48px,12vmin,140px);line-height:1;animation:bob 1.6s ease-in-out infinite}
+.splitpad .padsmall{font-size:clamp(18px,3.4vmin,36px);opacity:.85}
+.splitpad.roll{border-style:solid;border-color:var(--c);color:var(--c);cursor:default}
+.splitpad.got{border:5px solid #fff;background:var(--c);color:#141033;cursor:default;animation:splitpop .5s cubic-bezier(.3,1.6,.5,1)}
+.splitpad.end{border-style:solid;border-color:var(--yellow);cursor:default}
+@keyframes splitpop{0%{transform:scale(.85)}100%{transform:scale(1)}}
+.splittally{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;width:100%}
+.splitcol{display:flex;flex-direction:column;align-items:center;gap:6px;min-width:130px;padding:8px 14px;border-radius:14px;background:rgba(255,255,255,.07);border-top:6px solid var(--c)}
+.splitcol b{font-size:clamp(14px,2vmin,20px)}
+.splitcol>span{font-family:var(--display);font-weight:700;font-size:clamp(20px,3vmin,30px);color:var(--c)}
+.splitcol .dots{display:flex;flex-wrap:wrap;gap:4px;justify-content:center;max-width:190px;min-height:12px}
+.splitcol .dots i{width:12px;height:12px;border-radius:50%;background:var(--c)}
+/* Hauptraster als Flex: eine unvollständige letzte Reihe steht mittig statt links verloren */
+.games.fitflex{display:flex;flex-wrap:wrap;justify-content:center}
+.games.fitflex>.game{flex:0 0 var(--cw)}
 
 </style>
 </head>
@@ -1528,6 +1562,7 @@ function gameTitle(id) {
     case "maske": return T(id, h("span", { class: "mk" }, "🎭"), letters("DIE MASKE", "l", (c, i) => ({ style: `--d:${i * 0.18}s` })));
     case "hoehe": return T(id, h("span", { class: "hup" }, "⬆ HÖHER"), h("span", { class: "sm" }, "oder"), h("span", { class: "hdn" }, "TIEFER ⬇"));
     case "mauer": return T(id, letters("DIE MAUER", "brick"));
+    case "teamsplit": return T(id, h("span", { class: "ppl" }, "👥"), letters("TEAMS EINTEILEN", "l", (c, i) => ({ style: `color:${COLORS[i % 8]};--d:${(i * 0.17) % 1.4}s` })));
     case "duelmode": return T(id, h("span", { class: "slot7" }, "🎰"), letters("DUELL-MODUS", "reel", (c, i) => ({ style: `--d:${i * 0.12}s` })));
   }
   return T("plain", id);
@@ -1548,7 +1583,9 @@ function show(node, gameId, grade) {
 function renderTop(gameId, grade) {
   // Dreispaltig (links | Titel | rechts), damit der Titel immer genau in der Mitte steht
   const t = $("#top"); t.replaceChildren();
-  const left = h("div", { class: "tside" }, gameId ? h("button", { class: "btn small", onclick: () => home() }, "🏠 Start") : null);
+  const left = h("div", { class: "tside" }, gameId ? h("button", { class: "btn small", onclick: () => home() }, "🏠 Start")
+    : [h("button", { class: "btn small topmode duel", title: "Duell-Modus: Das Glücksrad wählt die Spiele", onclick: () => { ac(); duelSetup(); } }, "🎰 Duell-Modus"),
+       h("button", { class: "btn small topmode split", title: "Kinder zufällig auf die Teams verteilen", onclick: () => { ac(); teamSplit(); } }, "👥 Teams einteilen")]);
   const right = h("div", { class: "tside right" });
   if (grade) right.append(h("span", { class: "badge" }, (DUEL ? `🎰 ${DUEL.i + 1}/${DUEL.list.length} · ` : "") + grade + ". Klasse"));
   right.append(h("button", { class: "btn round ghost", title: "Ton an/aus", onclick: e => { S.muted = !S.muted; saveS(); e.currentTarget.textContent = S.muted ? "🔇" : "🔊"; if (!S.muted) sfx.tick(); else stopClip(); } }, S.muted ? "🔇" : "🔊"));
@@ -1666,14 +1703,8 @@ function home() {
   const logo = h("div", { class: "logo" }, h("div", { class: "word", "aria-label": "Quizzlyboard" },
     [...LOGO].map((c, i) => h("span", { class: "lt" + (window.__introRunning ? " hidden" : ""), style: `color:${LOGO_COLORS[i % LOGO_COLORS.length]}` }, c))),
     h("div", { class: "sub" }, "Such dir ein Spiel aus und wähle die Klassenstufe!"));
-  const wrap = h("div", { class: "home" }, logo,
-    h("button", { class: "duelbanner", onclick: () => { ac(); duelSetup(); } },
-      h("span", { class: "dbico" }, "🎰"), h("span", { class: "dbtxt" }, h("b", null, "Duell-Modus"), h("small", null, "Das Glücksrad wählt die Spiele – Team gegen Team über mehrere Runden.")), h("span", { class: "dbgo" }, "Los ▶")));
-  CATS.forEach(([id, title, sub]) => {
-    const list = GAMES.filter(g => g.cat === id);
-    if (!list.length) return;
-    wrap.append(h("div", { class: "sec" }, title, h("small", null, sub)));
-    wrap.append(h("div", { class: "games" }, list.map(g => {
+  const wrap = h("div", { class: "home" }, logo);
+  const cards = list => h("div", { class: "games" }, list.map(g => {
       const card = h("div", { class: "game", style: `--c1:${g.c1};--c2:${g.c2}` },
         h("div", { class: "cbtns" },
           g.topics ? h("button", { class: "qbtn", title: "Themen auswählen", "aria-label": "Themen auswählen", onclick: e => { e.stopPropagation(); topicsDialog(g); } }, "🏷️") : null,
@@ -1682,10 +1713,41 @@ function home() {
         h("div", { class: "klassen" }, h("small", null, "Kl."), [1, 2, 3, 4].map(k => h("button", { onclick: () => startGame(g, k) }, String(k)))),
         h("button", { class: "tutbtn", onclick: () => tutorial(g) }, "🎬 Tutorial"));
       return card;
-    })));
-  });
+    }));
+  const head = ([, title, sub]) => h("div", { class: "sec" }, title, h("small", null, sub));
+  // volle Reihen oben: erst die große Gruppe „Direkt am Smartboard“, die kleinen Gruppen nebeneinander ganz unten
+  const big = CATS.find(c => c[0] === "board"), small = CATS.filter(c => c[0] !== "board");
+  const boardList = GAMES.filter(g => g.cat === "board"), boardGrid = cards(boardList);
+  wrap.append(head(big), boardGrid);
+  const secrow = h("div", { class: "secrow" });
+  wrap.append(secrow);
+  secrow.append(...small.map(c => {
+    const list = GAMES.filter(g => g.cat === c[0]);
+    if (!list.length) return null;
+    const grid = cards(list); grid.style.gridTemplateColumns = `repeat(${list.length},minmax(0,1fr))`;
+    return h("div", { class: "secgrp", style: `grid-column:span ${list.length}` }, head(c), grid);
+  }).filter(Boolean));
   wrap.append(legalFooter());
   show(wrap, "", 0);
+  // Spaltenzahl so wählen, dass die letzte Reihe möglichst voll ist (keine einzelne Karte allein)
+  function fitCols() {
+    const avail = Math.min(1400, boardGrid.clientWidth || wrap.clientWidth), max = Math.max(1, Math.floor((avail + 14) / 224));
+    const n = boardList.length, empty = c => (c - n % c) % c;
+    let best = max; // unter den drei breitesten Rastern das mit den wenigsten Lücken in der letzten Reihe
+    for (let c = max - 1; c >= Math.max(3, max - 2); c--) if (empty(c) < empty(best)) best = c;
+    boardGrid.classList.add("fitflex");
+    boardGrid.style.setProperty("--cw", `calc((100% - ${best - 1} * 14px) / ${best})`);
+    secrow.style.gridTemplateColumns = `repeat(${best},minmax(0,1fr))`;
+    // Überschriften der unteren Gruppen gleich hoch → Karten starten auf einer Linie
+    const heads = [...secrow.querySelectorAll(".secgrp > .sec")];
+    heads.forEach(e => e.style.minHeight = "");
+    const tops = new Set(heads.map(e => Math.round(e.getBoundingClientRect().top)));
+    if (tops.size === 1) { const m = Math.max(...heads.map(e => e.offsetHeight)); heads.forEach(e => e.style.minHeight = m + "px"); }
+  }
+  fitCols(); requestAnimationFrame(fitCols);
+  try { document.fonts.ready.then(() => wrap.isConnected && fitCols()); } catch (e) {} // Schrift geladen → Höhen neu messen
+  addEventListener("resize", fitCols);
+  cleanup = () => removeEventListener("resize", fitCols);
 }
 
 /* ---------- Regelkarte: dreht sich um und kommt nach vorne ---------- */
@@ -1791,6 +1853,93 @@ function duelSetup() {
       h("button", { class: "btn green big", disabled: mode === "pick" && !pick.size, onclick: start }, "🎰 Duell starten"));
   }
   show(view, "duelmode", 0); draw();
+}
+/* =====================================================================
+   Teams einteilen: Anzahl Kinder eingeben, jedes Kind tippt einmal auf die Tafel
+   und bekommt zufällig ein Team. Die Teams werden so gleich groß wie möglich.
+   ===================================================================== */
+const rndFair = n => { try { const a = new Uint32Array(1); crypto.getRandomValues(a); return a[0] % n; } catch (e) { return rnd(n); } };
+function teamSplit() {
+  let n = store.get("qb_split_n", 20);
+  const view = h("div", { class: "lwrap splitset" });
+  function setup() {
+    const T = teams.length;
+    const inp = h("input", { type: "number", min: String(T), max: "60", value: String(n), class: "splitn", inputmode: "numeric",
+      onchange: () => { n = Math.max(T, Math.min(60, parseInt(inp.value, 10) || T)); inp.value = n; } });
+    const step = d => { n = Math.max(T, Math.min(60, (parseInt(inp.value, 10) || n) + d)); inp.value = n; };
+    view.replaceChildren(
+      h("div", { class: "hintline" }, "Diese Teams werden aufgefüllt:"),
+      h("div", { class: "splitteams" }, teams.map((t, i) => h("span", { class: "splitchip", style: "--c:" + COLORS[i] }, t.name))),
+      h("button", { class: "btn ghost small", onclick: () => settingsMenu(() => setup()) }, "⚙️ Teams ändern"),
+      h("div", { class: "stepper" }, h("span", null, "Wie viele Kinder?"),
+        h("button", { class: "btn ghost round", onclick: () => step(-1) }, "−"), inp,
+        h("button", { class: "btn ghost round", onclick: () => step(1) }, "+")),
+      h("div", { class: "hintline" }, "Jedes Kind kommt nach vorne und tippt einmal auf die Tafel. Die Teams werden gleich groß."),
+      h("button", { class: "btn green big", onclick: () => { n = Math.max(teams.length, Math.min(60, parseInt(inp.value, 10) || n)); store.set("qb_split_n", n); play(); } }, "▶ Los geht’s"));
+  }
+  function play() {
+    const T = teams.length, names = teams.map(t => t.name);
+    // gerechter Beutel: jedes Team gleich oft, die Reste gehen an zufällige Teams
+    const extra = new Set(); while (extra.size < n % T) extra.add(rndFair(T));
+    let bag = [];
+    for (let i = 0; i < T; i++) for (let j = 0; j < Math.floor(n / T) + (extra.has(i) ? 1 : 0); j++) bag.push(i);
+    for (let i = bag.length - 1; i > 0; i--) { const j = rndFair(i + 1); [bag[i], bag[j]] = [bag[j], bag[i]]; }
+    const done = [], timers = [];
+    let busy = false;
+    cleanup = () => timers.forEach(clearTimeout);
+    const count = h("span", { class: "pill" });
+    const pad = h("button", { class: "splitpad", onclick: () => tap() });
+    const tally = h("div", { class: "splittally" });
+    const undo = h("button", { class: "btn ghost small", onclick: () => { if (busy || !done.length) return; bag.unshift(done.pop()); sfx.soft(330); idle(); paint(); } }, "↶ Rückgängig");
+    function paint() {
+      count.textContent = done.length < n ? `Kind ${done.length + 1} von ${n}` : `Alle ${n} Kinder eingeteilt`;
+      undo.disabled = !done.length;
+      tally.replaceChildren(...names.map((nm, i) => {
+        const k = done.filter(x => x === i).length;
+        return h("div", { class: "splitcol", style: "--c:" + COLORS[i] }, h("b", null, nm), h("div", { class: "dots" }, Array.from({ length: k }, () => h("i"))), h("span", null, String(k)));
+      }));
+    }
+    function idle() { pad.className = "splitpad"; pad.style.removeProperty("--c"); pad.replaceChildren(h("span", { class: "padico" }, "👆"), h("span", { class: "padtxt" }, "Tippe hier!")); }
+    function tap() {
+      if (busy) return;
+      if (!bag.length) return;
+      busy = true; ac();
+      const team = bag.shift();
+      pad.className = "splitpad roll";
+      // kurzer Wirbel durch die Teams (ruhiges Tempo, kein Flackern), dann das Ergebnis
+      let k = rndFair(T), t = 0, gap = 160;
+      const spin = () => {
+        pad.style.setProperty("--c", COLORS[k % T]); pad.replaceChildren(h("span", { class: "padtxt" }, names[k % T])); sfx.tick();
+        k++; t += gap; gap *= 1.12;
+        if (t < 1500) timers.push(setTimeout(spin, gap));
+        else timers.push(setTimeout(land, gap));
+      };
+      const land = () => {
+        done.push(team);
+        pad.className = "splitpad got"; pad.style.setProperty("--c", COLORS[team]);
+        pad.replaceChildren(h("span", { class: "padsmall" }, "Du bist in"), h("span", { class: "padtxt" }, names[team]));
+        sfx.tada(); confetti(18); paint();
+        timers.push(setTimeout(() => {
+          busy = false;
+          if (bag.length) idle();
+          else finish();
+        }, 2200));
+      };
+      spin();
+    }
+    function finish() {
+      sfx.fan(); confetti();
+      pad.className = "splitpad end"; pad.style.removeProperty("--c");
+      pad.replaceChildren(h("span", { class: "padico" }, "🎉"), h("span", { class: "padtxt" }, "Alle eingeteilt!"));
+      ctrl.replaceChildren(
+        h("button", { class: "btn ghost", onclick: () => setup() }, "🔄 Nochmal einteilen"),
+        h("button", { class: "btn green", onclick: () => home() }, "🏠 Zur Startseite"));
+    }
+    const ctrl = h("div", { class: "row" }, undo, h("button", { class: "btn ghost small", onclick: () => { timers.forEach(clearTimeout); setup(); } }, "✕ Abbrechen"));
+    view.replaceChildren(h("div", { class: "vinfo" }, count), pad, tally, ctrl);
+    idle(); paint();
+  }
+  show(view, "teamsplit", 0); $("#score").style.display = "none"; setup(); // Punkteleiste gehört nicht hierher
 }
 function duelWheel() {
   const elig = GAMES.filter(g => g.duel), N = elig.length, step = 360 / N;
