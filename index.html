@@ -679,6 +679,11 @@ h1,h2,h3,h4,.btn,.pill,.badge{font-family:var(--display)}
 .games.fitflex{display:flex;flex-wrap:wrap;justify-content:center}
 .games.fitflex>.game{flex:0 0 var(--cw)}
 
+/* Wortsalat: aufgedeckt ≠ geschafft */
+.slot.shown{border:0;background:linear-gradient(180deg,#cbd5e1,#94a3b8);color:#1e293b;animation:pop .3s}
+.reveal.lost{background:linear-gradient(180deg,#e2e8f0,#94a3b8);color:#1e293b;box-shadow:0 .08em 0 #475569,0 0 1em rgba(148,163,184,.5)}
+.relay.timeout{color:#fff;background:#dc2626;border-radius:14px;padding:.2em .7em;font-size:clamp(22px,4vmin,44px);animation:pop .35s}
+
 </style>
 </head>
 <body>
@@ -3646,7 +3651,7 @@ function wortsalat(g) {
     if (idx > 0) nextTeam();
     markUsed(pool[idx]);
     const [word, pic, nr] = pool[idx], L = [...word];
-    const T = Math.max(20, L.length * 4); // Sekunden für dieses Wort
+    const T = Math.max(30, L.length * 8); // Sekunden für dieses Wort (Staffel: jedes Kind muss erst zur Tafel)
     const A = active, B = teams.length > 1 ? (active + 1) % teams.length : active;
     let mix = shuffle(L); while (mix.join("") === word && L.length > 1) mix = shuffle(L);
     let pos = 0, phase = "ready", left = T, endAt = 0;
@@ -3679,9 +3684,22 @@ function wortsalat(g) {
     const nextBtn = () => h("button", { class: "btn green", onclick: next }, idx + 1 >= pool.length ? "🏁 Fertig" : "➡ Nächstes Wort");
     function start() {
       phase = "run"; tiles.forEach(t => t.disabled = false); endAt = Date.now() + T * 1000; tick(); timer = setInterval(tick, 200); sfx.tick();
-      ctrl.replaceChildren(h("button", { class: "btn ghost", onclick: giveUp }, "💡 Auflösen"));
+      ctrl.replaceChildren(confirmBtn("💡 Auflösen", giveUp));
     }
-    function fill() { slots.forEach((s, i) => { s.textContent = L[i]; s.classList.add("filled"); }); tiles.forEach(t => t.classList.add("used")); }
+    // „Auflösen“ nur mit zweitem Tipp – eine versehentliche Berührung am Board löst nichts aus
+    function confirmBtn(label, fn) {
+      let armed = 0;
+      const b = h("button", { class: "btn ghost", onclick: () => {
+        if (Date.now() - shownAt < 600) return; // Geistertipp direkt nach dem Erscheinen
+        if (Date.now() - armed < 4000) { fn(); return; }
+        armed = Date.now(); b.textContent = "❓ Wirklich auflösen?"; b.classList.add("pink");
+        setTimeout(() => { if (b.isConnected) { b.textContent = label; b.classList.remove("pink"); } }, 4000);
+      } }, label);
+      const shownAt = Date.now();
+      return b;
+    }
+    // fehlende Buchstaben GRAU zeigen (nicht grün wie beim Selbst-Lösen)
+    function fill() { slots.forEach((s, i) => { if (!s.classList.contains("filled")) { s.textContent = L[i]; s.classList.add("shown"); } }); tiles.forEach(t => t.classList.add("used")); }
     function done() {
       phase = "done"; clearInterval(timer); const p = pts();
       addScore(A, p); bigReveal(ansBox, word); confetti(15);
@@ -3691,15 +3709,17 @@ function wortsalat(g) {
     function timeUp() {
       if (phase !== "run") return; phase = "steal"; clearInterval(timer); sfx.buzz();
       clock.textContent = "⏰ Zeit vorbei!";
-      if (B === A) { giveUp(); return; }
-      relay.textContent = "🦹 Klau-Chance: " + teams[B].name + " darf das Wort laut sagen!";
+      relay.classList.add("timeout"); tiles.forEach(t => t.disabled = true); // Buchstaben sichtbar gesperrt
+      // Wort NICHT automatisch aufdecken – sonst sieht es aus, als wäre es gelöst
+      if (B === A) { relay.textContent = "⏰ Zeit abgelaufen! Kein Punkt."; ctrl.replaceChildren(h("button", { class: "btn gold", onclick: giveUp }, "💡 Lösung zeigen")); return; }
+      relay.textContent = "⏰ Zeit abgelaufen! 🦹 Klau-Chance: " + teams[B].name + " darf das Wort laut sagen!";
       ctrl.replaceChildren(
-        h("button", { class: "btn tbtn big", style: "--c:" + COLORS[B], onclick: () => { addScore(B, 1); sfx.ok(); fill(); bigReveal(ansBox, word); relay.textContent = "Geklaut! +1 für " + teams[B].name; ctrl.replaceChildren(nextBtn()); } }, "✓ Geklaut (+1)"),
-        h("button", { class: "btn ghost", onclick: () => { sfx.bad(); fill(); bigReveal(ansBox, word); relay.textContent = "Niemand bekommt einen Punkt."; ctrl.replaceChildren(nextBtn()); } }, "✗ Nicht geklaut"));
+        h("button", { class: "btn tbtn big", style: "--c:" + COLORS[B], onclick: () => { addScore(B, 1); sfx.ok(); fill(); bigReveal(ansBox, word, "lost"); relay.classList.remove("timeout"); relay.textContent = "Geklaut! +1 für " + teams[B].name; ctrl.replaceChildren(nextBtn()); } }, "✓ Geklaut (+1)"),
+        h("button", { class: "btn ghost", onclick: () => { sfx.bad(); fill(); bigReveal(ansBox, word, "lost"); relay.classList.remove("timeout"); relay.textContent = "Niemand bekommt einen Punkt."; ctrl.replaceChildren(nextBtn()); } }, "✗ Nicht geklaut"));
     }
     function giveUp() {
-      phase = "done"; clearInterval(timer); fill(); bigReveal(ansBox, word);
-      relay.textContent = "Kein Punkt für dieses Wort."; ctrl.replaceChildren(nextBtn());
+      phase = "done"; clearInterval(timer); fill(); bigReveal(ansBox, word, "lost"); relay.classList.remove("timeout");
+      relay.textContent = "Aufgelöst – kein Punkt für dieses Wort."; ctrl.replaceChildren(nextBtn());
     }
     ctrl.append(h("button", { class: "btn green big", onclick: start }, "▶ Los, " + teams[A].name + "!"), h("button", { class: "btn ghost", onclick: next }, "⏭ Überspringen"));
     relay.textContent = "Jedes Kind tippt EINEN Buchstaben – dann ist das nächste Kind dran.";
