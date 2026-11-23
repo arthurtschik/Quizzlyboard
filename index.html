@@ -449,7 +449,7 @@ h1,h2,h3,h4,.btn,.pill,.badge{font-family:var(--display)}
 .ssearch{width:100%;font:inherit;font-size:19px;padding:12px 16px;border-radius:14px;border:3px solid var(--cyan);background:#0e0a33;color:#fff;-webkit-user-select:text;user-select:text;margin:6px 0 10px;
   position:sticky;top:0;z-index:3}
 .sdcard{position:relative;background:linear-gradient(160deg,#2a1d8f,#12096b);border:3px solid var(--yellow);border-radius:18px;padding:14px 16px;margin-bottom:12px;display:flex;flex-direction:column;gap:8px}
-.sdnr{font-family:var(--display);color:var(--yellow);font-weight:700;font-size:18px}
+.sdnr{font-family:var(--display);color:var(--yellow);font-weight:700;font-size:18px;padding-right:44px} /* Platz für den Schließen-Knopf */
 .sdq{font-size:19px;font-weight:700;line-height:1.35;padding-right:40px}
 .sda{font-family:var(--display);font-size:26px;font-weight:700;color:#06361a;background:var(--green);border-radius:12px;padding:8px 14px;white-space:pre-line}
 .sgrp{font-family:var(--display);font-weight:600;font-size:18px;color:var(--yellow);margin:12px 0 6px}
@@ -1806,10 +1806,16 @@ function markUsed(x) {
   const all = store.get("qb_used", {}); (all[r[0]] = all[r[0]] || {})[r[1]] = Date.now(); store.set("qb_used", all);
 }
 /* Frage für ein Feld: [Frage, Antwort, Nr. oder null] */
+/* Eindeutige Spickzettel-Nummern – die Klasse steckt mit drin, so findet die Suche jede Frage direkt:
+   Listen-Spiele: Klasse + laufende Nummer (zweistellig) → 307 = 3. Klasse, Nr. 7
+   Wissens-Quiz:  Klasse + Kategorie + Punkte + Frage   → 37305 = 3. Klasse, 7. Kategorie, 3 Punkte, Frage 5
+   Neue Inhalte werden hinten angehängt, darum ändern sich bestehende Nummern nie. */
+const spickNr = (k, i) => `${k}${String(i + 1).padStart(2, "0")}`;
+const quizNr = (k, cat, p, i) => `${k}${JEO[k].findIndex(([c]) => c === cat) + 1}${p + 1}${String(i + 1).padStart(2, "0")}`;
 function quizQuestion(k, c, p) {
   if (c.gen) { const [q, a] = mathQ(k, p + 1); return [q, a, null]; }
   const list = c.levels[p], i = drawFromBag(`${k}|${catKey(c.cat)}|${p}`, list.length);
-  return [list[i][0], list[i][1], i + 1];
+  return [list[i][0], list[i][1], quizNr(k, c.cat, p, i)];
 }
 
 /* ---------- Mathe-Aufgaben: Klasse k, Stufe 1–5 ---------- */
@@ -2588,18 +2594,18 @@ function duelNext() {
    Erst Spiel wählen, dann Fragen per Nummer oder Suche finden.
    ===================================================================== */
 /* Wissens-Quiz im Spickzettel: Gruppe = Kategorie · Punkte, Nr. = Position im Feld (wie auf dem Board) */
-const quizSpick = k => quizCats(k).filter(c => !c.gen).flatMap(c => c.levels.flatMap((list, p) => list.map(([q, a], i) => ({ nr: String(i + 1), grp: c.cat + " · " + (p + 1) + " P", q, a }))));
+const quizSpick = k => quizCats(k).filter(c => !c.gen).flatMap(c => c.levels.flatMap((list, p) => list.map(([q, a], i) => ({ nr: quizNr(k, c.cat, p, i), grp: c.cat + " · " + (p + 1) + " P", q, a }))));
 const SPICK = [
-  { id: "duell", label: "⚡ Gruppen-Duell", items: k => DUELL[k].map(([q, a], i) => ({ nr: String(i + 1), q, a: a.map(([t, p], j) => `${j + 1}. ${t}  (${p})`).join("\n") })) },
-  { id: "jeopardy", label: "❓ Wissens-Quiz", note: "Mathe-Felder sind Zufallsaufgaben – die Lösung erscheint auf dem Board unter „Antwort zeigen“.", items: quizSpick },
+  { id: "duell", label: "⚡ Gruppen-Duell", items: k => DUELL[k].map(([q, a], i) => ({ nr: spickNr(k, i), q, a: a.map(([t, p], j) => `${j + 1}. ${t}  (${p})`).join("\n") })) },
+  { id: "jeopardy", label: "❓ Wissens-Quiz", note: "Nummer = Klasse · Kategorie · Punkte · Frage (z. B. 37305). Mathe-Felder sind Zufallsaufgaben – die Lösung erscheint auf dem Board unter „Antwort zeigen“.", items: quizSpick },
   { id: "mauer", label: "🟢 Die Mauer", note: "Nutzt die Fragen aus dem Wissens-Quiz (gleiche Nummern).", items: quizSpick },
-  { id: "verdreht", label: "🔀 Verdreht!", items: k => VERD[k].map(([q, a], i) => ({ nr: String(i + 1), q, a })) },
-  { id: "abc", label: "🔢 1, 2 oder 3", items: k => ABC[k].map(([q, o], i) => ({ nr: String(i + 1), q, a: o[0] })) },
-  { id: "wf", label: "✅ Wahr oder Falsch", items: k => WF[k].map(([q, t, w], i) => ({ nr: String(i + 1), q, a: (t ? "WAHR" : "FALSCH") + " – " + w })) },
-  { id: "maske", label: "🎭 Die Maske", items: k => MASKE[k].map(([n, e, hs], i) => ({ nr: String(i + 1), q: hs.join(" · "), a: e + " " + n })) },
-  { id: "bild", label: "🖼️ Bilderrätsel", items: k => BILD[k].map(([e, n, hint], i) => ({ nr: String(i + 1), q: "Hinweis: " + hint, a: e + " " + n })) },
-  { id: "wortsalat", label: "🔤 Wortsalat", items: k => WORTE[k].map(([w, e], i) => ({ nr: String(i + 1), q: e + "  (" + [...w].length + " Buchstaben)", a: w })) },
-  { id: "bombe", label: "💣 Tick-Tack-Bumm", note: "Rechenaufgaben haben keine Nummer – die Lösung steht auf dem Board unter „👁“.", items: k => BLITZ[k].map(([q, a], i) => ({ nr: String(i + 1), q, a })) }
+  { id: "verdreht", label: "🔀 Verdreht!", items: k => VERD[k].map(([q, a], i) => ({ nr: spickNr(k, i), q, a })) },
+  { id: "abc", label: "🔢 1, 2 oder 3", items: k => ABC[k].map(([q, o], i) => ({ nr: spickNr(k, i), q, a: o[0] })) },
+  { id: "wf", label: "✅ Wahr oder Falsch", items: k => WF[k].map(([q, t, w], i) => ({ nr: spickNr(k, i), q, a: (t ? "WAHR" : "FALSCH") + " – " + w })) },
+  { id: "maske", label: "🎭 Die Maske", items: k => MASKE[k].map(([n, e, hs], i) => ({ nr: spickNr(k, i), q: hs.join(" · "), a: e + " " + n })) },
+  { id: "bild", label: "🖼️ Bilderrätsel", items: k => BILD[k].map(([e, n, hint], i) => ({ nr: spickNr(k, i), q: "Hinweis: " + hint, a: e + " " + n })) },
+  { id: "wortsalat", label: "🔤 Wortsalat", items: k => WORTE[k].map(([w, e], i) => ({ nr: spickNr(k, i), q: e + "  (" + [...w].length + " Buchstaben)", a: w })) },
+  { id: "bombe", label: "💣 Tick-Tack-Bumm", note: "Rechenaufgaben haben keine Nummer – die Lösung steht auf dem Board unter „👁“.", items: k => BLITZ[k].map(([q, a], i) => ({ nr: spickNr(k, i), q, a })) }
 ];
 const norm = s => String(s).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
 function spickzettel() {
@@ -2619,7 +2625,7 @@ function spickzettel() {
     }
     const list = h("div", { class: "slist" });
     const detail = h("div", { class: "sdetail" });
-    const search = h("input", { type: "search", id: "spick-search", class: "ssearch", placeholder: "🔍 Suchen: Nummer oder Wort …", value: st.q, autocomplete: "off",
+    const search = h("input", { type: "search", id: "spick-search", class: "ssearch", placeholder: "🔍 Nummer vom Board (z. B. 307) oder Wort …", value: st.q, autocomplete: "off",
       oninput: e => { st.q = e.target.value; renderList(); } });
     function renderDetail() {
       detail.replaceChildren();
@@ -2633,18 +2639,24 @@ function spickzettel() {
     function renderList() {
       const q = norm(st.q.trim());
       let items = st.game.items(st.k);
-      // Reine Zahl = Suche nach der Nummer; sonst Volltextsuche in Frage, Antwort und Kategorie
-      if (/^\d+$/.test(q)) items = items.filter(it => it.nr === q);
+      const digits = q.replace(/\s+/g, "");
+      // Reine Zahl = Nummernsuche über ALLE Klassen (die Klasse steckt in der Nummer); sonst Volltextsuche
+      if (/^\d+$/.test(digits)) {
+        const all = [1, 2, 3, 4].flatMap(k => st.game.items(k).map(it => Object.assign({}, it, { k, grp: k + ". Klasse" + (it.grp ? " · " + it.grp : "") })));
+        const exact = all.filter(it => it.nr === digits);
+        items = exact.length ? exact : all.filter(it => it.nr.startsWith(digits)).slice(0, 60);
+        if (exact.length === 1 && exact[0].k !== st.k) { st.k = exact[0].k; store.set("qb_spick_k", st.k); $$(".spick .kp").forEach((b, i) => b.classList.toggle("on", i + 1 === st.k)); }
+      }
       else if (q) items = items.filter(it => norm(it.q + " " + it.a + " " + (it.grp || "")).includes(q));
       list.replaceChildren();
       if (!items.length) { list.append(h("div", { class: "hintline" }, "Nichts gefunden.")); return; }
       let grp = null, grid = null;
       items.forEach(it => {
         if (it.grp !== grp || !grid) { grp = it.grp; if (grp) list.append(h("div", { class: "sgrp" }, grp)); grid = h("div", { class: "stiles" }); list.append(grid); }
-        grid.append(h("button", { class: "stile" + (st.open === it ? " on" : ""), onclick: () => { st.open = it; renderDetail(); renderList(); window.scrollTo && page.scrollTo({ top: 0, behavior: "smooth" }); } },
+        grid.append(h("button", { class: "stile" + (st.open && st.open.nr === it.nr ? " on" : ""), onclick: () => { st.open = it; renderDetail(); renderList(); window.scrollTo && page.scrollTo({ top: 0, behavior: "smooth" }); } },
           h("span", { class: "snr" }, it.nr), h("span", { class: "sq" }, it.q)));
       });
-      if (items.length === 1 && q && st.open !== items[0]) { st.open = items[0]; renderDetail(); }
+      if (items.length === 1 && q && (!st.open || st.open.nr !== items[0].nr)) { st.open = items[0]; renderDetail(); renderList(); }
     }
     page.replaceChildren(
       h("div", { class: "shead" }, h("button", { class: "btn ghost small", onclick: () => { st.game = null; draw(); } }, "← Spiele"), h("h2", null, st.game.label)),
@@ -3244,7 +3256,7 @@ const legalFooter = () => h("div", { class: "legalfoot" },
    ===================================================================== */
 const NUMWORDS = ["Eins.", "Zwei.", "Drei."]; // werden einzeln vorgelesen (passt zu jeder Mischung)
 const nrPill = nr =>h("span", { class: "pill nr" }, "Nr. " + nr);
-const withNr = arr => arr.map((x, i) => [...x, i + 1]); // hängt die Spickzettel-Nummer an
+const withNr = (arr, g) => arr.map((x, i) => [...x, spickNr(g, i)]); // hängt die Spickzettel-Nummer an (Klasse + Nr.)
 
 /* ---------- Teams wählen (für Spiele mit genau zwei Teams) ---------- */
 function needTwo() {
@@ -3375,7 +3387,7 @@ function scrambleWord(w, g) {
   return out;
 }
 function verdreht(g) {
-  const pool = fairShuffle("verdreht" + g, withNr(VERD[g])).slice(0, lim("verdreht", 10)); let idx = -1;
+  const pool = fairShuffle("verdreht" + g, withNr(VERD[g], g)).slice(0, lim("verdreht", 10)); let idx = -1;
   const view = h("div", { class: "vwrap" });
   show(view, "verdreht", g);
   next();
@@ -3430,7 +3442,7 @@ function verdreht(g) {
 /* ---------- 1, 2 oder 3  &  Wahr oder Falsch ---------- */
 function lauf(g, kind) {
   const abc = kind === "abc";
-  const pool = fairShuffle(kind + g, withNr(abc ? ABC[g] : WF[g])); let idx = -1;
+  const pool = fairShuffle(kind + g, withNr(abc ? ABC[g] : WF[g], g)); let idx = -1;
   let secs = TUT ? 6 : store.get("qb_secs_" + kind, abc ? 20 : 12);
   const view = h("div", { class: "lwrap" });
   show(view, kind, g);
@@ -3507,7 +3519,7 @@ function lauf(g, kind) {
 
 /* ---------- Bilderrätsel ---------- */
 function bild(g) {
-  const pool = fairShuffle("bild" + g, withNr(BILD[g])).slice(0, lim("bild", 8)); let idx = -1;
+  const pool = fairShuffle("bild" + g, withNr(BILD[g], g)).slice(0, lim("bild", 8)); let idx = -1;
   const view = h("div", { class: "lwrap" });
   show(view, "bild", g);
   let auto = null;
@@ -3640,7 +3652,7 @@ function wimmel(g) {
    Fertig in der Zeit → 3/2/1 Punkte je nach Restzeit. Zeit vorbei → das andere Team darf klauen (+1).
    Falscher Buchstabe kostet 2 Sekunden. */
 function wortsalat(g) {
-  const pool = fairShuffle("wortsalat" + g, withNr(WORTE[g])).slice(0, lim("wortsalat", 10)); let idx = -1, timer = null;
+  const pool = fairShuffle("wortsalat" + g, withNr(WORTE[g], g)).slice(0, lim("wortsalat", 10)); let idx = -1, timer = null;
   const view = h("div", { class: "lwrap" });
   show(view, "wortsalat", g);
   cleanup = () => clearInterval(timer);
@@ -3802,7 +3814,7 @@ function zuordnen(g) {
 
 /* ---------- Gruppen-Duell (mit Klau-Chance nach 3 ✗) ---------- */
 function duell(g) {
-  const pool = fairShuffle("duell" + g, withNr(DUELL[g])).slice(0, lim("duell", 5)); let idx = -1;
+  const pool = fairShuffle("duell" + g, withNr(DUELL[g], g)).slice(0, lim("duell", 5)); let idx = -1;
   const view = h("div", { class: "lwrap" });
   show(view, "duell", g);
   next();
@@ -3965,7 +3977,7 @@ function bombe(g, opts = {}) {
   function nextQ() {
     let q, a, nr = null;
     if (Math.random() < 0.5) [q, a] = blitzMath(g);
-    else { if (!bag.length) bag = shuffle(withNr(BLITZ[g])); [q, a, nr] = bag.pop(); }
+    else { if (!bag.length) bag = shuffle(withNr(BLITZ[g], g)); [q, a, nr] = bag.pop(); }
     qBox.textContent = q; aBox.textContent = ""; aBox.dataset.a = a; nrBox.replaceChildren(nr ? nrPill(nr) : "");
     qBox.classList.remove("pop"); void qBox.offsetWidth; qBox.classList.add("pop");
   }
@@ -4027,7 +4039,7 @@ function bombe(g, opts = {}) {
 
 /* ---------- Die Maske ---------- */
 function maske(g) {
-  const pool = fairShuffle("maske" + g, withNr(MASKE[g])).slice(0, lim("maske", 6)); let idx = -1;
+  const pool = fairShuffle("maske" + g, withNr(MASKE[g], g)).slice(0, lim("maske", 6)); let idx = -1;
   const view = h("div", { class: "lwrap" });
   show(view, "maske", g);
   const timers = []; cleanup = () => timers.forEach(clearTimeout);
