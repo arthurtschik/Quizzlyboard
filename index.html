@@ -729,6 +729,70 @@ body.buzzmode #top, body.buzzmode #score{display:none}
 .art svg{width:100%;height:100%}
 .pic .em .art{width:.95em;height:.95em}
 
+/* ===== Bereiche: Auswahlseite & weiterführende Schule ===== */
+.topmode.area{background:linear-gradient(135deg,#64748b,#334155)}
+.landing .logo{margin-top:2vmin}
+.acards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;max-width:1200px;margin:3vmin auto 2vmin}
+@media (max-width:820px){.acards{grid-template-columns:1fr}}
+.acard{position:relative;display:flex;flex-direction:column;align-items:center;gap:8px;padding:28px 18px 24px;border-radius:26px;text-align:center;color:#fff;
+  box-shadow:0 8px 0 rgba(0,0,0,.35),0 14px 30px rgba(0,0,0,.35);transition:transform .15s ease}
+.acard:hover{transform:translateY(-4px)} .acard:active{transform:translateY(3px)}
+.acard.solo{background:linear-gradient(150deg,#f97316,#db2777)}
+.acard.gs{background:linear-gradient(150deg,#6366f1,#7c3aed)}
+.acard.wf{background:linear-gradient(150deg,#14b8a6,#0e7490)}
+.acard .aico{font-size:clamp(52px,9vmin,96px);line-height:1}
+.acard b{font-family:var(--display);font-size:clamp(22px,3.2vmin,34px);line-height:1.15}
+.acard small{font-size:clamp(14px,1.9vmin,18px);opacity:.92}
+.akl{display:flex;gap:6px;margin-top:4px}.akl i{font-style:normal;font-weight:800;background:#fff;color:#4c1d95;border-radius:10px;padding:2px 10px}
+.asoon{position:absolute;top:12px;right:12px;background:var(--yellow);color:#3b2a00;font-weight:800;font-size:13px;border-radius:99px;padding:4px 10px}
+.wfcard{max-width:640px;margin:3vmin auto;padding:28px 22px;border-radius:26px;background:rgba(255,255,255,.08);text-align:center;display:flex;flex-direction:column;align-items:center;gap:12px}
+.wfico{font-size:72px;line-height:1;animation:bob 2s ease-in-out infinite;--r:0deg}
+.wfcard h2{font-family:var(--display);font-size:clamp(26px,4vmin,40px);margin:0}
+.wfcard p{opacity:.9;line-height:1.45;margin:0 0 6px}
+.wfnote{min-height:1.4em;font-weight:800;color:var(--yellow);font-size:20px}.wfnote.pop{animation:pop .35s}
+
+/* ===== Alleinspielen ===== */
+.solok{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;margin:1vmin 0 2vmin;font-weight:800}
+.solog{grid-template-columns:repeat(auto-fill,minmax(230px,1fr))}
+.sgame2{text-align:left;display:flex;flex-direction:column;gap:4px;cursor:pointer}
+.sgame2 .sbest{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-top:6px}
+.sgame2 .sst{font-size:20px;letter-spacing:1px}.sgame2 .snew{font-size:13px;opacity:.85}.sgame2 small{font-size:13px;opacity:.9}
+.sgame2 .splay{margin-top:auto;align-self:flex-start;background:#fff;color:#4c1d95;font-weight:800;border-radius:99px;padding:6px 16px;margin-top:10px}
+.solo .sq2{font-family:var(--display);font-weight:600;font-size:clamp(24px,4.6vmin,52px);text-align:center;line-height:1.2;max-width:1100px}
+.solo .sextra{display:flex;flex-direction:column;align-items:center;gap:1vmin}
+.schoices{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;width:min(1100px,96vw)}
+.schoices.two{grid-template-columns:repeat(2,minmax(0,1fr));width:min(760px,96vw)}
+@media (max-width:700px){.schoices{grid-template-columns:1fr}}
+.schoice{font-family:var(--display);font-weight:700;font-size:clamp(20px,3.4vmin,36px);padding:18px 14px;border-radius:20px;background:linear-gradient(180deg,#9b6dff,#6d3ee8);
+  box-shadow:0 6px 0 #3f1f9e,0 10px 18px rgba(0,0,0,.3);transition:transform .1s ease;min-height:2.6em}
+.schoice:active{transform:translateY(4px);box-shadow:0 2px 0 #3f1f9e}
+.schoice.right{background:linear-gradient(180deg,#4ee38f,#1fae5f);box-shadow:0 6px 0 #11743d;color:#06361a}
+.schoice.wrong{background:linear-gradient(180deg,#ff8a8a,#e11d48);box-shadow:0 6px 0 #881337}
+.schoice:disabled{cursor:default}
+.sfb{display:flex;flex-direction:column;align-items:center;gap:10px;min-height:5em}
+.sfbt{font-family:var(--display);font-weight:700;font-size:clamp(22px,3.6vmin,38px)}.sfbt.ok{color:#4ee38f}.sfbt.no{color:#ff8a8a}
+.sexp{opacity:.95;font-size:clamp(16px,2.3vmin,22px);text-align:center;max-width:900px}
+.spic{flex:none;height:min(40vh,400px);min-height:0}
+.spic .pic{width:min(70vw,40vh*1.5,600px)}
+.tiles.s16{grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(4,1fr)}
+.solo .hbtns{display:flex;flex-direction:column;gap:12px}
+.solo .hbtns button{display:flex;flex-direction:column;align-items:center;font-size:clamp(30px,5vmin,52px);padding:10px 22px;border-radius:18px;font-weight:800}
+.solo .hbtns small{font-size:14px}
+.solo .hbtns .hup{background:linear-gradient(180deg,#4ee38f,#1fae5f);color:#06361a;box-shadow:0 6px 0 #11743d}
+.solo .hbtns .hdn{background:linear-gradient(180deg,#ff8a8a,#e11d48);box-shadow:0 6px 0 #881337}
+.soloend{display:flex;flex-direction:column;align-items:center;gap:14px;margin:auto;text-align:center}
+.soloend h2{font-family:var(--display);font-size:clamp(30px,5.5vmin,60px);margin:0}
+.rstars{display:flex;gap:2vmin}
+.rstar{font-size:clamp(60px,12vmin,130px);line-height:1;opacity:.35;transform:scale(.6);animation:starpop .5s cubic-bezier(.3,1.6,.5,1) var(--d) forwards}
+.rstar.on{opacity:1}
+@keyframes starpop{to{transform:scale(1)}}
+.rlabel{font-size:clamp(20px,3vmin,30px);font-weight:800}
+.rnew{font-family:var(--display);font-size:clamp(20px,3vmin,30px);color:var(--yellow)}.rold{opacity:.85}
+/* Alleinspiel: Spielfeld und Bildbereich brauchen eine eigene Breite (der Rahmen zentriert) */
+.solo .mgrid{width:min(1100px,100%);align-self:center}
+.solo .sextra{width:100%}
+.solo .spic{width:100%}
+
 </style>
 </head>
 <body>
@@ -3912,8 +3976,9 @@ function renderTop(gameId, grade) {
   // Dreispaltig (links | Titel | rechts), damit der Titel immer genau in der Mitte steht
   const t = $("#top"); t.replaceChildren();
   const spick = location.hash === "#spickzettel"; // Handy-Spickzettel: keine Modus-Knöpfe
+  const areaBtn = h("button", { class: "btn small topmode area", title: "Bereich wechseln (alleine / Grundschule / weiterführende Schule)", onclick: () => { store.set("qb_area", null); home(); } }, "⇄", h("span", { class: "tml" }, " Bereich"));
   const left = h("div", { class: "tside" }, gameId ? h("button", { class: "btn small", onclick: () => home() }, "🏠 Start")
-    : spick ? null : [h("button", { class: "btn small topmode duel", title: "Duell-Modus: Das Glücksrad wählt die Spiele", onclick: () => { ac(); duelSetup(); } }, "🎰", h("span", { class: "tml" }, " Duell-Modus")),
+    : spick || !curArea ? null : curArea !== "gs" ? areaBtn : [areaBtn, h("button", { class: "btn small topmode duel", title: "Duell-Modus: Das Glücksrad wählt die Spiele", onclick: () => { ac(); duelSetup(); } }, "🎰", h("span", { class: "tml" }, " Duell-Modus")),
        h("button", { class: "btn small topmode split", title: "Kinder zufällig auf die Teams verteilen", onclick: () => { ac(); teamSplit(); } }, "👥", h("span", { class: "tml" }, " Teams einteilen")),
        h("button", { class: "btn small topmode buzz", title: "Großer Buzzer in Teamfarbe", onclick: () => { ac(); buzzer(); } }, buzzIcon(), h("span", { class: "tml" }, " Buzzer"))]);
   const right = h("div", { class: "tside right" });
@@ -4028,12 +4093,53 @@ function startGame(g, k) {
   if (!S.keepScores && !DUEL) resetScores();
   g.run(k);
 }
+/* ---------- Bereiche: Auswahlseite, Grundschule, Alleinspielen, weiterführende Schule ---------- */
+let curArea = null; // welcher Bereich gerade angezeigt wird (für die Kopfzeile)
+const makeLogo = sub => h("div", { class: "logo" }, h("div", { class: "word", "aria-label": "Quizzlyboard" },
+  [...LOGO].map((c, i) => h("span", { class: "lt" + (window.__introRunning ? " hidden" : ""), style: `color:${LOGO_COLORS[i % LOGO_COLORS.length]}` }, c))),
+  h("div", { class: "sub" }, sub));
+/* Wegweiser: Die App merkt sich den gewählten Bereich (qb_area) */
 function home() {
   DUEL = null;
-  const logo = h("div", { class: "logo" }, h("div", { class: "word", "aria-label": "Quizzlyboard" },
-    [...LOGO].map((c, i) => h("span", { class: "lt" + (window.__introRunning ? " hidden" : ""), style: `color:${LOGO_COLORS[i % LOGO_COLORS.length]}` }, c))),
-    h("div", { class: "sub" }, "Such dir ein Spiel aus und wähle die Klassenstufe!"));
-  const wrap = h("div", { class: "home" }, logo);
+  const a = store.get("qb_area", null);
+  if (a === "gs") return gsHome();
+  if (a === "solo") return soloHome();
+  if (a === "wf") return wfHome();
+  return landing();
+}
+function chooseArea(a) {
+  ac(); store.set("qb_area", a); home();
+  if (a === "gs" && !session.get("qb_menu")) { session.set("qb_menu", "1"); settingsMenu(); } // beim ersten Mal: Teams anlegen
+}
+function landing() {
+  curArea = null;
+  const card = (a, ico, title, sub, cls, extra) => h("button", { class: "acard " + cls, onclick: () => chooseArea(a) },
+    h("span", { class: "aico" }, ico), h("b", null, title), h("small", null, sub), extra || null);
+  const view = h("div", { class: "home landing" }, makeLogo("Wer spielt heute?"),
+    h("div", { class: "acards" },
+      card("solo", "🎮", "Ich spiele alleine", "Allein üben und Sterne sammeln", "solo"),
+      card("gs", "🏫", "Wir sind eine Grundschule", "Quiz-Show für die ganze Klasse · Klasse 1–4", "gs",
+        h("span", { class: "akl" }, [1, 2, 3, 4].map(k => h("i", null, k)))),
+      card("wf", "🎓", "Wir sind eine weiterführende Schule", "Klasse 5–10", "wf", h("span", { class: "asoon" }, "🚧 in Arbeit"))),
+    legalFooter());
+  show(view, "", 0); hideScore();
+}
+function wfHome() {
+  curArea = "wf";
+  const note = h("div", { class: "wfnote" });
+  const view = h("div", { class: "home wfpage" }, makeLogo("Weiterführende Schule"),
+    h("div", { class: "wfcard" }, h("div", { class: "wfico" }, "🚧"), h("h2", null, "Wird gerade gebaut"),
+      h("p", null, "Für die Klassen 5 bis 10 entstehen gerade eigene Spiele und Fragen. Schau bald wieder vorbei!"),
+      h("div", { class: "kpills" }, [5, 6, 7, 8, 9, 10].map(k => h("button", { class: "kp", onclick: () => {
+        note.textContent = `Klasse ${k}: kommt bald! 🛠️`; note.classList.remove("pop"); void note.offsetWidth; note.classList.add("pop"); sfx.soft(); } }, k + ". Klasse"))),
+      note,
+      h("button", { class: "btn ghost", onclick: () => { store.set("qb_area", null); home(); } }, "⇄ Anderen Bereich wählen")),
+    legalFooter());
+  show(view, "", 0); hideScore();
+}
+function gsHome() {
+  curArea = "gs";
+  const wrap = h("div", { class: "home" }, makeLogo("Such dir ein Spiel aus und wähle die Klassenstufe!"));
   const cards = list => h("div", { class: "games" }, list.map(g => {
       const card = h("div", { class: "game", style: `--c1:${g.c1};--c2:${g.c2}` },
         h("div", { class: "cbtns" },
@@ -5067,6 +5173,234 @@ const legalFooter = () => h("div", { class: "legalfoot" },
   h("span", null, "Ohne Cookies & ohne Tracking"));
 
 /* =====================================================================
+   QUIZZLYBOARD – Alleinspielen: Kinder spielen allein, sammeln Sterne (0–3)
+   und schlagen ihren eigenen Rekord (nur auf diesem Gerät gespeichert).
+   ===================================================================== */
+const SOLO = [
+  { id: "memory", ico: "🐯", t: "Tier-Memory", d: "Finde alle Paare mit möglichst wenigen Zügen.", c1: "#fb923c", c2: "#db2777", run: soloMemory },
+  { id: "jeopardy", ico: "❓", t: "Wissens-Quiz", d: "10 Fragen – tippe die richtige Antwort.", c1: "#6366f1", c2: "#7c3aed", run: soloQuiz },
+  { id: "abc", ico: "🔢", t: "1, 2 oder 3", d: "Welche der drei Antworten stimmt?", c1: "#f59e0b", c2: "#ea580c", run: soloAbc },
+  { id: "wf", ico: "✅", t: "Wahr oder Falsch", d: "Stimmt der Satz oder nicht?", c1: "#22c55e", c2: "#0f766e", run: soloWf },
+  { id: "verdreht", ico: "🔀", t: "Verdreht!", d: "Lies die verdrehte Frage und finde die Antwort.", c1: "#14b8a6", c2: "#0891b2", run: soloVerdreht },
+  { id: "bild", ico: "🖼️", t: "Bilderrätsel", d: "Das Bild deckt sich auf – was ist es?", c1: "#ec4899", c2: "#9333ea", run: soloBild },
+  { id: "wortsalat", ico: "🔤", t: "Wortsalat", d: "Tippe die Buchstaben in der richtigen Reihenfolge.", c1: "#e879f9", c2: "#7c3aed", run: soloWortsalat },
+  { id: "hoehe", ico: "📈", t: "Höher oder Tiefer", d: "Mehr oder weniger? Baue eine lange Kette!", c1: "#3b82f6", c2: "#1e40af", run: soloHoehe }
+];
+const soloById = id => SOLO.find(g => g.id === id);
+/* replaceChildren ohne leere Werte (null würde sonst als Wort „null“ erscheinen) */
+const rc = (el, ...kids) => el.replaceChildren(...kids.flat().filter(x => x != null && x !== false && x !== ""));
+const soloBest = () => store.get("qb_solo_best", {});
+const starsTxt = n => "⭐".repeat(n) + "☆".repeat(3 - n);
+
+/* ---------- Übersicht ---------- */
+function soloHome() {
+  curArea = "solo";
+  let k = Math.min(4, Math.max(1, +store.get("qb_solo_k", 1) || 1));
+  const wrap = h("div", { class: "home solohome" });
+  function draw() {
+    const best = soloBest();
+    rc(wrap, makeLogo("Allein spielen – sammle Sterne!"),
+      h("div", { class: "solok" }, h("span", null, "Ich bin in"),
+        h("div", { class: "kpills" }, [1, 2, 3, 4].map(x => h("button", { class: "kp" + (x === k ? " on" : ""), onclick: () => { k = x; store.set("qb_solo_k", x); sfx.tick(); draw(); } }, x + ". Klasse")))),
+      h("div", { class: "games solog" }, SOLO.map(g => {
+        const b = best[g.id + "_" + k];
+        return h("button", { class: "game sgame2", style: `--c1:${g.c1};--c2:${g.c2}`, onclick: () => { ac(); g.run(k); } },
+          h("div", { class: "ico" }, g.ico), h("h2", null, g.t), h("p", null, g.d),
+          h("div", { class: "sbest" }, b ? h("span", { class: "sst" }, starsTxt(b.stars)) : h("span", { class: "snew" }, "Noch nicht gespielt"), b ? h("small", null, "Rekord: " + b.label) : null),
+          h("div", { class: "splay" }, "▶ Spielen"));
+      })),
+      legalFooter());
+  }
+  draw();
+  show(wrap, "", 0); hideScore();
+}
+
+/* ---------- gemeinsamer Rahmen ---------- */
+function soloScreen(g, k) {
+  const view = h("div", { class: "lwrap solo" });
+  show(view, g.id, k); hideScore();
+  cleanup = () => { $("#score").style.display = ""; };
+  return view;
+}
+/* Ende einer Runde: Sterne, Rekord (höher oder niedriger ist besser), Nochmal */
+function soloFinish(g, k, stars, label, value, lowerIsBetter) {
+  const key = g.id + "_" + k, all = soloBest(), old = all[key];
+  const better = !old || (lowerIsBetter ? value < old.value : value > old.value) || (value === old.value && stars > old.stars);
+  if (better) { all[key] = { stars, label, value }; store.set("qb_solo_best", all); }
+  stars >= 2 ? (sfx.fan(), confetti()) : sfx.soft(440);
+  const view = soloScreen(g, k);
+  const starEls = [0, 1, 2].map(i => h("span", { class: "rstar" + (i < stars ? " on" : ""), style: `--d:${0.25 + i * 0.35}s` }, i < stars ? "⭐" : "☆"));
+  view.append(h("div", { class: "soloend" },
+    h("div", { class: "rstars" }, starEls),
+    h("h2", null, stars === 3 ? "Super gemacht!" : stars === 2 ? "Toll!" : stars === 1 ? "Gut gemacht!" : "Weiter üben – du schaffst das!"),
+    h("div", { class: "rlabel" }, label),
+    better && old ? h("div", { class: "rnew" }, "🏆 Neuer Rekord!") : old ? h("div", { class: "rold" }, "Dein Rekord: " + old.label) : h("div", { class: "rnew" }, "🏆 Dein erster Rekord!"),
+    h("div", { class: "row" }, h("button", { class: "btn green big", onclick: () => g.run(k) }, "🔄 Nochmal"), h("button", { class: "btn ghost", onclick: () => home() }, "🎮 Andere Spiele"))));
+}
+const ratioStars = (r) => r >= 0.9 ? 3 : r >= 0.7 ? 2 : r >= 0.4 ? 1 : 0;
+
+/* falsche Antworten passend zur richtigen wählen */
+const normA = s => String(s).toLowerCase().replace(/^(der|die|das|ein|eine|mit dem|mit der|im|am|beim)\s+/, "").trim();
+function wrongAnswers(correct, pool, n = 2) {
+  const num = /^-?\d+(,\d+)?$/.test(String(correct).trim());
+  if (num) { // Zahlen: nahe beieinander liegende Zahlen
+    const v = parseFloat(String(correct).replace(",", ".")), out = new Set(), step = Math.max(1, Math.round(Math.abs(v) * 0.15));
+    while (out.size < n) { const d = (1 + rnd(3)) * step * (Math.random() < 0.5 ? -1 : 1); const w = v + d; if (w >= 0 && w !== v) out.add(String(w)); }
+    return [...out];
+  }
+  const cands = shuffle([...new Set(pool.map(String))]).filter(x => normA(x) !== normA(correct) && x.length < 60);
+  return cands.slice(0, n);
+}
+
+/* Multiple-Choice-Runde: rounds = [{ q, a, wrong:[…], pre?(box), after? }] */
+function soloMC(g, k, rounds, opts = {}) {
+  const view = soloScreen(g, k);
+  let i = 0, score = 0, timers = [];
+  cleanup = () => { $("#score").style.display = ""; timers.forEach(clearTimeout); stopSpeech(); };
+  next();
+  function next() {
+    timers.forEach(clearTimeout); timers = []; stopSpeech();
+    if (i >= rounds.length) { const st = ratioStars(score / rounds.length); soloFinish(g, k, st, `${score} von ${rounds.length} richtig`, score, false); return; }
+    const r = rounds[i]; let done = false;
+    const choices = shuffle([r.a, ...r.wrong]);
+    const fb = h("div", { class: "sfb" });
+    const btns = choices.map(c => h("button", { class: "schoice", onclick: () => answer(c) }, c));
+    const qBox = h("div", { class: "sq2" }, r.qEl || r.q);
+    const extra = h("div", { class: "sextra" });
+    const readBtn = h("button", { class: "btn ghost small", onclick: () => speakSeq(r.read || [r.q]) }, "🔊 Vorlesen");
+    rc(view, 
+      h("div", { class: "vinfo" }, h("span", { class: "pill" }, `Frage ${i + 1} / ${rounds.length}`), h("span", { class: "pill star" }, "✅ " + score)),
+      extra, qBox, r.noRead ? null : readBtn, h("div", { class: "schoices" + (choices.length === 2 ? " two" : "") }, btns), fb);
+    if (r.pre) r.pre(extra, timers);
+    if (!r.noRead && (k <= 2 || opts.autoRead)) timers.push(setTimeout(() => speakSeq(r.read || [r.q]), 350)); // Kl. 1–2: automatisch vorlesen
+    function answer(c) {
+      if (done) return; done = true; if (r.stop) r.stop();
+      const ok = normA(c) === normA(r.a);
+      if (ok) score++;
+      btns.forEach(b => { b.disabled = true; if (normA(b.textContent) === normA(r.a)) b.classList.add("right"); else if (b.textContent === c) b.classList.add("wrong"); });
+      ok ? sfx.ok() : sfx.bad();
+      rc(fb, h("div", { class: "sfbt " + (ok ? "ok" : "no") }, ok ? "Richtig! 🎉" : "Leider falsch."), r.after ? h("div", { class: "sexp" }, r.after) : null,
+        h("button", { class: "btn green", onclick: () => { i++; next(); } }, i + 1 >= rounds.length ? "🏁 Ergebnis" : "➡ Weiter"));
+    }
+  }
+}
+
+/* ---------- Wissens-Quiz ---------- */
+function soloQuiz(k) {
+  const g = soloById("jeopardy"), cats = quizCats(k), levels = [0, 0, 1, 1, 2, 2, 3, 3, 4, 4];
+  const rounds = levels.map(p => {
+    const c = cats[rnd(cats.length)], [q, a] = quizQuestion(k, c, p);
+    const pool = c.gen ? [] : c.levels.flat().map(x => x[1]);
+    return { q, a, wrong: wrongAnswers(a, pool.length > 3 ? pool : cats.flatMap(x => x.gen ? [] : x.levels.flat().map(y => y[1]))), pre: box => box.append(h("span", { class: "pill" }, c.cat + " · " + (p + 1) + (p ? " Punkte" : " Punkt"))) };
+  });
+  soloMC(g, k, rounds);
+}
+/* ---------- 1, 2 oder 3 ---------- */
+function soloAbc(k) {
+  const g = soloById("abc"), pool = fairShuffle("soloabc" + k, ABC[k]).slice(0, 10);
+  soloMC(g, k, pool.map(x => { markUsed(x); const [q, o] = x; return { q, a: o[0], wrong: o.slice(1), read: [q, ...o] }; }));
+}
+/* ---------- Wahr oder Falsch ---------- */
+function soloWf(k) {
+  const g = soloById("wf"), pool = fairShuffle("solowf" + k, WF[k]).slice(0, 10);
+  soloMC(g, k, pool.map(x => { markUsed(x); const [q, t, w] = x; return { q, a: t ? "✓ Wahr" : "✗ Falsch", wrong: [t ? "✗ Falsch" : "✓ Wahr"], after: w }; }));
+}
+/* ---------- Verdreht ---------- */
+function soloVerdreht(k) {
+  const g = soloById("verdreht"), all = VERD[k].map(x => x[1]), pool = fairShuffle("soloverd" + k, VERD[k]).slice(0, 8);
+  soloMC(g, k, pool.map(x => { markUsed(x); const [q, a] = x;
+    const scr = q.split(" ").map(w => { const m = w.match(/^(\P{L}*)(\p{L}+)(\P{L}*)$/u); return m ? m[1] + scrambleWord(m[2], k) + m[3] : w; }).join(" ");
+    return { q: scr, a, wrong: wrongAnswers(a, all), noRead: true, after: "Richtig gelesen: „" + q + "“" }; }));
+}
+/* ---------- Bilderrätsel: Bild deckt sich von allein auf ---------- */
+function soloBild(k) {
+  const g = soloById("bild"), all = BILD[k].map(x => x[1]), pool = fairShuffle("solobild" + k, BILD[k]).slice(0, 8);
+  soloMC(g, k, pool.map(x => { markUsed(x); const [em, name, hint] = x; let tiles = [];
+    return { q: "💬 " + hint, a: name, wrong: wrongAnswers(name, all), noRead: true,
+      pre: (box, timers) => {
+        tiles = Array.from({ length: 16 }, () => h("div", { class: "tile" }));
+        box.append(h("div", { class: "picwrap spic" }, h("div", { class: "pic" }, h("div", { class: "em" }, picEl(em)), h("div", { class: "tiles s16" }, tiles))));
+        const order = shuffle(tiles); let n = 0;
+        timers.push(setInterval(() => { if (n < order.length - 2) order[n++].classList.add("gone"); }, 900)); // Intervall-IDs lassen sich wie Timeouts beenden
+      },
+      stop: () => tiles.forEach(t => t.classList.add("gone")) }; }));
+}
+/* ---------- Wortsalat ---------- */
+function soloWortsalat(k) {
+  const g = soloById("wortsalat"), pool = fairShuffle("solows" + k, WORTE[k]).slice(0, 8);
+  const view = soloScreen(g, k);
+  let i = 0, clean = 0;
+  next();
+  function next() {
+    if (i >= pool.length) { soloFinish(g, k, ratioStars(clean / pool.length), `${clean} von ${pool.length} Wörtern ohne Fehler`, clean, false); return; }
+    const x = pool[i]; markUsed(x); const [word, pic] = x, L = [...word];
+    let mix = shuffle(L); while (mix.join("") === word && L.length > 1) mix = shuffle(L);
+    let pos = 0, miss = 0;
+    const slots = L.map(() => h("span", { class: "slot" }));
+    const fb = h("div", { class: "sfb" });
+    const tiles = mix.map(ch => { const t = h("button", { class: "ltile" }, ch);
+      t.addEventListener("click", () => {
+        if (t.classList.contains("used") || pos >= L.length) return;
+        if (ch === L[pos]) { t.classList.add("used"); slots[pos].textContent = ch; slots[pos].classList.add("filled"); pos++; sfx.soft(400 + pos * 25);
+          if (pos === L.length) { if (miss <= 1) clean++; sfx.ok(); rc(fb, h("div", { class: "sfbt ok" }, miss ? `Geschafft! (${miss} Fehler)` : "Perfekt! 🎉"), h("button", { class: "btn green", onclick: () => { i++; next(); } }, i + 1 >= pool.length ? "🏁 Ergebnis" : "➡ Nächstes Wort")); } }
+        else { miss++; t.classList.remove("nope"); void t.offsetWidth; t.classList.add("nope"); sfx.bad(); }
+      }); return t; });
+    rc(view, h("div", { class: "vinfo" }, h("span", { class: "pill" }, `Wort ${i + 1} / ${pool.length}`), h("span", { class: "pill star" }, "✅ " + clean)),
+      h("div", { class: "wspic" }, picEl(pic)), h("div", { class: "slots", "data-w": word }, slots), h("div", { class: "ltiles" }, tiles), fb);
+  }
+}
+/* ---------- Tier-Memory ---------- */
+function soloMemory(k) {
+  const g = soloById("memory"), pairs = { 1: 6, 2: 8, 3: 8, 4: 10 }[k], cols = pairs === 10 ? 5 : 4;
+  const poolA = MEM_POOL[k] ? ANIMALS.filter(a => MEM_POOL[k].includes(a.id)) : ANIMALS;
+  const view = soloScreen(g, k);
+  let cards = []; shuffle(poolA).slice(0, pairs).forEach(a => cards.push({ a }, { a })); cards = shuffle(cards);
+  let first = null, lock = false, found = 0, moves = 0;
+  const movesEl = h("span", { class: "pill star" }, "Züge: 0");
+  const grid = h("div", { class: "mgrid", style: `grid-template-columns:repeat(${cols},1fr);grid-template-rows:repeat(${Math.ceil(pairs * 2 / cols)},1fr)` });
+  cards.forEach(c => {
+    c.front = h("div", { class: "face front" }, h("div", { class: "em" }, c.a.e), k !== 2 ? h("div", { class: "nm" }, c.a.n) : "");
+    c.el = h("div", { class: "mcard", onclick: () => flip(c) }, h("div", { class: "in" }, h("div", { class: "face back" }, "?"), c.front));
+    grid.append(c.el);
+  });
+  view.append(h("div", { class: "vinfo" }, h("span", { class: "pill" }, "Finde alle " + pairs + " Paare!"), movesEl), grid);
+  function flip(c) {
+    if (lock || c.el.classList.contains("up") || c.el.classList.contains("done")) return;
+    c.el.classList.add("up"); playClip(c.a.id);
+    if (!first) { first = c; return; }
+    moves++; movesEl.textContent = "Züge: " + moves;
+    if (first.a === c.a) { const a = first; first = null; setTimeout(() => { a.el.classList.add("done"); c.el.classList.add("done"); sfx.ok(); found++;
+      if (found === pairs) setTimeout(() => soloFinish(g, k, moves <= pairs * 1.5 ? 3 : moves <= pairs * 2 ? 2 : moves <= pairs * 3 ? 1 : 0, `${moves} Züge für ${pairs} Paare`, moves, true), 900); }, 500); }
+    else { lock = true; const a = first; first = null; setTimeout(() => { a.el.classList.remove("up"); c.el.classList.remove("up"); lock = false; }, 1300); }
+  }
+}
+/* ---------- Höher oder Tiefer ---------- */
+function soloHoehe(k) {
+  const g = soloById("hoehe"), theme = HOCH[HOCH_GRADES[k][rnd(HOCH_GRADES[k].length)]];
+  const view = soloScreen(g, k);
+  let deck = shuffle(theme.items), cur = deck.pop(), chain = 0;
+  round();
+  function take() { let i = deck.findIndex(x => x[2] !== cur[2]); if (i < 0) { deck = shuffle(theme.items.filter(x => x[2] !== cur[2])); i = 0; } return deck.splice(i, 1)[0]; }
+  function card(it, open) { return h("div", { class: "hcard" + (open ? "" : " next") }, h("div", { class: "hem" }, picEl(it[0])), h("div", { class: "hname" }, it[1]), h("div", { class: "hval" + (open ? "" : " hidden") }, open ? it[3] : "?")); }
+  function round() {
+    if (chain >= 10) { soloFinish(g, k, 3, "Kette von 10 – ganz geschafft!", 10, false); return; }
+    const nxt = take(), up = nxt[2] > cur[2];
+    const fb = h("div", { class: "sfb" });
+    const choose = more => {
+      if (fb.childNodes.length) return;
+      const ok = more === up; view.querySelector(".hcard.next .hval").textContent = nxt[3]; view.querySelector(".hcard.next .hval").classList.remove("hidden");
+      if (ok) { chain++; sfx.ok(); rc(fb, h("div", { class: "sfbt ok" }, "Richtig! Kette: " + chain), h("button", { class: "btn green", onclick: () => { cur = nxt; round(); } }, "➡ Weiter")); }
+      else { sfx.bad(); const st = chain >= 8 ? 3 : chain >= 5 ? 2 : chain >= 2 ? 1 : 0;
+        rc(fb, h("div", { class: "sfbt no" }, "Leider falsch!"), h("button", { class: "btn green", onclick: () => soloFinish(g, k, st, "Kette: " + chain, chain, false) }, "🏁 Ergebnis")); }
+    };
+    rc(view, h("div", { class: "vinfo" }, h("span", { class: "pill" }, theme.t), h("span", { class: "pill star" }, "🔗 Kette: " + chain)),
+      h("div", { class: "hrow" }, card(cur, true),
+        h("div", { class: "hbtns" }, h("button", { class: "hup", onclick: () => choose(true) }, "⬆", h("small", null, "MEHR")), h("button", { class: "hdn", onclick: () => choose(false) }, "⬇", h("small", null, "WENIGER"))),
+        card(nxt, false)), fb);
+  }
+}
+
+/* =====================================================================
    QUIZZLYBOARD – Spiele
    ===================================================================== */
 const NUMWORDS = ["Eins.", "Zwei.", "Drei."]; // werden einzeln vorgelesen (passt zu jeder Mischung)
@@ -6067,7 +6401,7 @@ function mauer(g) {
    ===================================================================== */
 function boot() {
   renderScore();
-  const firstMenu = () => { if (!session.get("qb_menu")) { session.set("qb_menu", "1"); settingsMenu(); } };
+  const firstMenu = () => { if (store.get("qb_area", null) === "gs" && !session.get("qb_menu")) { session.set("qb_menu", "1"); settingsMenu(); } };
   if (location.hash === "#spickzettel") { spickzettel(); }
   else if (location.hash === "#impressum" || location.hash === "#datenschutz") { legalPage(location.hash.slice(1)); }
   else if (S.intro && !session.get("qb_intro")) { session.set("qb_intro", "1"); intro(firstMenu); }
