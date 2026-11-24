@@ -801,6 +801,80 @@ body.buzzmode #top, body.buzzmode #score{display:none}
 .solo .sextra{width:100%}
 .solo .spic{width:100%}
 
+/* ===== Bau-Spiele (Alleinspielen) ===== */
+.gt-rohr{gap:0}.gt-rohr .tap{margin-right:.2em}
+.gt-rohr .pipe{display:inline-grid;place-items:center;min-width:.8em;padding:.04em .05em;background:linear-gradient(180deg,#e0f2fe,#7dd3fc 45%,#0369a1);color:#0c4a6e;border-top:.07em solid #475569;border-bottom:.07em solid #475569;font-size:.85em}
+.gt-rohr .pipe:first-of-type{border-left:.07em solid #475569;border-radius:.12em 0 0 .12em}.gt-rohr .pipe:last-child{border-right:.07em solid #475569;border-radius:0 .12em .12em 0}
+.gt-bruecke{gap:.04em}
+.gt-bruecke .plank{display:inline-grid;place-items:center;min-width:.75em;padding:0 .05em;background:linear-gradient(#d97706,#92400e);color:#fff7ed;border:.04em solid #451a03;border-radius:.08em;transform:translateY(var(--y));font-size:.82em}
+.gt-baumeister{gap:.06em}
+.gt-baumeister .blk{display:inline-grid;place-items:center;min-width:.9em;height:1.05em;background:var(--b);color:#fff;border-radius:.12em;box-shadow:inset 0 -.12em 0 rgba(0,0,0,.25);font-size:.8em;text-shadow:0 .05em 0 rgba(0,0,0,.35);animation:blkdrop .5s var(--d) both}
+@keyframes blkdrop{from{transform:translateY(-1em);opacity:0}}
+
+/* Rohr-Profi */
+.pgrid{display:grid;grid-template-columns:repeat(var(--c),1fr);gap:3px;width:min(94vw,calc((100vh - 270px) * var(--c) / var(--r)),900px)}
+.pend{display:grid;place-items:center;font-size:clamp(22px,6vmin,60px);line-height:1}
+.pend.bloom{animation:starpop .6s both}
+.pcell{display:block;padding:0;border:0;border-radius:10px;background:radial-gradient(circle at 30% 25%,#8b5e34,#5b3a1e);box-shadow:inset 0 0 0 2px rgba(0,0,0,.25);overflow:hidden;cursor:pointer}
+.pcell:active{filter:brightness(1.15)}
+.prot{transition:transform .18s ease-out}
+.prot svg{display:block;width:100%;height:auto}
+.prot .po{fill:#cbd5e1;stroke:#475569;stroke-width:3}
+.prot .ch{fill:#1e293b;transition:fill .25s}
+.pcell.wet .ch{fill:#38bdf8}
+.pgrid.solved .pcell.wet{animation:wetglow 1.2s ease-in-out 2}
+@keyframes wetglow{50%{box-shadow:inset 0 0 0 3px #7dd3fc,0 0 14px #38bdf8}}
+
+/* Brückenbauer */
+.bscene{position:relative;flex:none;width:min(1000px,96vw);height:clamp(170px,32vh,300px);border-radius:20px;overflow:hidden;background:linear-gradient(#7dd3fc,#e0f2fe 70%)}
+.bwater{position:absolute;left:0;right:0;bottom:0;height:24%;background:repeating-linear-gradient(90deg,#0ea5e9 0 30px,#0284c7 30px 60px);animation:bwave 3s linear infinite}
+@keyframes bwave{to{background-position:60px 0}}
+.bcliff{position:absolute;bottom:0;height:55%;width:16%;background:linear-gradient(#65a30d 0 12%,#a16207 12%,#78350f)}
+.bcliff.l{left:0;border-radius:0 14px 0 0}.bcliff.r{right:0;border-radius:14px 0 0 0}
+.bflag{position:absolute;top:-1.15em;left:40%;font-size:clamp(20px,4vmin,36px)}
+.bgap{position:absolute;left:16%;width:68%;top:45%}
+.bgaplbl{position:absolute;bottom:calc(100% + 6px);left:0;right:0;text-align:center;font-weight:800;color:#0c4a6e;font-size:clamp(16px,2.8vmin,28px)}
+.bdeck{display:flex;height:clamp(24px,5vh,42px);outline:3px dashed rgba(12,74,110,.55);outline-offset:-1px}
+.bpl{flex:none;height:100%;padding:0;overflow:hidden;white-space:nowrap;background:linear-gradient(#f59e0b,#b45309);border:2px solid #78350f;border-radius:5px;color:#fff;font:700 clamp(12px,2vmin,20px) var(--display);cursor:pointer}
+.bruler{display:flex;height:10px}.bruler i{flex:1;border-left:2px solid rgba(12,74,110,.5)}.bruler i:last-child{border-right:2px solid rgba(12,74,110,.5)}
+.bcar{position:absolute;left:2%;bottom:55%;width:clamp(56px,10%,110px);z-index:2}
+.bcar svg{display:block;width:100%;height:auto}
+.bcar.fall{transition:transform .8s ease-in,left 0s!important;transform:translateY(190%) rotate(40deg)}
+.bsplash{position:absolute;bottom:14%;font-size:clamp(30px,6vmin,56px);opacity:0;transform:scale(.3);pointer-events:none}
+.bsplash.on{animation:bsplash 1s .5s both}
+@keyframes bsplash{40%{opacity:1;transform:scale(1.3)}to{opacity:0;transform:scale(1)}}
+.blbl{text-align:center;font-size:clamp(15px,2.3vmin,22px);max-width:900px}
+.btray{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;max-width:min(1000px,96vw)}
+.bplank{font:700 clamp(18px,3.2vmin,32px) var(--display);padding:10px 22px;border-radius:10px;background:linear-gradient(#f59e0b,#b45309);color:#fff;border:3px solid #78350f;box-shadow:0 5px 0 #451a03;cursor:pointer}
+.bplank:active{transform:translateY(3px);box-shadow:0 2px 0 #451a03}
+.bplank:disabled{opacity:.2}
+.shake{animation:shake .45s}
+@keyframes shake{20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
+.pill.good{background:#16a34a;color:#fff}
+
+/* Baumeister */
+.bmwrap{--cs:clamp(34px,min(9vw,8.5vh),80px);display:flex;gap:28px;flex-wrap:wrap;justify-content:center;align-items:flex-start}
+.bmwrap.one{--cs:clamp(32px,min(10.5vw,9vh),80px)}
+.bmbox{display:flex;flex-direction:column;align-items:center;gap:6px}
+.bmt{font-weight:800;font-size:clamp(15px,2.3vmin,22px)}
+.bmgrid{position:relative;display:grid;grid-template-columns:repeat(var(--c),var(--cs));grid-auto-rows:var(--cs);gap:4px;padding:8px;border-radius:14px}
+.bmgrid.plan{background-color:#1e40af;background-image:linear-gradient(rgba(255,255,255,.12) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.12) 1px,transparent 1px);background-size:12px 12px;box-shadow:0 0 0 3px #93c5fd}
+.bmgrid.build{background:rgba(120,113,108,.35);box-shadow:0 0 0 3px dashed;outline:3px dashed #a8a29e;outline-offset:-1px}
+.bmgrid.plan .bmb:not(.on){background:rgba(255,255,255,.06);border-radius:8px}
+.bmcell{display:block;padding:0;border:0;border-radius:8px;background:rgba(255,255,255,.1);cursor:pointer}
+.bmcell.fixed{cursor:default;background:rgba(30,64,175,.45)}
+.bmb{width:100%;height:100%;border-radius:8px;position:relative}
+.bmb.on{background:var(--b);box-shadow:inset 0 -6px 0 rgba(0,0,0,.25),inset 0 4px 0 rgba(255,255,255,.35)}
+.bmb.on::after{content:"";position:absolute;left:32%;top:28%;width:36%;height:36%;border-radius:50%;background:rgba(255,255,255,.22);box-shadow:0 2px 0 rgba(0,0,0,.2)}
+.bmaxis{position:absolute;top:2px;bottom:2px;width:6px;left:calc(8px + var(--h) * (var(--cs) + 4px) - 5px);background:#ef4444;border-radius:3px;box-shadow:0 0 10px #ef4444;pointer-events:none}
+.bmcell.bad{animation:bmbad .45s 4;outline:4px solid #ef4444;outline-offset:-2px}
+@keyframes bmbad{50%{outline-color:transparent}}
+.bmgrid.done .bmb.on{animation:starpop .5s both}
+.bmpal{display:flex;gap:14px;flex-wrap:wrap;justify-content:center}
+.bmsw{width:clamp(46px,7.5vmin,66px);height:clamp(46px,7.5vmin,66px);border-radius:14px;background:var(--b);border:4px solid rgba(255,255,255,.25);box-shadow:inset 0 -6px 0 rgba(0,0,0,.25);cursor:pointer;font-size:clamp(22px,4vmin,34px);transition:transform .15s}
+.bmsw.er{background:#e5e7eb}
+.bmsw.on{border-color:#fff;transform:scale(1.15);box-shadow:0 0 0 4px rgba(255,255,255,.35),inset 0 -6px 0 rgba(0,0,0,.25)}
+
 </style>
 </head>
 <body>
@@ -3962,6 +4036,9 @@ function gameTitle(id) {
     case "maske": return T(id, h("span", { class: "mk" }, "🎭"), letters("DIE MASKE", "l", (c, i) => ({ style: `--d:${i * 0.18}s` })));
     case "hoehe": return T(id, h("span", { class: "hup" }, "⬆ HÖHER"), h("span", { class: "sm" }, "oder"), h("span", { class: "hdn" }, "TIEFER ⬇"));
     case "mauer": return T(id, letters("DIE MAUER", "brick"));
+    case "rohr": return T(id, h("span", { class: "tap" }, "🚰"), letters("ROHR-PROFI", "pipe", (c, i) => ({ style: `--d:${i * 0.12}s` })));
+    case "bruecke": return T(id, letters("BRÜCKENBAUER", "plank", (c, i) => ({ style: `--y:${Math.round(Math.sin(i / 11 * Math.PI) * -8)}px` })));
+    case "baumeister": return T(id, letters("BAUMEISTER", "blk", (c, i) => ({ style: `--b:${["#ef4444", "#3b82f6", "#eab308", "#22c55e"][i % 4]};--d:${i * 0.1}s` })));
     case "teamsplit": return T(id, h("span", { class: "ppl" }, "👥"), letters("TEAMS EINTEILEN", "l", (c, i) => ({ style: `color:${COLORS[i % 8]};--d:${(i * 0.17) % 1.4}s` })));
     case "duelmode": return T(id, h("span", { class: "slot7" }, "🎰"), letters("DUELL-MODUS", "reel", (c, i) => ({ style: `--d:${i * 0.12}s` })));
   }
@@ -5408,6 +5485,278 @@ function soloHoehe(k) {
       h("div", { class: "hrow" }, card(cur, true),
         h("div", { class: "hbtns" }, h("button", { class: "hup", onclick: () => choose(true) }, "⬆", h("small", null, "MEHR")), h("button", { class: "hdn", onclick: () => choose(false) }, "⬇", h("small", null, "WENIGER"))),
         card(nxt, false)), fb);
+  }
+}
+
+/* =====================================================================
+   QUIZZLYBOARD – Bau-Spiele fürs Alleinspielen:
+   Rohr-Profi (Rohre drehen), Brückenbauer (Lücke genau füllen),
+   Baumeister (Bauplan nachbauen / spiegeln).
+   ===================================================================== */
+SOLO.push(
+  { id: "rohr", ico: "🚰", t: "Rohr-Profi", d: "Drehe die Rohre, bis das Wasser zur Blume fließt.", c1: "#0ea5e9", c2: "#1e3a8a", run: soloRohr },
+  { id: "bruecke", ico: "🌉", t: "Brückenbauer", d: "Lege Bretter genau über den Fluss – dann darf das Auto fahren.", c1: "#a16207", c2: "#0f766e", run: soloBruecke },
+  { id: "baumeister", ico: "🧱", t: "Baumeister", d: "Baue den Bauplan Stein für Stein nach.", c1: "#ef4444", c2: "#b45309", run: soloBaumeister }
+);
+/* kleine Helfer: Zeitgeber, die beim Verlassen des Spiels sicher gestoppt werden */
+function bauTimers() {
+  const list = [];
+  cleanup = () => { $("#score").style.display = ""; list.forEach(clearTimeout); };
+  return (fn, ms) => { const t = setTimeout(fn, ms); list.push(t); return t; };
+}
+const mistakeStars = m => m === 0 ? 3 : m <= 2 ? 2 : m <= 5 ? 1 : 0;
+const svgEl = (html, cls) => { const d = h("div", { class: cls }); d.innerHTML = html; return d; };
+
+/* ---------- 1) Rohr-Profi ---------- */
+/* Richtungen als Bits: N=1, O=2, S=4, W=8 */
+const P_D = { 1: [-1, 0], 2: [0, 1], 4: [1, 0], 8: [0, -1] }, P_OPP = { 1: 4, 2: 8, 4: 1, 8: 2 };
+const pRot = (m, n = 1) => { for (let i = 0; i < n; i++) m = ((m << 1) | (m >> 3)) & 15; return m; };
+function pipeSvg(mask) {
+  const arm = { 1: "x='34' y='-2' width='32' height='52'", 2: "x='50' y='34' width='52' height='32'", 4: "x='34' y='50' width='32' height='52'", 8: "x='-2' y='34' width='52' height='32'" };
+  const ch = { 1: "x='43' y='-2' width='14' height='52'", 2: "x='50' y='43' width='52' height='14'", 4: "x='43' y='50' width='14' height='52'", 8: "x='-2' y='43' width='52' height='14'" };
+  let o = "", c = "";
+  [1, 2, 4, 8].forEach(d => { if (mask & d) { o += `<rect class='po' ${arm[d]} rx='4'/>`; c += `<rect class='ch' ${ch[d]}/>`; } });
+  return `<svg viewBox='0 0 100 100' aria-hidden='true'>${o}<circle class='po' cx='50' cy='50' r='19'/>${c}<circle class='ch' cx='50' cy='50' r='8'/></svg>`;
+}
+function soloRohr(k) {
+  const g = soloById("rohr"), view = soloScreen(g, k), later = bauTimers();
+  const SIZES = { 1: [[3, 4], [3, 4], [4, 4]], 2: [[4, 4], [4, 5], [5, 5]], 3: [[5, 5], [5, 6], [6, 6]], 4: [[6, 6], [6, 7], [7, 7]] }[k];
+  let lvl = 0, taps = 0, minSum = 0;
+  level();
+  function makePath(R, C, rs, rt) {
+    const seen = new Set(), stack = [];
+    const dfs = (r, c) => {
+      seen.add(r + "," + c); stack.push([r, c]);
+      if (r === rt && c === C - 1) return true;
+      for (const d of shuffle([1, 2, 4, 8])) {
+        const nr = r + P_D[d][0], nc = c + P_D[d][1];
+        if (nr < 0 || nc < 0 || nr >= R || nc >= C || seen.has(nr + "," + nc)) continue;
+        if (dfs(nr, nc)) return true;
+      }
+      stack.pop(); return false;
+    };
+    dfs(rs, 0); return stack;
+  }
+  function level() {
+    const [R, C] = SIZES[lvl], rs = rnd(R), rt = rnd(R);
+    const path = makePath(R, C, rs, rt);
+    const cells = [];
+    for (let r = 0; r < R; r++) for (let c = 0; c < C; c++) {
+      const t = Math.random(); cells.push({ r, c, need: 0, base: k >= 3 && t < 0.22 ? 7 : t < 0.55 ? 5 : 3, rot: 0 });
+    }
+    const at = (r, c) => cells[r * C + c];
+    const dirTo = (a, b) => b[0] < a[0] ? 1 : b[1] > a[1] ? 2 : b[0] > a[0] ? 4 : 8;
+    path.forEach((p, i) => {
+      const inD = i === 0 ? 8 : dirTo(p, path[i - 1]), outD = i === path.length - 1 ? 2 : dirTo(p, path[i + 1]);
+      const cell = at(p[0], p[1]); cell.need = inD | outD; cell.base = cell.need;
+    });
+    /* alles verdrehen – Rohre auf dem Weg stehen am Anfang immer falsch */
+    cells.forEach(cell => {
+      let s = rnd(4);
+      if (cell.need) { while (pRot(cell.base, s) === cell.need) s = rnd(4);
+        cell.base = pRot(cell.base, s); let n = 0; while (pRot(cell.base, n) !== cell.need) n++; minSum += n; }
+      else cell.base = pRot(cell.base, s);
+    });
+    const mask = cell => pRot(cell.base, cell.rot % 4);
+    let solved = false;
+    const flower = h("div", { class: "pend tgt" }, "🥀"), src = h("div", { class: "pend src" }, "🚰");
+    const grid = h("div", { class: "pgrid", style: `--c:${C + 2};--r:${R}` });
+    for (let r = 0; r < R; r++) {
+      grid.append(r === rs ? src : h("div", { class: "pend" }));
+      for (let c = 0; c < C; c++) {
+        const cell = at(r, c);
+        cell.el = h("button", { class: "pcell", "aria-label": "Rohr drehen", onclick: () => turn(cell) }, svgEl(pipeSvg(cell.base), "prot"));
+        grid.append(cell.el);
+      }
+      grid.append(r === rt ? flower : h("div", { class: "pend" }));
+    }
+    const tapsEl = h("span", { class: "pill star" }, "🔄 " + taps);
+    const fb = h("div", { class: "sfb" }, h("div", { class: "sexp" }, "Tippe ein Rohr an, um es zu drehen."));
+    rc(view, h("div", { class: "vinfo" }, h("span", { class: "pill" }, `Level ${lvl + 1} / ${SIZES.length}`), tapsEl), grid, fb);
+    view.__cells = cells; /* nur für automatische Tests */
+    flow();
+    function turn(cell) {
+      if (solved) return;
+      cell.rot++; taps++; tapsEl.textContent = "🔄 " + taps; sfx.tick();
+      cell.el.firstChild.style.transform = `rotate(${cell.rot * 90}deg)`;
+      flow();
+    }
+    function flow() {
+      cells.forEach(c => c.el.classList.remove("wet"));
+      const start = at(rs, 0); if (!(mask(start) & 8)) return done(false);
+      const q = [start], seen = new Set([start]);
+      while (q.length) {
+        const cur = q.shift(); cur.el.classList.add("wet");
+        [1, 2, 4, 8].forEach(d => {
+          if (!(mask(cur) & d)) return;
+          const nr = cur.r + P_D[d][0], nc = cur.c + P_D[d][1];
+          if (nr < 0 || nc < 0 || nr >= R || nc >= C) return;
+          const n = at(nr, nc); if (seen.has(n) || !(mask(n) & P_OPP[d])) return;
+          seen.add(n); q.push(n);
+        });
+      }
+      const end = at(rt, C - 1); done(seen.has(end) && (mask(end) & 2));
+    }
+    function done(ok) {
+      if (!ok) return;
+      solved = true; grid.classList.add("solved"); flower.textContent = "🌻"; flower.classList.add("bloom"); sfx.ok();
+      later(() => rc(fb, h("div", { class: "sfbt ok" }, "Das Wasser fließt! 💧"),
+        h("button", { class: "btn green", onclick: () => { lvl++; lvl >= SIZES.length ? finish() : level(); } }, lvl + 1 >= SIZES.length ? "🏁 Ergebnis" : "➡ Nächstes Level")), 500);
+    }
+  }
+  /* Sterne: wie viele Drehungen mehr als nötig? */
+  function finish() {
+    const extra = Math.max(0, taps - minSum);
+    const st = extra <= Math.max(3, minSum * 0.3) ? 3 : extra <= minSum ? 2 : 1;
+    soloFinish(g, k, st, `${taps} Drehungen (${extra} mehr als nötig)`, extra, true);
+  }
+}
+
+/* ---------- 2) Brückenbauer ---------- */
+const CAR_SVG = "<svg viewBox='0 0 120 60' aria-hidden='true'><rect x='6' y='22' width='108' height='24' rx='9' fill='#ef4444'/><path d='M28 24 L40 6 H78 L94 24 Z' fill='#ef4444'/><path d='M44 10 H58 V23 H36 Z M62 10 H76 L87 23 H62 Z' fill='#bae6fd'/><rect x='104' y='28' width='10' height='7' rx='3' fill='#fde047'/><circle cx='32' cy='47' r='11' fill='#1f2937'/><circle cx='32' cy='47' r='5' fill='#cbd5e1'/><circle cx='90' cy='47' r='11' fill='#1f2937'/><circle cx='90' cy='47' r='5' fill='#cbd5e1'/></svg>";
+function bridgeTask(k) {
+  const cfg = { 1: { L: [5, 10], step: 1, min: 1, max: 6 }, 2: { L: [10, 20], step: 1, min: 2, max: 10 },
+                3: { L: [30, 100], step: 10, min: 5, max: 60, ps: 5 }, 4: { L: [200, 600], step: 25, min: 50, max: 300, ps: 25 } }[k];
+  const ps = cfg.ps || 1;
+  for (let tries = 0; tries < 200; tries++) {
+    const steps = (cfg.L[1] - cfg.L[0]) / cfg.step, L = cfg.L[0] + rnd(steps + 1) * cfg.step;
+    const n = k === 1 ? 2 + rnd(2) : 2 + rnd(2);
+    const cuts = []; for (let i = 0; i < n - 1; i++) cuts.push(ps * (1 + rnd(L / ps - 1)));
+    const pts = [0, ...[...new Set(cuts)].sort((a, b) => a - b), L];
+    const parts = pts.slice(1).map((x, i) => x - pts[i]);
+    if (parts.length < 2 || parts.some(x => x < cfg.min || x > cfg.max)) continue;
+    const extra = [];
+    while (extra.length < (k <= 2 ? 3 : 4)) { const v = cfg.min + ps * rnd(Math.floor((cfg.max - cfg.min) / ps) + 1); extra.push(v); }
+    return { L, pieces: shuffle([...parts, ...extra]) };
+  }
+  return { L: 8, pieces: shuffle([3, 5, 2, 4]) };
+}
+const bFmt = (k, v) => k === 4 ? (v >= 100 ? Math.floor(v / 100) + " m" + (v % 100 ? " " + (v % 100) + " cm" : "") : v + " cm") : v + " m";
+function soloBruecke(k) {
+  const g = soloById("bruecke"), view = soloScreen(g, k), later = bauTimers();
+  const ROUNDS = 5; let round = 0, mistakes = 0;
+  next();
+  function next() {
+    if (round >= ROUNDS) return soloFinish(g, k, mistakeStars(mistakes), `${ROUNDS} Brücken · ${mistakes} ${mistakes === 1 ? "Fehler" : "Fehler"}`, mistakes, true);
+    const t = bridgeTask(k); let placed = [], busy = false, won = false;
+    const sum = () => placed.reduce((a, p) => a + p.v, 0);
+    const deck = h("div", { class: "bdeck" });
+    const ruler = h("div", { class: "bruler" });
+    if (t.L <= 20) for (let i = 0; i < t.L; i++) ruler.append(h("i"));
+    const car = svgEl(CAR_SVG, "bcar");
+    const splash = h("div", { class: "bsplash" }, "💦");
+    const gapLbl = h("div", { class: "bgaplbl" }, "↔ " + bFmt(k, t.L));
+    const scene = h("div", { class: "bscene" },
+      h("div", { class: "bsky" }), h("div", { class: "bwater" }), h("div", { class: "bcliff l" }), h("div", { class: "bcliff r" }, h("span", { class: "bflag" }, "🏁")),
+      h("div", { class: "bgap" }, gapLbl, deck, ruler), car, splash);
+    const left = h("span", { class: "pill" });
+    const tray = h("div", { class: "btray" });
+    const fb = h("div", { class: "sfb" });
+    const drive = h("button", { class: "btn green big", onclick: test }, "🚗 Testfahrt!");
+    const btns = t.pieces.map((v, i) => { const b = h("button", { class: "bplank", onclick: () => put(i, b) }, bFmt(k, v)); return b; });
+    tray.append(...btns);
+    rc(view, h("div", { class: "vinfo" }, h("span", { class: "pill" }, `Brücke ${round + 1} / ${ROUNDS}`), h("span", { class: "pill star" }, "❌ " + mistakes), left),
+      scene, h("div", { class: "blbl" }, "Tippe Bretter an. Sie müssen ", h("b", null, "genau"), " über die Lücke passen!"), tray, h("div", { class: "row" }, drive), fb);
+    view.__task = t; /* nur für automatische Tests */
+    draw();
+    function draw() {
+      deck.replaceChildren(...placed.map(p => h("button", { class: "bpl", style: `width:${p.v / t.L * 100}%`, title: "Zurücklegen", onclick: () => take(p) }, bFmt(k, p.v))));
+      const s = sum(); left.textContent = s === t.L ? "✅ passt genau!" : "Noch frei: " + bFmt(k, t.L - s);
+      left.className = "pill" + (s === t.L ? " good" : "");
+    }
+    function put(i, b) {
+      if (busy || won || b.disabled) return;
+      const v = t.pieces[i];
+      if (sum() + v > t.L) { mistakes++; sfx.bad(); b.classList.remove("shake"); void b.offsetWidth; b.classList.add("shake");
+        rc(fb, h("div", { class: "sfbt no" }, "Zu lang! Dieses Brett passt nicht mehr hinein.")); view.querySelector(".pill.star").textContent = "❌ " + mistakes; return; }
+      sfx.tick(); b.disabled = true; placed.push({ v, b }); rc(fb); draw();
+    }
+    function take(p) { if (busy || won) return; placed = placed.filter(x => x !== p); p.b.disabled = false; sfx.soft(330); draw(); }
+    function test() {
+      if (busy || won) return;
+      busy = true; drive.disabled = true; rc(fb);
+      const s = sum(), ok = s === t.L;
+      const end = ok ? 92 : 16 + 68 * s / t.L - 4;
+      car.style.transition = `left ${ok ? 2.2 : 0.4 + 1.4 * s / t.L}s ease-in-out`; car.style.left = end + "%";
+      if (ok) {
+        won = true;
+        later(() => { sfx.ok(); confetti(30); rc(fb, h("div", { class: "sfbt ok" }, "Geschafft! Die Brücke hält. 🎉"),
+          h("button", { class: "btn green", onclick: () => { round++; next(); } }, round + 1 >= ROUNDS ? "🏁 Ergebnis" : "➡ Nächste Brücke")); }, 2300);
+      } else {
+        mistakes++;
+        later(() => { car.classList.add("fall"); sfx.bad(); splash.style.left = (end + 5) + "%"; splash.classList.add("on");
+          view.querySelector(".pill.star").textContent = "❌ " + mistakes;
+          rc(fb, h("div", { class: "sfbt no" }, "Platsch! Die Brücke ist noch zu kurz.")); }, (0.4 + 1.4 * s / t.L) * 1000 + 50);
+        later(() => { car.style.transition = "none"; car.classList.remove("fall"); car.style.left = ""; splash.classList.remove("on"); busy = false; drive.disabled = false; }, (0.4 + 1.4 * s / t.L) * 1000 + 1700);
+      }
+    }
+  }
+}
+
+/* ---------- 3) Baumeister ---------- */
+const BM_COL = [["rot", "#ef4444"], ["blau", "#3b82f6"], ["gelb", "#facc15"], ["grün", "#22c55e"]];
+function soloBaumeister(k) {
+  const g = soloById("baumeister"), view = soloScreen(g, k), later = bauTimers();
+  const cfg = { 1: { R: 3, C: 3, n: 2, mirror: false }, 2: { R: 4, C: 4, n: 3, mirror: false }, 3: { R: 4, C: 6, n: 3, mirror: true }, 4: { R: 5, C: 8, n: 4, mirror: true } }[k];
+  const ROUNDS = 4; let round = 0, mistakes = 0;
+  next();
+  function pattern(R, C) {
+    for (;;) {
+      const p = []; for (let i = 0; i < R * C; i++) p.push(Math.random() < 0.5 ? 1 + rnd(cfg.n) : 0);
+      const filled = p.filter(Boolean).length, cols = new Set(p.filter(Boolean)).size;
+      if (filled >= Math.ceil(R * C * 0.35) && filled <= Math.ceil(R * C * 0.75) && cols >= Math.min(2, cfg.n)) return p;
+    }
+  }
+  function next() {
+    if (round >= ROUNDS) return soloFinish(g, k, mistakeStars(mistakes), `${ROUNDS} Baupläne · ${mistakes} Fehler`, mistakes, true);
+    const { R, C, mirror } = cfg, half = C / 2;
+    let sel = 1, won = false;
+    /* Spiegeln: linke Hälfte ist vorgegeben, rechte Hälfte wird gebaut */
+    const plan = pattern(R, mirror ? half : C);
+    const target = []; const build = [];
+    if (mirror) for (let r = 0; r < R; r++) for (let c = 0; c < C; c++) { target.push(c < half ? plan[r * half + c] : plan[r * half + (C - 1 - c)]); build.push(c < half ? plan[r * half + c] : 0); }
+    else for (let i = 0; i < R * C; i++) { target.push(plan[i]); build.push(0); }
+    const fixed = i => mirror && (i % C) < half;
+    const block = (v, extra) => h("div", { class: "bmb" + (v ? " on" : "") + (extra || ""), style: v ? `--b:${BM_COL[v - 1][1]}` : "" });
+    const cellsEl = [];
+    const buildGrid = h("div", { class: "bmgrid build" + (mirror ? " mirror" : ""), style: `--c:${C}` });
+    build.forEach((v, i) => { const b = h("button", { class: "bmcell" + (fixed(i) ? " fixed" : ""), onclick: () => paint(i) }); cellsEl.push(b); buildGrid.append(b); });
+    if (mirror) buildGrid.append(h("div", { class: "bmaxis", style: `--h:${half}` }));
+    const planGrid = mirror ? null : h("div", { class: "bmgrid plan", style: `--c:${C}` }, plan.map(v => block(v)));
+    const pal = h("div", { class: "bmpal" });
+    const fb = h("div", { class: "sfb" });
+    function drawPal() {
+      pal.replaceChildren(...BM_COL.slice(0, cfg.n).map(([n, col], i) => h("button", { class: "bmsw" + (sel === i + 1 ? " on" : ""), style: `--b:${col}`, "aria-label": "Farbe " + n, onclick: () => { sel = i + 1; sfx.tick(); drawPal(); } })),
+        h("button", { class: "bmsw er" + (sel === 0 ? " on" : ""), "aria-label": "Radiergummi", onclick: () => { sel = 0; sfx.tick(); drawPal(); } }, "🧽"));
+    }
+    function drawCells() { cellsEl.forEach((b, i) => { b.replaceChildren(block(build[i])); }); }
+    function paint(i) {
+      if (won || fixed(i)) return;
+      build[i] = build[i] === sel ? 0 : sel; sfx.soft(build[i] ? 520 : 330);
+      cellsEl[i].classList.remove("bad"); drawCells();
+    }
+    function check() {
+      if (won) return;
+      const bad = []; build.forEach((v, i) => { if (v !== target[i]) bad.push(i); });
+      if (!bad.length) {
+        won = true; sfx.ok(); buildGrid.classList.add("done"); confetti(25);
+        rc(fb, h("div", { class: "sfbt ok" }, mirror ? "Perfekt gespiegelt! 🎉" : "Genau wie im Bauplan! 🎉"),
+          h("button", { class: "btn green", onclick: () => { round++; next(); } }, round + 1 >= ROUNDS ? "🏁 Ergebnis" : "➡ Nächster Bauplan"));
+        return;
+      }
+      mistakes++; sfx.bad(); view.querySelector(".pill.star").textContent = "❌ " + mistakes;
+      bad.forEach(i => cellsEl[i].classList.add("bad"));
+      later(() => bad.forEach(i => cellsEl[i] && cellsEl[i].classList.remove("bad")), 1800);
+      rc(fb, h("div", { class: "sfbt no" }, bad.length === 1 ? "Fast! Ein Stein stimmt noch nicht." : `Noch ${bad.length} Steine stimmen nicht.`), h("div", { class: "sexp" }, "Die rot blinkenden Felder musst du ändern."));
+    }
+    rc(view, h("div", { class: "vinfo" }, h("span", { class: "pill" }, `Bauplan ${round + 1} / ${ROUNDS}`), h("span", { class: "pill star" }, "❌ " + mistakes)),
+      h("div", { class: "blbl" }, mirror ? "Spiegle die Steine an der roten Linie – baue die rechte Seite!" : "Baue den Bauplan genau nach: Farbe wählen, dann Felder antippen."),
+      h("div", { class: "bmwrap" + (mirror ? " one" : "") },
+        planGrid ? h("div", { class: "bmbox" }, h("div", { class: "bmt" }, "📋 Bauplan"), planGrid) : null,
+        h("div", { class: "bmbox" }, h("div", { class: "bmt" }, mirror ? "↔️ Spiegel-Baustelle" : "🏗️ Deine Baustelle"), buildGrid)),
+      pal, h("div", { class: "row" }, h("button", { class: "btn green big", onclick: check }, "✔ Fertig – prüfen")), fb);
+    view.__target = target; view.__fixed = fixed; /* nur für automatische Tests */
+    drawPal(); drawCells();
   }
 }
 
