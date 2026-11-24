@@ -812,18 +812,50 @@ body.buzzmode #top, body.buzzmode #score{display:none}
 @keyframes blkdrop{from{transform:translateY(-1em);opacity:0}}
 
 /* Rohr-Profi */
-.pgrid{display:grid;grid-template-columns:repeat(var(--c),1fr);gap:3px;width:min(94vw,calc((100vh - 270px) * var(--c) / var(--r)),900px)}
-.pend{display:grid;place-items:center;font-size:clamp(22px,6vmin,60px);line-height:1}
-.pend.bloom{animation:starpop .6s both}
-.pcell{display:block;padding:0;border:0;border-radius:10px;background:radial-gradient(circle at 30% 25%,#8b5e34,#5b3a1e);box-shadow:inset 0 0 0 2px rgba(0,0,0,.25);overflow:hidden;cursor:pointer}
-.pcell:active{filter:brightness(1.15)}
-.prot{transition:transform .18s ease-out}
+.gt-rohr .tap{display:inline-block;width:.62em;margin-right:.22em}.gt-rohr .tap svg{display:block;width:100%;height:auto}
+.pgrid{display:grid;grid-template-columns:1.5fr repeat(var(--n),1fr) 1.5fr;gap:3px;margin-top:clamp(10px,4vh,44px);width:min(94vw,calc((100vh - 290px) * var(--c) / (var(--r) + .3)),1300px)}
+.pend{position:relative}
+.pside{position:absolute;left:0;right:0;bottom:0;pointer-events:none}
+.pside svg{display:block;width:100%;height:auto;overflow:visible}
+.pcell{display:block;padding:0;border:0;border-radius:10px;overflow:hidden;cursor:pointer;
+  background:radial-gradient(circle at 18% 22%,rgba(255,255,255,.1) 0 5%,transparent 6%),radial-gradient(circle at 78% 72%,rgba(0,0,0,.13) 0 6%,transparent 7%),radial-gradient(circle at 70% 18%,rgba(0,0,0,.1) 0 4%,transparent 5%),linear-gradient(155deg,#6aa51c,#3f6212);
+  box-shadow:inset 0 0 0 2px rgba(0,0,0,.2),inset 0 -5px 0 rgba(0,0,0,.14)}
+.pcell:active{filter:brightness(1.12)}
+.prot{transition:transform .2s ease-out}
 .prot svg{display:block;width:100%;height:auto}
-.prot .po{fill:#cbd5e1;stroke:#475569;stroke-width:3}
-.prot .ch{fill:#1e293b;transition:fill .25s}
-.pcell.wet .ch{fill:#38bdf8}
-.pgrid.solved .pcell.wet{animation:wetglow 1.2s ease-in-out 2}
-@keyframes wetglow{50%{box-shadow:inset 0 0 0 3px #7dd3fc,0 0 14px #38bdf8}}
+.pcell .gr,.pside .gr{fill:#1e293b}
+.pcell .wa,.pside .wa{fill:url(#pw);opacity:0;transition:opacity .2s}
+.pcell.wet .wa{opacity:1;transition:opacity .35s var(--wd,0s)}
+.pside .wa.on,.bed.on .wa{opacity:1}
+.bed.on .wa{transition:opacity .3s calc(var(--t0,0s) - .2s)}
+.pgrid.solved .pcell.wet{animation:wetglow 1s ease-in-out var(--wd,0s) 2}
+@keyframes wetglow{50%{box-shadow:inset 0 0 0 3px #7dd3fc,0 0 16px #38bdf8}}
+.tank .twave{animation:twave 2.2s linear infinite}
+@keyframes twave{to{transform:translateX(-22px)}}
+.tank .wheel{transform-box:fill-box;transform-origin:center}
+.tank.on .wheel{animation:wheelspin 1.4s ease-in-out both}
+@keyframes wheelspin{to{transform:rotate(-540deg)}}
+/* Beet: trocken -> nass -> Blumen wachsen */
+.bed .wets{transform-box:fill-box;transform-origin:left center;transform:scaleX(0);transition:transform 1s ease-out}
+.bed.on .wets{transform:scaleX(1);transition-delay:var(--t0,0s)}
+.bed .crack{transition:opacity .6s}.bed.on .crack{opacity:0;transition-delay:calc(var(--t0,0s) + .4s)}
+.bed .stemg{transform-box:fill-box;transform-origin:50% 100%;transform:scaleY(.2) rotate(-8deg);transition:transform 1.1s cubic-bezier(.3,1.4,.5,1)}
+.bed .stem{stroke:#a3a35a;transition:stroke .8s}.bed .leaf{fill:#b5b56a;transition:fill .8s}
+.bed.on .stemg{transform:none;transition-delay:calc(var(--t0,0s) + .5s + var(--i) * .25s)}
+.bed.on .stem{stroke:#15803d;transition-delay:calc(var(--t0,0s) + .3s)}.bed.on .leaf{fill:#22c55e;transition-delay:calc(var(--t0,0s) + .3s)}
+.bed .head{transform-box:fill-box;transform-origin:center;transform:scale(0) rotate(-90deg);transition:transform .7s cubic-bezier(.3,1.6,.5,1)}
+.bed.on .head{transform:none;transition-delay:calc(var(--t0,0s) + 1.2s + var(--i) * .25s)}
+.bed.on .fl{animation:sway 3s ease-in-out calc(var(--t0,0s) + 2.6s + var(--i) * .3s) infinite}
+.bed .fl{transform-box:fill-box;transform-origin:50% 100%}
+@keyframes sway{25%{transform:rotate(2.5deg)}75%{transform:rotate(-2.5deg)}}
+.bed .drop{opacity:0;transform-box:fill-box;transform-origin:center}
+.bed.on .drop{animation:dropjump .7s ease-out calc(var(--t0,0s) + .15s + var(--i) * .15s) 2}
+@keyframes dropjump{0%{opacity:0;transform:translateY(6px) scale(.6)}30%{opacity:1}100%{opacity:0;transform:translateY(-16px) scale(1)}}
+.bed .bfly{opacity:0}
+.bed.on .bfly{animation:bfly 6s ease-in-out calc(var(--t0,0s) + 2.2s) infinite}
+.bed .bw{transform-box:fill-box;transform-origin:center;animation:flap .25s ease-in-out infinite alternate}
+@keyframes flap{to{transform:scaleX(.25)}}
+@keyframes bfly{0%{opacity:0;transform:translate(96px,10px)}12%{opacity:1}35%{transform:translate(58px,-12px) rotate(-10deg)}60%{transform:translate(30px,4px) rotate(8deg)}85%{opacity:1;transform:translate(70px,-20px)}100%{opacity:0;transform:translate(100px,-30px)}}
 
 /* Brückenbauer */
 .bscene{position:relative;flex:none;width:min(1000px,96vw);height:clamp(170px,32vh,300px);border-radius:20px;overflow:hidden;background:linear-gradient(#7dd3fc,#e0f2fe 70%)}
@@ -4036,7 +4068,7 @@ function gameTitle(id) {
     case "maske": return T(id, h("span", { class: "mk" }, "🎭"), letters("DIE MASKE", "l", (c, i) => ({ style: `--d:${i * 0.18}s` })));
     case "hoehe": return T(id, h("span", { class: "hup" }, "⬆ HÖHER"), h("span", { class: "sm" }, "oder"), h("span", { class: "hdn" }, "TIEFER ⬇"));
     case "mauer": return T(id, letters("DIE MAUER", "brick"));
-    case "rohr": return T(id, h("span", { class: "tap" }, "🚰"), letters("ROHR-PROFI", "pipe", (c, i) => ({ style: `--d:${i * 0.12}s` })));
+    case "rohr": return T(id, svgEl("<svg viewBox='0 0 20 26' aria-hidden='true'><path d='M10 1C6 8 2 12 2 17a8 8 0 0 0 16 0C18 12 14 8 10 1z' fill='#38bdf8' stroke='#e0f2fe' stroke-width='1.5'/></svg>", "tap"), letters("ROHR-PROFI", "pipe", (c, i) => ({ style: `--d:${i * 0.12}s` })));
     case "bruecke": return T(id, letters("BRÜCKENBAUER", "plank", (c, i) => ({ style: `--y:${Math.round(Math.sin(i / 11 * Math.PI) * -8)}px` })));
     case "baumeister": return T(id, letters("BAUMEISTER", "blk", (c, i) => ({ style: `--b:${["#ef4444", "#3b82f6", "#eab308", "#22c55e"][i % 4]};--d:${i * 0.1}s` })));
     case "teamsplit": return T(id, h("span", { class: "ppl" }, "👥"), letters("TEAMS EINTEILEN", "l", (c, i) => ({ style: `color:${COLORS[i % 8]};--d:${(i * 0.17) % 1.4}s` })));
@@ -5511,12 +5543,72 @@ const svgEl = (html, cls) => { const d = h("div", { class: cls }); d.innerHTML =
 /* Richtungen als Bits: N=1, O=2, S=4, W=8 */
 const P_D = { 1: [-1, 0], 2: [0, 1], 4: [1, 0], 8: [0, -1] }, P_OPP = { 1: 4, 2: 8, 4: 1, 8: 2 };
 const pRot = (m, n = 1) => { for (let i = 0; i < n; i++) m = ((m << 1) | (m >> 3)) & 15; return m; };
+/* gemeinsame Farbverläufe für alle Rohre (einmal pro Seite) */
+function pipeDefs() {
+  if (document.getElementById("pipedefs")) return;
+  const steel = "<stop offset='0' stop-color='#526173'/><stop offset='.3' stop-color='#f8fafc'/><stop offset='.58' stop-color='#cbd5e1'/><stop offset='1' stop-color='#3b4757'/>";
+  const brass = "<stop offset='0' stop-color='#7c2d12'/><stop offset='.32' stop-color='#fde68a'/><stop offset='.6' stop-color='#f59e0b'/><stop offset='1' stop-color='#78350f'/>";
+  const d = h("div", { id: "pipedefs", style: "position:absolute;width:0;height:0;overflow:hidden", "aria-hidden": "true" });
+  d.innerHTML = `<svg width='0' height='0'><defs>
+    <linearGradient id='pgH' x1='0' y1='0' x2='0' y2='1'>${steel}</linearGradient><linearGradient id='pgV' x1='0' y1='0' x2='1' y2='0'>${steel}</linearGradient>
+    <linearGradient id='pbH' x1='0' y1='0' x2='0' y2='1'>${brass}</linearGradient><linearGradient id='pbV' x1='0' y1='0' x2='1' y2='0'>${brass}</linearGradient>
+    <radialGradient id='pgC' cx='.38' cy='.34' r='.75'><stop offset='0' stop-color='#ffffff'/><stop offset='.45' stop-color='#cbd5e1'/><stop offset='1' stop-color='#3b4757'/></radialGradient>
+    <linearGradient id='pw' gradientUnits='userSpaceOnUse' x1='0' y1='0' x2='26' y2='26' spreadMethod='repeat'><stop offset='0' stop-color='#0369a1'/><stop offset='.5' stop-color='#7dd3fc'/><stop offset='1' stop-color='#0369a1'/>
+      <animateTransform attributeName='gradientTransform' type='translate' from='0 0' to='26 26' dur='0.9s' repeatCount='indefinite'/></linearGradient>
+    <linearGradient id='tkB' x1='0' y1='0' x2='1' y2='0'><stop offset='0' stop-color='#1e3a8a'/><stop offset='.3' stop-color='#60a5fa'/><stop offset='.55' stop-color='#2563eb'/><stop offset='1' stop-color='#1e3a8a'/></linearGradient>
+    <linearGradient id='wdB' x1='0' y1='0' x2='0' y2='1'><stop offset='0' stop-color='#e0a25a'/><stop offset='.5' stop-color='#b7742f'/><stop offset='1' stop-color='#8a5220'/></linearGradient>
+  </defs></svg>`;
+  document.body.append(d);
+}
 function pipeSvg(mask) {
-  const arm = { 1: "x='34' y='-2' width='32' height='52'", 2: "x='50' y='34' width='52' height='32'", 4: "x='34' y='50' width='32' height='52'", 8: "x='-2' y='34' width='52' height='32'" };
-  const ch = { 1: "x='43' y='-2' width='14' height='52'", 2: "x='50' y='43' width='52' height='14'", 4: "x='43' y='50' width='14' height='52'", 8: "x='-2' y='43' width='52' height='14'" };
-  let o = "", c = "";
-  [1, 2, 4, 8].forEach(d => { if (mask & d) { o += `<rect class='po' ${arm[d]} rx='4'/>`; c += `<rect class='ch' ${ch[d]}/>`; } });
-  return `<svg viewBox='0 0 100 100' aria-hidden='true'>${o}<circle class='po' cx='50' cy='50' r='19'/>${c}<circle class='ch' cx='50' cy='50' r='8'/></svg>`;
+  const body = { 1: [29, -1, 42, 51, "V"], 2: [50, 29, 51, 42, "H"], 4: [29, 50, 42, 51, "V"], 8: [-1, 29, 51, 42, "H"] };
+  const flange = { 1: [24, 1, 52, 11, "V"], 2: [88, 24, 11, 52, "H"], 4: [24, 88, 52, 11, "V"], 8: [1, 24, 11, 52, "H"] };
+  const groove = { 1: [42, -1, 16, 51], 2: [50, 42, 51, 16], 4: [42, 50, 16, 51], 8: [-1, 42, 51, 16] };
+  const R = (a, extra) => `<rect x='${a[0]}' y='${a[1]}' width='${a[2]}' height='${a[3]}' ${extra}/>`;
+  let bo = "", fl = "", gr = "", wa = "";
+  [1, 2, 4, 8].forEach(d => { if (!(mask & d)) return;
+    bo += R(body[d], `fill='url(#pg${body[d][4]})' stroke='#334155' stroke-width='2'`);
+    fl += R(flange[d], `rx='3' fill='url(#pb${flange[d][4]})' stroke='#78350f' stroke-width='1.5'`);
+    gr += R(groove[d], "class='gr'"); wa += R(groove[d], "class='wa'"); });
+  return `<svg viewBox='0 0 100 100' aria-hidden='true'>${bo}${fl}<circle cx='50' cy='50' r='25' fill='url(#pgC)' stroke='#334155' stroke-width='2'/>`
+    + `${gr}<circle class='gr' cx='50' cy='50' r='10'/>${wa}<circle class='wa' cx='50' cy='50' r='10'/></svg>`;
+}
+/* Wassertank (links) – Auslauf auf Höhe der Rohrmitte */
+const TANK_SVG = `<svg viewBox='0 0 100 150' aria-hidden='true'>
+  <rect x='14' y='126' width='7' height='22' fill='#475569'/><rect x='55' y='126' width='7' height='22' fill='#475569'/><rect x='8' y='144' width='62' height='5' rx='2' fill='#334155'/>
+  <rect x='66' y='103' width='35' height='28' fill='url(#pgH)' stroke='#334155' stroke-width='2'/><rect x='89' y='99' width='10' height='36' rx='3' fill='url(#pbH)' stroke='#78350f' stroke-width='1.5'/>
+  <rect class='gr' x='66' y='111.7' width='35' height='10.6'/><rect class='wa on' x='66' y='111.7' width='35' height='10.6'/>
+  <rect x='6' y='26' width='64' height='104' rx='14' fill='url(#tkB)' stroke='#1e3a8a' stroke-width='3'/>
+  <ellipse cx='38' cy='27' rx='32' ry='9' fill='#93c5fd' stroke='#1e3a8a' stroke-width='3'/>
+  <rect x='6' y='56' width='64' height='5' fill='#1e3a8a' opacity='.55'/><rect x='6' y='106' width='64' height='5' fill='#1e3a8a' opacity='.55'/>
+  <path d='M38 33c-5 7-8 10-8 14a8 8 0 0 0 16 0c0-4-3-7-8-14z' fill='#e0f2fe'/>
+  <rect x='25' y='66' width='26' height='36' rx='6' fill='#0c4a6e' stroke='#e0f2fe' stroke-width='2.5'/>
+  <clipPath id='tkclip'><rect x='27' y='68' width='22' height='32' rx='4'/></clipPath>
+  <g clip-path='url(#tkclip)'><path class='twave' d='M0 80 q5.5 -4 11 0 t11 0 t11 0 t11 0 t11 0 t11 0 t11 0 V102 H0z' fill='#38bdf8'/></g>
+  <rect x='13' y='34' width='6' height='88' rx='3' fill='#fff' opacity='.22'/>
+  <g class='valve'><rect x='75' y='92' width='6' height='12' fill='#64748b'/><g class='wheel'><circle cx='78' cy='88' r='10' fill='none' stroke='#dc2626' stroke-width='4'/><path d='M68 88h20M78 78v20' stroke='#dc2626' stroke-width='3'/><circle cx='78' cy='88' r='3' fill='#7f1d1d'/></g></g>
+</svg>`;
+/* Hochbeet (rechts) mit Blumen, die nach dem Gießen wachsen */
+function bedSvg() {
+  const F = [[30, 30, "#f472b6", "#fde047"], [47, 16, "#facc15", "#c2410c"], [64, 34, "#a78bfa", "#fde047"], [82, 20, "#fb7185", "#fef08a"]];
+  const flowers = F.map(([x, top, pc, cc], i) => {
+    const petals = [0, 60, 120, 180, 240, 300].map(a => `<ellipse cx='0' cy='-7.5' rx='4.6' ry='7.5' fill='${pc}' transform='rotate(${a})'/>`).join("");
+    return `<g class='fl' style='--i:${i}'><g class='stemg'><path class='stem' d='M${x} 96 C${x - 3} ${78}, ${x + 3} ${top + 24}, ${x} ${top}' fill='none' stroke-width='3.4' stroke-linecap='round'/>
+      <path class='leaf' d='M${x} 80q-12-3-15-13q12 1 15 13z'/><path class='leaf' d='M${x} ${top + 30}q12-3 15-13q-12 1-15 13z'/></g>
+      <g transform='translate(${x} ${top})'><g class='head'>${petals}<circle r='5' fill='${cc}' stroke='#92400e' stroke-width='1'/></g></g></g>`;
+  }).join("");
+  const drops = [38, 56, 74].map((x, i) => `<path class='drop' style='--i:${i}' d='M${x} 84c-2.5 3.5-4 5.2-4 7a4 4 0 0 0 8 0c0-1.8-1.5-3.5-4-7z' fill='#7dd3fc'/>`).join("");
+  return `<svg viewBox='0 0 100 150' aria-hidden='true'>
+    <rect x='-1' y='103' width='22' height='28' fill='url(#pgH)' stroke='#334155' stroke-width='2'/><rect x='1' y='99' width='10' height='36' rx='3' fill='url(#pbH)' stroke='#78350f' stroke-width='1.5'/>
+    <rect class='gr' x='-1' y='111.7' width='22' height='10.6'/><rect class='wa' x='-1' y='111.7' width='22' height='10.6'/>
+    ${flowers}
+    <path d='M16 98 Q20 88 56 88 Q92 88 96 98 Z' fill='#b0855a'/><path class='wets' d='M16 98 Q20 88 56 88 Q92 88 96 98 Z' fill='#4a2c17'/>
+    <path class='crack' d='M30 93l5-2 3 3M60 92l4 2 4-3M78 94l3-2' stroke='#7c5a36' stroke-width='1.2' fill='none'/>
+    ${drops}
+    <rect x='14' y='96' width='84' height='52' rx='4' fill='url(#wdB)' stroke='#5b3412' stroke-width='2.5'/>
+    <path d='M15 113h82M15 130h82' stroke='#5b3412' stroke-width='2.2' opacity='.7'/><path d='M22 104q20-3 40 0t30 0M26 121q18 3 36 0t30 0M20 139q22-3 42 0t30 0' stroke='#7a4518' stroke-width='1' fill='none' opacity='.55'/><circle cx='20' cy='104' r='1.8' fill='#5b3412'/><circle cx='92' cy='104' r='1.8' fill='#5b3412'/><circle cx='20' cy='121' r='1.8' fill='#5b3412'/><circle cx='92' cy='121' r='1.8' fill='#5b3412'/><circle cx='20' cy='139' r='1.8' fill='#5b3412'/><circle cx='92' cy='139' r='1.8' fill='#5b3412'/>
+    <g class='bfly'><g class='bw'><ellipse cx='-4' cy='0' rx='5' ry='7' fill='#f97316'/><ellipse cx='4' cy='0' rx='5' ry='7' fill='#f97316'/><ellipse cx='-3.5' cy='6' rx='3' ry='4' fill='#fb923c'/><ellipse cx='3.5' cy='6' rx='3' ry='4' fill='#fb923c'/></g><rect x='-1' y='-6' width='2' height='15' rx='1' fill='#1f2937'/></g>
+  </svg>`;
 }
 function soloRohr(k) {
   const g = soloById("rohr"), view = soloScreen(g, k), later = bauTimers();
@@ -5538,7 +5630,7 @@ function soloRohr(k) {
     dfs(rs, 0); return stack;
   }
   function level() {
-    const [R, C] = SIZES[lvl], rs = rnd(R), rt = rnd(R);
+    const [R, C] = SIZES[lvl], rs = 1 + rnd(R - 1), rt = 1 + rnd(R - 1); /* nicht oberste Reihe: Tank und Beet ragen nach oben */
     const path = makePath(R, C, rs, rt);
     const cells = [];
     for (let r = 0; r < R; r++) for (let c = 0; c < C; c++) {
@@ -5559,8 +5651,10 @@ function soloRohr(k) {
     });
     const mask = cell => pRot(cell.base, cell.rot % 4);
     let solved = false;
-    const flower = h("div", { class: "pend tgt" }, "🥀"), src = h("div", { class: "pend src" }, "🚰");
-    const grid = h("div", { class: "pgrid", style: `--c:${C + 2};--r:${R}` });
+    pipeDefs();
+    const bed = svgEl(bedSvg(), "pside bed"), tank = svgEl(TANK_SVG, "pside tank");
+    const flower = h("div", { class: "pend tgt" }, bed), src = h("div", { class: "pend src" }, tank);
+    const grid = h("div", { class: "pgrid", style: `--n:${C};--c:${C + 3};--r:${R}` });
     for (let r = 0; r < R; r++) {
       grid.append(r === rs ? src : h("div", { class: "pend" }));
       for (let c = 0; c < C; c++) {
@@ -5582,26 +5676,38 @@ function soloRohr(k) {
       flow();
     }
     function flow() {
-      cells.forEach(c => c.el.classList.remove("wet"));
-      const start = at(rs, 0); if (!(mask(start) & 8)) return done(false);
-      const q = [start], seen = new Set([start]);
-      while (q.length) {
-        const cur = q.shift(); cur.el.classList.add("wet");
-        [1, 2, 4, 8].forEach(d => {
-          if (!(mask(cur) & d)) return;
-          const nr = cur.r + P_D[d][0], nc = cur.c + P_D[d][1];
-          if (nr < 0 || nc < 0 || nr >= R || nc >= C) return;
-          const n = at(nr, nc); if (seen.has(n) || !(mask(n) & P_OPP[d])) return;
-          seen.add(n); q.push(n);
-        });
+      /* Wasser breitet sich vom Tank aus; neu erreichte Rohre füllen sich nacheinander (Verzögerung je Abstand) */
+      const before = new Set(cells.filter(c => c.wet)), dist = new Map();
+      cells.forEach(c => { c.wet = false; });
+      const start = at(rs, 0);
+      if (mask(start) & 8) {
+        const q = [start]; dist.set(start, 0); start.wet = true;
+        while (q.length) {
+          const cur = q.shift();
+          [1, 2, 4, 8].forEach(d => {
+            if (!(mask(cur) & d)) return;
+            const nr = cur.r + P_D[d][0], nc = cur.c + P_D[d][1];
+            if (nr < 0 || nc < 0 || nr >= R || nc >= C) return;
+            const n = at(nr, nc); if (dist.has(n) || !(mask(n) & P_OPP[d])) return;
+            dist.set(n, dist.get(cur) + 1); n.wet = true; q.push(n);
+          });
+        }
       }
-      const end = at(rt, C - 1); done(seen.has(end) && (mask(end) & 2));
+      const fresh = cells.filter(c => c.wet && !before.has(c));
+      const base = fresh.length ? Math.min(...fresh.map(c => dist.get(c))) : 0;
+      const delay = c => c.wet && !before.has(c) ? (dist.get(c) - base) * 0.07 : 0;
+      cells.forEach(c => { c.el.style.setProperty("--wd", delay(c).toFixed(2) + "s"); c.el.classList.toggle("wet", c.wet); });
+      const end = at(rt, C - 1);
+      if (end.wet && (mask(end) & 2)) done(delay(end) + 0.35);
     }
-    function done(ok) {
-      if (!ok) return;
-      solved = true; grid.classList.add("solved"); flower.textContent = "🌻"; flower.classList.add("bloom"); sfx.ok();
-      later(() => rc(fb, h("div", { class: "sfbt ok" }, "Das Wasser fließt! 💧"),
-        h("button", { class: "btn green", onclick: () => { lvl++; lvl >= SIZES.length ? finish() : level(); } }, lvl + 1 >= SIZES.length ? "🏁 Ergebnis" : "➡ Nächstes Level")), 500);
+    function done(t0) {
+      solved = true; grid.classList.add("solved");
+      flower.style.setProperty("--t0", t0.toFixed(2) + "s");
+      tank.classList.add("on"); bed.classList.add("on");
+      later(() => sfx.ok(), t0 * 1000 + 300);
+      later(() => sfx.tada(), t0 * 1000 + 1500);
+      later(() => rc(fb, h("div", { class: "sfbt ok" }, "Die Blumen blühen!"),
+        h("button", { class: "btn green", onclick: () => { lvl++; lvl >= SIZES.length ? finish() : level(); } }, lvl + 1 >= SIZES.length ? "🏁 Ergebnis" : "➡ Nächstes Level")), t0 * 1000 + 2000);
     }
   }
   /* Sterne: wie viele Drehungen mehr als nötig? */
