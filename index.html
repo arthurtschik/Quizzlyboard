@@ -769,6 +769,14 @@ body.buzzmode #top, body.buzzmode #score{display:none}
 .schoice.right{background:linear-gradient(180deg,#4ee38f,#1fae5f);box-shadow:0 6px 0 #11743d;color:#06361a}
 .schoice.wrong{background:linear-gradient(180deg,#ff8a8a,#e11d48);box-shadow:0 6px 0 #881337}
 .schoice:disabled{cursor:default}
+.schoice:disabled{opacity:1;filter:none}
+.schoice.sdim{opacity:.35}
+.schoice.right.show{position:relative;outline:5px solid #fff;outline-offset:3px;animation:rightpulse 1s ease-in-out 3}
+.schoice.right.show::after{content:"✓";position:absolute;top:-14px;right:-10px;width:36px;height:36px;line-height:36px;border-radius:50%;background:#fff;color:#11743d;font-size:24px;box-shadow:0 3px 8px #0006}
+@keyframes rightpulse{50%{transform:scale(1.06)}}
+.sright{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:10px;background:rgba(78,227,143,.16);border:3px solid #4ee38f;border-radius:18px;padding:10px 20px;max-width:min(900px,94vw)}
+.srl{font-weight:700;font-size:clamp(17px,2.5vmin,24px);color:#bff5d6}
+.sra{font-family:var(--display);font-weight:700;font-size:clamp(22px,3.8vmin,40px);color:#4ee38f}
 .sfb{display:flex;flex-direction:column;align-items:center;gap:10px;min-height:5em}
 .sfbt{font-family:var(--display);font-weight:700;font-size:clamp(22px,3.6vmin,38px)}.sfbt.ok{color:#4ee38f}.sfbt.no{color:#ff8a8a}
 .sexp{opacity:.95;font-size:clamp(16px,2.3vmin,22px);text-align:center;max-width:900px}
@@ -5262,24 +5270,27 @@ function soloMC(g, k, rounds, opts = {}) {
     timers.forEach(clearTimeout); timers = []; stopSpeech();
     if (i >= rounds.length) { const st = ratioStars(score / rounds.length); soloFinish(g, k, st, `${score} von ${rounds.length} richtig`, score, false); return; }
     const r = rounds[i]; let done = false;
-    const choices = shuffle([r.a, ...r.wrong]);
+    const choices = r.fixed || shuffle([r.a, ...r.wrong]);
+    const scorePill = h("span", { class: "pill star" }, "✅ " + score);
     const fb = h("div", { class: "sfb" });
     const btns = choices.map(c => h("button", { class: "schoice", onclick: () => answer(c) }, c));
     const qBox = h("div", { class: "sq2" }, r.qEl || r.q);
     const extra = h("div", { class: "sextra" });
     const readBtn = h("button", { class: "btn ghost small", onclick: () => speakSeq(r.read || [r.q]) }, "🔊 Vorlesen");
     rc(view, 
-      h("div", { class: "vinfo" }, h("span", { class: "pill" }, `Frage ${i + 1} / ${rounds.length}`), h("span", { class: "pill star" }, "✅ " + score)),
+      h("div", { class: "vinfo" }, h("span", { class: "pill" }, `Frage ${i + 1} / ${rounds.length}`), scorePill),
       extra, qBox, r.noRead ? null : readBtn, h("div", { class: "schoices" + (choices.length === 2 ? " two" : "") }, btns), fb);
     if (r.pre) r.pre(extra, timers);
     if (!r.noRead && (k <= 2 || opts.autoRead)) timers.push(setTimeout(() => speakSeq(r.read || [r.q]), 350)); // Kl. 1–2: automatisch vorlesen
     function answer(c) {
       if (done) return; done = true; if (r.stop) r.stop();
       const ok = normA(c) === normA(r.a);
-      if (ok) score++;
-      btns.forEach(b => { b.disabled = true; if (normA(b.textContent) === normA(r.a)) b.classList.add("right"); else if (b.textContent === c) b.classList.add("wrong"); });
+      if (ok) { score++; scorePill.textContent = "✅ " + score; }
+      btns.forEach(b => { b.disabled = true; if (normA(b.textContent) === normA(r.a)) b.classList.add("right"); else if (b.textContent === c) b.classList.add("wrong"); else if (!ok) b.classList.add("sdim"); });
+      if (!ok) btns.forEach(b => { if (normA(b.textContent) === normA(r.a)) b.classList.add("show"); });
       ok ? sfx.ok() : sfx.bad();
-      rc(fb, h("div", { class: "sfbt " + (ok ? "ok" : "no") }, ok ? "Richtig! 🎉" : "Leider falsch."), r.after ? h("div", { class: "sexp" }, r.after) : null,
+      rc(fb, h("div", { class: "sfbt " + (ok ? "ok" : "no") }, ok ? "Richtig! 🎉" : "Leider falsch."),
+        ok ? null : h("div", { class: "sright" }, h("span", { class: "srl" }, "✅ Richtig ist:"), h("span", { class: "sra" }, r.a)), r.after ? h("div", { class: "sexp" }, r.after) : null,
         h("button", { class: "btn green", onclick: () => { i++; next(); } }, i + 1 >= rounds.length ? "🏁 Ergebnis" : "➡ Weiter"));
     }
   }
@@ -5303,7 +5314,7 @@ function soloAbc(k) {
 /* ---------- Wahr oder Falsch ---------- */
 function soloWf(k) {
   const g = soloById("wf"), pool = fairShuffle("solowf" + k, WF[k]).slice(0, 10);
-  soloMC(g, k, pool.map(x => { markUsed(x); const [q, t, w] = x; return { q, a: t ? "✓ Wahr" : "✗ Falsch", wrong: [t ? "✗ Falsch" : "✓ Wahr"], after: w }; }));
+  soloMC(g, k, pool.map(x => { markUsed(x); const [q, t, w] = x; return { q, a: t ? "✓ Wahr" : "✗ Falsch", wrong: [t ? "✗ Falsch" : "✓ Wahr"], fixed: ["✓ Wahr", "✗ Falsch"], after: w }; }));
 }
 /* ---------- Verdreht ---------- */
 function soloVerdreht(k) {
