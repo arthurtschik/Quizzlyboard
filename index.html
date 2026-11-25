@@ -5290,6 +5290,2093 @@ const legalFooter = () => h("div", { class: "legalfoot" },
   h("span", null, "Ohne Cookies & ohne Tracking"));
 
 /* =====================================================================
+   QUIZZLYBOARD – Passende falsche Antworten fürs Wissens-Quiz (Alleinspielen)
+   Pro Kategorie eine Zeile je Frage: „falsch 1 | falsch 2“.
+   Reihenfolge = alle Fragen der Kategorie, Stufe 1 bis 5, jeweils in der Originalreihenfolge
+   (so wie quizCats() sie liefert). Neue Fragen hinten anhängen, nie umsortieren!
+   ===================================================================== */
+const MC = {};
+function mcAdd(k, cat, text) { MC[k + "|" + cat] = text.trim().split("\n").map(l => l.split("|").map(s => s.trim())); }
+
+/* ---------------- Klasse 1 ---------------- */
+mcAdd(1, "Tiere", `
+Das Pferd | Das Schaf
+Der Hund | Die Maus
+Die Ziege | Die Kuh
+Der Hund | Die Ente
+Die Ente | Der Spatz
+Die Maus | Der Igel
+Der Frosch | Die Ente
+Die Fliege | Die Ameise
+Das Pferd | Die Kuh
+Der Schmetterling | Die Fledermaus
+Zwei | Sechs
+Vier | Drei
+Der Käfer | Der Igel
+Das Pferd | Der Tiger
+Das Kamel | Der Elefant
+Fleisch | Körner
+Der Hase | Der Biber
+Den Tiger | Den Elefanten
+Zwei | Sechs
+Der Fisch | Die Schnecke
+Die Ente | Die Gans
+Kalb | Welpe
+Lamm | Ferkel
+Fohlen | Kalb
+Der Hase | Der Igel
+Der Igel | Die Schnecke
+Der Bär | Der Hund
+Die Biene | Die Ameise
+Der Hase | Der Koala
+Der Pinguin | Der Schneehase
+Welpe | Fohlen
+Sechs | Vier
+Fohlen | Ferkel
+Ein Fisch | Eine Schnecke
+Der Strauß | Die Ente
+Der Specht | Die Taube
+Der Delfin | Die Qualle
+Im Ameisenhaufen | Im Nest
+Gras | Nüsse
+Der Hase | Das Eichhörnchen
+Die Giraffe | Das Nashorn
+Der Elefant | Der Hai
+Acht | Vier
+Der Fuchs | Der Otter
+Das Pferd | Der Esel
+Der Frosch | Die Eidechse
+Das Zebra | Der Pinguin
+Der Löwe | Das Pferd
+Ein Nest | Einen Stein
+Der Hund | Keiner von beiden
+`);
+mcAdd(1, "Farben", `
+Blau | Grün
+Grün | Blau
+Grün | Gelb
+Grau | Gelb
+Rot | Blau
+Gelb | Rot
+Gelb | Grau
+Lila | Grün
+Blau | Gelb
+Weiß | Rot
+Blau | Gelb
+Blau | Grün
+Rot | Lila
+Braun | Schwarz
+Grün | Weiß
+Rot | Blau
+Gelb | Rot
+Grün | Schwarz
+Orange | Gelb
+Lila | Blau
+Rot | Lila
+Grün | Braun
+Blau | Gelb
+Gelb | Grün
+Rosa | Braun
+Rot | Gelb
+Rot | Grün
+Rot und Blau | Gelb und Grün
+Schwarz | Rot
+Blau, Lila, Weiß | Schwarz und Grau
+Blau mit weißen Punkten | Grün mit gelben Punkten
+Rot | Gelb
+Grün | Blau
+Rot, Weiß, Blau | Grün, Gelb, Blau
+Grün | Blau
+Weiß | Rot
+Schwarz | Blau
+Blau, Lila oder Rosa | Schwarz oder Weiß
+Blau | Rot
+Grün | Blau
+Schwarz, Weiß, Grau | Rosa, Braun, Silber
+Weiß | Hellblau
+Grün | Blau
+Lila | Blau
+Rot | Grün
+Rot, Weiß, Blau | Schwarz, Rot, Gold
+Grün | Lila
+Drei | Zehn
+Lila oder Rosa | Schwarz
+Blau oder Lila | Weiß
+`);
+mcAdd(1, "Essen", `
+Die Birne | Der Apfel
+Die Banane | Die Pflaume
+Saft mit viel Zucker | Kakao
+Suppe | Kaffee
+Einen Apfel | Einen Kuchen
+Kartoffeln | Brot
+Butter | Brot
+Eine Suppe | Einen Salat
+Die Zitrone | Die Kiwi
+Mit der Gabel | Mit dem Messer
+Vom Schwein | Vom Huhn
+Aus Reis | Aus Mehl
+Zucker | Marmelade
+Die Kokosnuss | Die Melone
+Spaghetti | Suppe
+Bananen und Gurken | Schokolade und Salz
+Die Banane | Die Birne
+Limonade | Milch
+Aus Birnen | Aus Orangen
+Käse | Butter
+Die Gurke | Der Brokkoli
+Die Karotte | Die Kartoffel
+Der Salat | Die Erbse
+Die Kokosnuss | Die Banane
+Aus Reis | Aus Weizen
+Die Gurke | Die Paprika
+Aus Wasser | Aus Mehl
+Äpfel | Kirschen
+Milch | Saft
+Die Banane | Die Melone
+Aus Zucker | Aus Reis
+Croissant | Brötchen
+Frühstück | Mittagessen
+Erdbeeren | Himbeeren
+Aus Mehl | Aus Milch
+Die Erdnuss | Die Kokosnuss
+Aus Kaffeebohnen | Aus Zuckerrüben
+Die Zucchini | Der Lauch
+Bohnen | Linsen
+Quark | Pudding
+Die Honigmelone | Die Grapefruit
+Die Himbeere | Die Kirsche
+Wasser, Salz, Zucker | Reis, Nudeln, Käse
+Aus Frankreich | Aus Spanien
+Schale | Stiel
+Nudeln | Kartoffeln
+Gerösteter Reis | Getrockneter Weizen
+Süßigkeiten | Beides gleich
+Der Apfel | Beide
+Aus Reis | Aus Mais
+`);
+mcAdd(1, "Alltag", `
+Fünf | Zehn
+Mit einer Zahnbürste | Mit einem Löffel
+In der Badewanne | Im Schrank
+Handschuhe | Eine Mütze
+Mit einem Kissen | Mit einer Decke
+Im Badezimmer | Im Schlafzimmer
+Mit einem Messer | Mit einem Lineal
+Sandalen | Hausschuhe
+Mit Shampoo | Mit Zahnpasta
+Im Klassenzimmer | Im Lehrerzimmer
+Grün | Gelb
+Fünf | Zwanzig
+Der Kalender | Das Thermometer
+Der Bäcker / die Bäckerin | Der Polizist / die Polizistin
+In der Bücherei | Beim Arzt
+Der Lehrer / die Lehrerin | Der Bäcker / die Bäckerin
+Etwas malen | Etwas kleben
+Eine Sonnenbrille | Einen Schal
+Küche | Wohnzimmer
+In die Biotonne | In den Gelben Sack
+Kamm & Seife | Waschlappen & Shampoo
+Freitag | Montag
+Drei | Eins
+110 | 115
+Sonntag | Dienstag
+In die Biotonne (braun) | In die Restmülltonne (schwarz)
+Im Supermarkt | Im Kino
+Ganz schnell rennen | Mit dem Ball spielen
+Am Tag | Beides
+Ärztinnen und Ärzte | Hausmeister
+Mittwoch | Sonntag
+Im Sommer | Im Frühling
+Im Herbst | Im Winter
+Weihnachten | Ostern
+Elf | Zehn
+Mittwoch | Freitag
+Wie spät es ist | Wie schwer etwas ist
+Die Polizei | Der Krankenwagen
+Ostern | Halloween
+Abtrocknen | Eincremen
+Drei: Sommer, Herbst, Winter | Fünf: Frühling, Sommer, Herbst, Winter, Regenzeit
+Freitag und Samstag | Sonntag und Montag
+112 | 117
+12 | 20
+Im März | Im Dezember
+November | Januar
+Im Frühling | Im Sommer
+Sieben | Vier
+Einen Hammer | Eine Zange
+Damit die Tonnen voll werden | Weil es hübsch aussieht
+`);
+mcAdd(1, "Fahrzeuge", `
+Der Bus | Das Auto
+Mit dem Taxi | Mit dem Traktor
+Ein Fahrrad | Ein Roller
+Mit dem Bagger | Mit dem Bus
+Das Feuerwehrauto | Das Taxi
+Das Flugzeug | Der Heißluftballon
+Mit dem Fahrrad | Mit dem Roller
+Ein Fahrrad | Ein Auto
+Das Ruderboot | Das U-Boot
+Die Straßenbahn | Der Bus
+Drei | Vier
+Der Krankenwagen | Der Bagger
+Mit einem Flugzeug | Mit einem Hubschrauber
+Taxi, Bus, Bagger | Traktor, Müllauto, Lieferwagen
+Wasser und Seife | Luft und Sand
+Drei | Sechs
+Der Kran | Der Traktor
+Der Bus | Der Lastwagen
+Am Bahnhof | Am Hafen
+Mit dem Roller | Mit dem Schlitten
+Das Müllauto | Der Krankenwagen
+Kapitän / Kapitänin | Lokführer / Lokführerin
+Pilot / Pilotin | Busfahrer / Busfahrerin
+Eine Mütze | Eine Sonnenbrille
+Am Bahnhof | An der Tankstelle
+In der Werkstatt | Am Bahnhof
+Bus | Traktor
+Zwei | Vier
+Am Flughafen | Im Bahnhof
+Der Pilot / die Pilotin | Der Lokführer / die Lokführerin
+Mit dem Zug | Mit dem Schiff
+Wie schnell es fährt | Ob es Benzin braucht
+Er bringt Pakete | Er räumt Schnee
+Mit dem Segelboot | Mit dem Motorboot
+Hybridauto | Rennauto
+Benzin | Strom
+Fischkutter | Ruderboot
+Nur die Klingel | Die Reifen
+Der Lastwagen | Der Kran
+Traktor | Bus
+Der Zug | Das Flugzeug
+Unterwasser-Zug | Taucherboot
+Ein Hubschrauber | Ein Drachen
+S-Bahn | Bummelzug
+Mit dem Bus | Mit dem Fahrrad
+Ein Fahrrad | Beide gleich schnell
+Das Düsenflugzeug | Der Hubschrauber
+Gehweg | Autobahn
+Der Bagger | Der Schneepflug
+Busfahrer / Busfahrerin | Lokführer / Lokführerin
+`);
+mcAdd(1, "Wetter", `
+Schneeflocken | Hagelkörner
+Der Mond | Die Wolken
+Der Regen | Der Nebel
+Der Schnee | Die Sterne
+Shorts und T-Shirt | Badehose und Sonnenhut
+Kalt und eisig | Immer verschneit
+Aus Sand | Aus Wolle
+Eiszapfen | Schneeberge
+Warm | Heiß
+Einen Regenschirm | Gummistiefel
+Eine Sonnenbrille | Einen Schal
+Ein Regenbogen | Ein Stern
+Große Regentropfen | Weiße Schneeflocken
+Regen | Hagel
+Handcreme | Zahnpasta
+Brise | Nieselregen
+Aus Wolken | Aus Zucker
+Eine Mütze aus Wolle | Einen Fahrradhelm
+Schnee | Nebel
+Dampf | Wolken
+Hagel | Regen
+Mit dem Kompass | Mit der Waage
+Im Kalender | Im Märchenbuch
+Im Sommer | Im Herbst
+Man hört zuerst den Donner | Beides gleichzeitig
+Wie spät es ist | Wie warm es ist
+Sonnenschein | Nebel
+Niedrigwasser | Ebbe
+Er wird härter | Er wird größer
+Aus dem Meer | Von der Sonne
+Eine Wolke | Ein Blitz
+25 Grad | Beide gleich kalt
+Ganz feiner Regen | Ein großer Schneehaufen
+Gewitter | Regenbogen
+Wenn es nachts dunkel ist | Wenn es schneit
+Am Strand | In der Wüste
+Ein Hautausschlag vom Gras | Ein Kratzer vom Spielen
+Im Haus | Im Auto
+Platzregen | Hagel
+Im Winter | Im Herbst
+Ein Rauschen | Ein Pfeifen
+Bei 10 Grad | Bei 100 Grad
+Astronaut / Astronautin | Förster / Försterin
+Gefrorener Regen auf der Straße | Ganz dichter Nebel
+Im Westen | Im Norden
+Sonnenuntergang | Mittag
+Weil der Wind so stark ist | Weil die Sonne zu hell scheint
+Hochwasser | Nebel
+Nebelwolke | Regen
+Wie spät es ist | Wo die Straßen sind
+`);
+mcAdd(1, "Märchen", `
+Schneewittchen | Gretel
+Ein Frosch | Ein Zwerg
+Max und Moritz | Hans und Grete
+Zwei | Vier
+Einen Kuchen | Eine Birne
+Aschenputtel | Dornröschen
+Ein Bauer | Ein Zwerg
+Ein Hund | Ein Fuchs
+„… dann schlafen sie noch heute.“ | „… dann ist die Geschichte aus.“
+„Hallo zusammen …“ | „Gestern war ich …“
+Schneewittchen | Rapunzel
+Drei | Fünf
+„Rapunzel, komm zum Essen!“ | „Rapunzel, schneide dein Haar ab!“
+Die Hexe | Der Zwerg
+Mit dem Jäger | Mit der Katze
+Hund, Pferd, Schaf, Kuh | Katze, Maus, Huhn, Ente
+Rotkäppchen | Schneewittchen
+Aus Gold | Aus Holz
+In einen Frosch | In einen König
+Steine | Blumen
+Fünf | Neun
+Der Wolf | Die Hexe
+Nach Hamburg | Nach Berlin
+Dornröschen | Aschenputtel
+Sie bekommt einen Schuh | Sie schläft ein
+An einer Rose | An einer Nadel
+Pippi Langstrumpf | Rumpelstilzchen
+Der Fuchs | Der Bär
+Die Brüder Wright | Die Schwestern Müller
+Zwei | Sieben
+Der Fuchs | Der Bär
+Der Fuchs | Der Bär
+Brot und Käse | Äpfel und Milch
+Der Prinz | Der Förster
+Die Königin auf der Bohne | Die Prinzessin auf dem Kissen
+Eine große Gans | Ein bunter Pfau
+Gretel | Heidi
+Weiß wie Milch | Weiß wie eine Wolke
+Als Jäger | Als Rotkäppchen
+Das Haus aus Stroh | Das Haus aus Holz
+Schneewittchen | Rotkäppchen
+Elsa | Cinderella
+Baghira | Kaa
+Pinocchio | Peter Pan
+Ein Pferd | Ein Ballkleid
+Pinocchio | Rumpelstilzchen
+Zehn | Einen
+Einen Hut | Handschuhe
+Sieben Jahre | Tausend Jahre
+Mit Spielzeug | Mit einem Hund
+`);
+
+/* ---------------- Klasse 2 ---------------- */
+mcAdd(2, "Tiere", `
+Fohlen | Kätzchen
+Welpe | Ferkel
+Die Kuh | Die Ziege
+Die Ente | Die Gans
+Vier | Sechs
+Der Igel | Die Schnecke
+Der Fuchs | Die Maus
+Die Qualle | Der Seestern
+Die Biene | Der Glühwurm
+Die Fliege | Die Wespe
+Die Giraffe | Das Nashorn
+Kalb | Lamm
+Bambus | Gras
+Der Dachs | Der Hase
+Acht | Vier
+Am Nordpol (Arktis) | In der Wüste
+Der Löwe | Der Leopard
+Das Pferd | Der Esel
+Henne | Küken
+Fleisch und Fisch | Gras und Heu
+Der Hase | Beide
+Kälber | Fohlen
+Der Hai | Der Seehund
+Ameisenstall | Ameisenstock
+Der Adler | Die Taube
+Fleischfresser | Allesfresser
+Die Möwe | Der Schwan
+Mit der Lunge | Mit der Nase
+Die Libelle | Der Käfer
+Der Koala | Der Eisbär
+Raupen | Larven
+Welpe | Lamm
+Fohlen | Henne
+Der Specht | Der Otter
+Der Kuckuck | Die Eule
+Eine Herde | Ein Rudel
+In den kalten Norden | In die Berge
+Der Marienkäfer | Die Libelle
+Die Kuh | Der Elefant
+Ohren | Hörner
+Der Pinguin | Das Flughörnchen
+Pflanzenfresser | Fleischfresser
+Der Adler | Der Spatz
+Eins | Acht
+Die Schlange | Der Frosch
+Sie frisst mehr Gras | Sie legt Eier
+Durch Kiemen | Durch die Haut
+Die Spinne | Beide
+Der Biber | Der Delfin
+Winterruhe | Winterpause
+`);
+mcAdd(2, "Natur", `
+Im Frühling | Im Sommer
+Wurzeln | Steine
+In der Wüste | Auf dem Wasser
+Der Sommer | Der Herbst
+Die Sonne | Ein Stern
+Die Tulpe | Das Gänseblümchen
+Sand | Luft
+Wiese | Feld
+Milch | Saft
+Die Nacht | Beide gleich
+Sand, Salz, Steine | Zucker, Wind, Eis
+Aus einem Stein | Aus einem Blatt
+Die Wurzel | Der Ast
+Gletscher | Hügel
+Ein Bach | Beide gleich groß
+Planeten | Wolken
+In einen See | In die Berge
+Aus Watte | Aus Rauch
+Kastanien | Bucheckern
+Zerriebenes Glas | Getrockneter Lehm
+Eine Biene | Ein Käfer
+Wasser und Zucker | Sand und Honig
+Eicheln | Tannenzapfen
+Ein großer, salziger See | Ein schneller Bach
+Strömung | Welle
+Er wird härter | Er wird größer
+Die Erde | Beide gleich groß
+Die Palme | Die Seerose
+Ast | Wurzel
+Teich | Pfütze
+Der Mond | Der Polarstern
+Wie hoch der Baum wird | Wie viel Wasser er hat
+Sand | Wind
+Laubbäume (z. B. Eiche) | Obstbäume (z. B. Apfelbaum)
+Ein Wasserfall in den Bergen | Ein See im Wald
+Wasser wird zu Eis | Eis wird zu Wasser
+Ameisen | Schnecken
+Feiner, heller Sand | Ein Stück Baumrinde
+Eine Kirsche | Ein Blatt
+Getrocknete Blätter | Frisches Gras
+Dampf | Tau
+Wegen der Sonne | Weil sie grün angemalt sind
+Ein Platz zum Spielen | Ein großer Müllberg
+Ein sehr alter Baum | Ein bunter Stein
+Sand | Asche
+Sie werden länger | Sie bleiben gleich
+Fluss | See
+Mit der Verdunstung | Mit dem Regenbogen
+Kohlendioxid | Wasserdampf
+Ein großer Spielplatz | Ein Bauernhof
+`);
+mcAdd(2, "Deutsch", `
+Drei | Fünf
+warm | nass
+hell | bunt
+schneller | laut
+hoch | links
+klein | dick
+Mit E | Mit P
+Drei | Fünf
+Hund, Hut, Haus … | Hemd, Hose, Hals …
+Mit T | Mit N
+Lang | Dick
+Kinds | Kindern
+Mause | Mausen
+Buchs | Buche
+Apfels | Äpfeln
+schnell | still
+dreckig | kalt
+groß | schwer
+Hund, Maus, Haus … | Tasse, Kanne, Rose …
+Zwei (Ba-nane) | Vier (B-a-na-ne)
+Baume | Baumen
+springen | rot
+Hund | rennen
+Tuwörter (Verben) | Wiewörter (Adjektive)
+der | das
+die | das
+der | die
+b, c, d, f, g | ä, ö, ü, ß
+O | L
+Das Ausrufezeichen | Der Punkt
+Hund, Bein, Tisch … | Maus, Mäuse, Mauer …
+Y | X
+30 | 20
+Das Fragezeichen | Das Komma
+Vogels | Vögeln
+langsam | morgen
+Mannschnee | Schneeball
+Birne | Apfel
+rund, schön, bunt … | Tor, Netz, Spiel …
+Drei (Scho-ko-la-de) | Fünf (S-cho-ko-la-de)
+Tisch | blau
+ich gehte | ich bin gang
+Bine | Bihne
+B, C, D | Y, X, Z
+Haushaus | Hausel
+spielen | gewinnt
+Hund | Maus
+Glase | Glasen
+Freude | froh
+Zwei (Kro-kodil) | Vier (Kro-ko-di-l)
+`);
+mcAdd(2, "Sport & Spiel", `
+Zehn | Zwölf
+Mit einem Schläger | Mit einem Puck
+Im Garten oder in der Badewanne | In der Turnhalle oder im Sandkasten
+Fangen | Blinde Kuh
+Mit Rollschuhen | Mit Skiern
+Fünf | Zwölf
+Auf dem Spielplatz | Im Klassenzimmer
+Ins Tor | Über das Netz
+Mit einem Ball | Mit einem Reifen
+Mit dem Fahrrad | Mit dem Skateboard
+Mit einem Holzstock | Mit der Hand
+Stürmer / Stürmerin | Schiedsrichter / Schiedsrichterin
+Die Gelbe Karte | Die Grüne Karte
+Vier | Acht
+Eine Mütze | Einen Schal
+Federball | Minigolf
+Uno | Memory
+Über einen Kasten | Über ein Netz
+Fangen | Blinde Kuh
+Rennen | Tanzen
+Den Rasen | Die Torlatte
+11 | 20
+Die Rote Karte | Die Blaue Karte
+EM | FIFA
+Feldhockey | Curling
+32 | 100
+Silber | Bronze
+„… doch“ | „… ganz schnell“
+Ein Sprung ins Wasser | Ein Fußballspiel
+Vier | Sechs
+Dame | Mühle
+Anpfiff | Halbzeit
+Zwei | Vier
+Ein Tor nach der Ecke | Ein Freistoß von der Mittellinie
+Speerwerfen | Fechten
+Basketball | Handball
+Schach | Mühle
+Wie viele Tore gefallen sind | Wie lange noch gespielt wird
+Mit Schläger und Tennisball | Mit Stock und Puck
+Gold | Bronze
+Drei | Sechs
+60 Minuten (zweimal 30) | 120 Minuten (zweimal 60)
+Die Dame | Der Turm
+Ein Tor mit dem Kopf | Drei Tore von verschiedenen Spielern
+Sechs | Elf
+Tauchen | Segeln
+Gymnastik | Schwimmen
+Gold | Silber
+Rolle vorwärts / Handstand | Spagat / Brücke
+Ein Tor in der letzten Minute | Ein Tor vom Torwart
+`);
+mcAdd(2, "Mein Körper", `
+Mit den Ohren | Mit dem Mund
+Mit den Ohren | Mit der Nase
+Mit der Nase | Mit den Zähnen
+Drei | Vier
+Federn | Blätter
+Mit den Füßen | Mit den Ohren
+Die Ohren | Die Nägel
+Eins | Drei
+Mit den Armen | Mit den Händen
+Am Rücken | An der Hand
+Vier | Zehn
+Fünf | Zwanzig
+Die Lunge | Der Magen
+Mit dem Magen | Mit dem Herzen
+Haut | Beide gleich hart
+Ellenbogen | Knöchel
+Knie | Handgelenk
+Wasser | Milch
+Zum Schlafen | Zum Riechen
+Haare | Wimpern
+Mit den Augen | Mit der Nase
+Drei | Sieben
+Sehen, Hören, Laufen, Singen, Lachen | Essen, Trinken, Schlafen, Atmen, Denken
+Muskeln | Bauch
+In die Lunge | Ins Herz
+Kinderarzt / Kinderärztin | Tierarzt / Tierärztin
+Die Haare | Die Haut
+Gummibärchen | Beides gleich
+Es bleibt eine Lücke für immer | Der Zahn wächst wieder an
+Die Ohren und die Nase | Die Augenbrauen und die Haare
+Babyzähne | Kinderzähne
+20 | 50
+Wasser | Luft
+Kohlendioxid | Stickstoff
+Er friert | Er schläft
+Iris | Linse
+Wie schwer man ist | Wie groß man ist
+Nerven | Muskeln
+Weil Wasser satt macht | Weil man sonst schlecht hört
+Im Bauch, etwas rechts | Im Kopf
+Mit dem Herzen | Mit dem Magen
+Etwa 50 | Über 1000
+Das Herz | Die Lunge
+Etwa 30 Grad | Etwa 42 Grad
+Der Magen | Die Lunge
+Luftröhre | Darm
+Einen | Vier
+Ein langsames Nachdenken | Ein Muskel im Bein
+Er wird krank | Er hört auf zu atmen
+Pupille | Linse
+`);
+mcAdd(2, "Musik", `
+Die Gitarre | Die Geige
+Die Trommel | Beide
+Die Trommel | Beide
+Sommerlieder | Kinderlieder
+Mit den Augen | Mit der Nase
+Klatschen | Singen
+Es brummt | Es pfeift
+Der Triangel | Beide gleich laut
+„… Kätzchen“ | „… Hühnchen“
+Mit den Füßen | Mit dem Mund
+Auf der Flöte | Auf der Geige
+Die Rassel | Die Trommel
+Die Flöte | Die Trompete
+Die Mundharmonika | Das Klavier
+Chor | Familie
+Der Komponist / die Komponistin | Der Sänger / die Sängerin
+Ein Saiteninstrument aus Holz | Ein Schlaginstrument
+Schreien | Beides gleich laut
+„… gesungen“ | „… gelaufen“
+Aus Metall | Aus Glas
+Alle meine Entchen | Stille Nacht
+Vier | Zwölf
+Lieder, die man auswendig kann | Bilder von Instrumenten
+Trommel / Pauke | Rassel / Triangel
+Einer singt ganz allein | Drei spielen zusammen
+Die Harfe | Die Trompete
+Tanzlied | Geburtstagslied
+Der erste Ton im Lied | Das Ende vom Lied
+Die Gitarre | Die Geige
+Die Trompete | Die Flöte
+Die Trommel | Die Flöte
+A, B, C, D, E, F, G | 1, 2, 3, 4, 5, 6, 7
+Die Gitarre | Die Orgel
+Blasinstrumente | Schlaginstrumente
+Holzblasinstrumente | Streichinstrumente
+Jemand, der Instrumente baut | Jemand, der Musik verkauft
+Ein ganz leiser Ton | Ein Instrument
+Sopran | Alt
+Bass | Tenor
+Ein sehr hoher Ton | Ein Musikinstrument
+Ein Orchester | Ein Duett
+Ludwig van Beethoven | Johann Sebastian Bach
+Wolfgang Amadeus Mozart | Johann Sebastian Bach
+Refrain | Duett
+schnell | leise
+laut | langsam
+Drei | Sieben
+Taktstrich | Pausenzeichen
+Ein einzelner langer Ton | Eine Pause
+„… Weihnachtsbaum“ | „… Kerzenlicht“
+`);
+mcAdd(2, "Zeit & Kalender", `
+Zehn | 52
+Fünf | Zwölf
+Montag | Freitag
+Der Abend | Beide gleich früh
+Morgens | Mittags
+Der Winter | Der Frühling
+Gestern | Übermorgen
+Morgen | Vorgestern
+Am Abend | In der Nacht
+Mittwoch | Samstag
+April | Juli
+Drei | Zwölf
+März | Dezember
+Im April | Im September
+Im Sommer | Im Winter
+Dezember | Februar
+Die Minuten | Die Sekunden
+Die Stunden | Die Tage
+Drei | Fünf
+Der Winter | Der Herbst
+Im November | Im Januar
+30 | 28
+100 | 30
+20 | 50
+30 | 10
+Im November | Im September
+Im Januar | Im November
+April | Juni
+Der Frühling | Der Sommer
+356 | 300
+12 | 60
+Feiertagsjahr | Neujahr
+Jedes Jahr | Alle zehn Jahre
+12 | 100
+31 | 28
+6 Uhr | 3 Uhr
+100 | 5
+24 | 6
+Januar | November
+Uhrzeit und Wetter | Geburtstage aller Kinder
+30 | 31
+1000 | 10
+100 | 60
+Im Juni | Im April
+Silvester | Ostern
+Fünf | Zwölf
+7 | 21
+Mitternacht | Mittag
+November | August
+40 | 50
+`);
+
+/* ---------------- Klasse 3 ---------------- */
+mcAdd(3, "Deutschland", `
+Hamburg | München
+Schwarz, Rot, Grün | Rot, Weiß, Gold
+Mit der D-Mark | Mit dem Franken
+Bremen | Kiel
+In Berlin | In Köln
+Kölner Tor | Holstentor
+Der Harz | Der Schwarzwald
+Bratwurst | Weißwurst
+Englisch | Deutsch und Französisch
+Das Croissant | Die Breze mit Käse
+Die Elbe | Die Donau
+In Hessen | In Baden-Württemberg
+In Bayern | In Hessen
+Der Rhein | Die Weser
+Der Main | Die Elbe
+Schweiz | Tschechien
+Chiemsee | Müritz
+Der Löwe | Der Bär
+Sylt | Usedom
+Sieben | Zwölf
+Zwölf | Zwanzig
+Nürnberg | Augsburg
+Karlsruhe | Freiburg
+Bayerischer Wald | Teutoburger Wald
+Bundesrat | Rathaus
+Bundespräsident / Bundespräsidentin | Bürgermeister / Bürgermeisterin
+Hamburg | Bonn
+Am 1. Mai | Am 9. November
+Helgoland | Rügen
+Der Main | Die Spree
+Der Feldberg | Der Brocken
+Etwa 8 Millionen | Über 800 Millionen
+Hessen | Sachsen-Anhalt
+Saarland | Berlin
+München, Köln, Frankfurt | Berlin, Dresden, Bonn
+Am Bodensee | An der Mosel
+Schloss Sanssouci | Die Wartburg
+Frankfurt am Main | Kassel
+1990 | 1961
+Zugspitze | Watzmann
+Bodensee oder Mittelmeer | Atlantik oder Schwarzes Meer
+Der Rhein | Der Main
+Niedersachsen | Nordrhein-Westfalen
+Bayern | Baden-Württemberg
+Köln | Dortmund
+Leipzig | Chemnitz
+Helmut Kohl | Willy Brandt
+„Freude, schöner Götterfunken …“ | „Alle Menschen werden Brüder …“
+Im Schwarzwald | Im Erzgebirge
+Polen | Ungarn
+`);
+mcAdd(3, "Tiere & Natur", `
+Fleischfresser | Allesfresser
+Wespen | Hummeln und Ameisen
+Mit der Lunge | Mit der Nase
+Nüsse, Beeren und Gras | Fische und Frösche
+Herde | Schwarm
+Auf Bäumen | Im Wasser
+Das Reh | Die Kuh
+Zwei | Sechs
+Eine Fledermaus | Eine Schildkröte
+Eine Schnecke | Ein Fisch
+Sechs | Zehn
+Pflanzenfresser | Allesfresser
+Der Hai | Der Seehund
+Acht | Vier
+Kaulquappe | Made
+Die Eule | Die Amsel
+Gras und Blätter | Nüsse und Beeren
+Mit Kiemen – er bleibt unter Wasser | Durch die Haut
+In einem Nest im Baum | Unter Laub im Garten
+Der Fuchs | Beide gleich groß
+Der Löwe | Das Pferd
+Tiere, die nur im Wasser leben – z. B. Fisch | Tiere mit Federn – z. B. Ente
+Die Maus | Beide
+Tagaktiv | Winteraktiv
+Die Fledermaus | Beide
+Sie schläft nur | Sie wird zu einer Biene
+Der Elefant | Der Hai
+Kröten haben Federn | Kröten haben eine glatte, nasse Haut
+Ein Zoo | Ein Futterplatz
+Auf Bäumen | In Nestern aus Gras
+Die Lunge | Der Magen
+Ein Spiel im Wald | Eine Reihe von Bäumen
+Blüten werden von Bienen gegessen | Pflanzen werden gegossen
+Tiere, die Eier legen | Tiere mit Federn
+Die Spinne | Die Schnecke
+Mit dem Schnabel | Mit den Beinen
+Weil er schön aussieht | Weil er laut ist
+Vögel und Schlangen | Spinnen und Käfer
+Weichtiere | Insekten
+Fühler | Hörner
+Der Windkreislauf | Der Erdkreislauf
+Zwei | Einen
+Ein Winterschlaf | Ein Nestbau
+In ein eigenes Nest | In den Boden
+Der Pinguin | Das Eichhörnchen
+Raubtier | Haustier
+Mit lautem Bellen | Mit spitzen Stacheln
+Ein großer Freizeitpark | Ein Wald zum Bäumefällen
+Pflanzen trinken Wasser durch die Blätter | Tiere schlafen in der Sonne
+Mit sehr guten Augen | Mit Licht aus den Flügeln
+`);
+mcAdd(3, "Sprache", `
+Still | Sanft
+dicker | rund
+schwach | dunkel
+zuckrig | lecker
+Hunds | Hünde
+Eis | Eie
+Das Komma | Das Fragezeichen
+Klein | Egal
+der | die
+Ein Nomen | Ein Adjektiv
+Verben | Adjektive
+Nomen (Namenwörter) | Verben (Tuwörter)
+Adjektive (Wiewörter) | Nomen (Namenwörter)
+großer, am großesten | größer, am meisten groß
+guter, am gutesten | besser, am bessesten
+Baum, Bein, Bad … | Tisch, Stuhl, Bank …
+Zwei (Ele-fant) | Vier (E-le-fan-t)
+Fahrad | Beides ist richtig
+die | der
+Blumes | Blüme
+ich gehte | ich gang
+ich spielt | ich spiel
+ich schwimmte | ich schwomm
+ich esste | ich aßte
+Türhaus | Haustor
+und, oder, aber | Hund, Katze, Maus
+Ein Wort mit gegenteiliger Bedeutung | Ein Wort, das sich reimt
+Kumpel | Freundin
+Klein – es ist ein Verb | Beides geht
+gehen, Gang, Geher | schnell, langsam, bunt
+langsam, träge | laut, kräftig
+bellt | Der
+Der Hund | Das Nomen
+Adjektive (Wiewörter) | Artikel (Begleiter)
+In Klammern | Zwischen zwei Kommas
+In der Vergangenheit | In der Zukunft
+Mit ss | Mit s
+Ein Wort mit gleicher Bedeutung | Ein langes Wort
+mm | ss
+Ferien, Feuer, Farbe … | laufen, gehen, rennen …
+Schuh + Hof | Schule + Ofen
+Drei | Sechs
+ich ging | ich bin gegangen
+„Heute Morgen …“ | „Ich erzähle dir …“
+Ein Wort mit vier Silben | Ein lustiger Satz
+Ein Bilderbuch | Ein Wörterbuch für Tiere
+Vokale (Selbstlaute) | Umlaute
+Zum Beenden eines Satzes | Für eine Frage
+Ein Text ohne Absätze | Ein Brief an einen Freund
+Fragewort | Satzwort
+`);
+mcAdd(3, "Allgemeinwissen", `
+Zehn | Vierzehn
+Drei | Sechs
+110 | 115
+Gelb | Blau
+Die Uhrzeit | Die Temperatur
+Fleisch verkaufen | Kuchen verzieren
+12 | 36
+Bäcker und Friseure | Piloten und Köche
+Schnee | Dampf
+Die Größe | Die Temperatur
+Der erste | Der vierte
+In Asien | In Afrika
+China | Kanada
+Deutsch | Französisch
+Pfund | Euro
+Eine Landkarte von Europa | Ein Kompass
+Lyon | Marseille
+365 | 360
+Kilimandscharo | Zugspitze
+Portugiesisch | Italienisch
+Polizisten | Rettungsschwimmer
+Oben, Unten, Links, Rechts | Nord, Mitte, Süd, Rand
+Im Osten | Im Norden
+Afrika | Europa
+Ein Fluss in Afrika | Eine Straße in Amerika
+Gobi | Kalahari
+Große Mauer von Japan | Hadrianswall
+Aus Plastik | Aus Sand
+Mailand | Venedig
+Dollar | Franken
+Der Atlantik | Der Indische Ozean
+Drei | Zehn
+In Mexiko | In Griechenland
+In Italien | In Spanien
+Manchester | Liverpool
+Der Grüne Halbmond | Das Blaue Kreuz
+Mit einem Mikroskop | Mit einer Lupe
+Ein Stern | Ein Mond
+Der Rhein | Der Amazonas
+Barcelona | Sevilla
+Fünf | Zehn
+Thomas Edison | Albert Einstein
+Rund 50 | Rund 1000
+Ein großes Fußballturnier | Eine Raumstation
+Ein Tanzschritt | Ein Musikstück
+Morsezeichen | Hieroglyphen
+Mit einer Kerze | Mit einer Sonnenuhr
+Arktis | Grönland
+Rom | Neapel
+Albert Einstein | Martin Luther
+`);
+mcAdd(3, "Verkehr", `
+Rot | Gelb
+Grün | Gelb
+Auf dem Radweg | Auf der Fahrbahn
+Rechts, links, rechts | Nur geradeaus
+Den Helm | Die Warnweste
+Auf dem Gehweg | Auf der Autobahn
+Weiß | Gelb
+Vorne auf dem Beifahrersitz | Auf dem Schoß der Eltern
+Der Busfahrer | Der Schülerlotse
+Auf dem Spielplatz | Im Garten
+Zwischen parkenden Autos | In der Kurve
+Gleich darf man gehen | Ganz schnell fahren
+Kreis | Achteck
+Schneller fahren | Stehen bleiben und hupen
+Eine | Drei
+Kleine Lampen mit Batterie | Bremsen am Fahrrad
+Gehweg | Fahrradverbot
+Mit der Bremse | Mit dem Licht
+Dunkle Kleidung | Einen Regenschirm
+An der Kreuzung | Am Zebrastreifen
+Eine Mütze | Eine Kappe
+Achtung, Schule fällt aus! | Spielplatz geradeaus
+Links | In der Mitte
+Wer von links kommt | Wer schneller ist
+Er kontrolliert Autos | Er fährt den Schulbus
+Ein Klingelzeichen | Ein Lichtzeichen
+Ein rotes Achteck | Ein blauer Kreis
+Rollerprüfung | Führerscheinprüfung
+Eine Ampel | Ein Parkplatz
+Weil es verboten ist zu rennen | Weil die Autos dort parken
+Sechs | Vier
+Vorfahrtsstraße | Stopp
+Bis 12 Jahre | Bis 6 Jahre
+Ein Ort zum Parken | Eine gefährliche Kurve
+Wie viel Benzin noch da ist | Wie spät es ist
+30 km/h | 100 km/h
+Landstraße | Spielstraße
+Eine Straße ohne Kreuzung | Ein Parkplatz in der Mitte
+Parken verboten | Vorfahrt achten
+Am roten Schild mit „P“ | Am gelben Schild mit „H“
+Rot | Gelb
+30 km/h | 50 km/h
+Links abbiegen erlaubt | Immer weiterfahren ohne Anhalten
+Eine Straße nur für Fahrräder | Eine Straße ohne Ampeln
+Dort darf man höchstens 50 km/h fahren | Dort darf man nur 30 Minuten parken
+Rotes Licht und roter Reflektor | Eine Klingel und eine Flagge
+Pedalreflektoren | Rücklichter
+Ein Kissen für die Rückbank | Ein Navi im Auto
+Eckig mit blauem Rand | Dreieckig mit gelbem Rand
+Spielstraße | Radweg
+`);
+mcAdd(3, "Pflanzen", `
+Die Birke | Die Eiche
+Ein Stein | Ein Tier
+Rot | Gelb
+Die Tulpe | Die Sonnenblume
+Gänseblümchen | Schneeglöckchen
+Die Blüten | Die Wurzeln
+Die Buche | Die Tanne
+Die Kartoffel | Der Kürbis
+Bäume und Sträucher | Pilze und Moos
+Erde | Licht
+Birnen | Kirschen
+Wurzel | Stängel
+Die Wurzel der Pflanze | Ein grünes Blatt
+Die Buche | Die Kiefer
+Die Tulpe | Der Krokus
+Moos | Klee
+Laubbäume (z. B. Eiche, Buche) | Obstbäume (z. B. Apfelbaum)
+Ein sehr großer Baum | Eine Blume ohne Blätter
+Rose | Beide
+Die Eiche | Die Linde
+Die Tulpe | Das Gänseblümchen
+Eichhörnchen | Bucheckern
+Mit den Blättern | Mit der Blüte
+Nektar | Wasser
+Nadelbäume | Obstbäume
+Die Tanne | Die Kiefer
+Rose, Gänseblümchen … | Sonnenblume, Mohnblume …
+Die Brennnessel | Der Kaktus
+Wind | Kälte
+Pflaumen | Äpfel
+Die Blüte | Das Blatt
+Wasser | Erde
+Kohlendioxid | Stickstoff
+Sauerstoff | Wasserdampf
+Mit den Bienen | Mit dem Wasser
+Eine alte Wurzel | Eine Blüte ohne Farbe
+An der Höhe | An der Zahl der Blätter
+Der Champignon | Beide
+Hafer oder Reis | Mais oder Gerste
+Einjährige Pflanzen | Kletterpflanzen
+Wachs | Zucker
+Blütenblätter | Kelchblätter
+Staubblatt | Kelch
+Ein Wald nur mit Tannen | Ein Wald mit vielen Wiesen
+Ein kleiner Pilz | Ein junger Baum
+Aus dem Zuckerrohr | Aus der Kartoffel
+Weil die Bäume frieren | Weil es mehr regnet
+In der Wüste | Auf hohen Bergen
+Die Birke | Die Kastanie
+Ein Gewächshaus | Ein Blumenladen
+`);
+mcAdd(3, "Weltall", `
+Der Mars | Der Mond
+Der Mond | Die Sterne
+Planeten | Wolken
+Mit einem Flugzeug | Mit einem Heißluftballon
+Am Mittag | Nur im Winter
+Ein Planet | Ein Mond
+Kalt | Lauwarm
+Halbmond | Neumond
+Der Mond | Beide
+Einen Taucheranzug | Einen Regenmantel
+Die Sonne | Der Mars
+Einen Monat | Einen Tag
+Eine Woche | Ein Jahr
+Saturn | Erde
+Jupiter | Mars
+Venus | Erde
+Sonnenstraße | Andromeda
+Sternhaufen | Planetenbahn
+Weil die Sonne ausgeht | Weil der Mond die Sonne verdeckt
+Ein Stern, der herunterfällt | Ein kleines Flugzeug
+Die Venus | Der Jupiter
+Juri Gagarin | Buzz Aldrin
+Merkur | Mars
+Ein Stern, der hell leuchtet | Ein Teleskop auf der Erde
+MIR | NASA
+Zwei | Drei
+Man fällt ganz schnell | Man wird sehr schwer
+Uranus | Pluto
+Aus Steinen | Aus Wasser
+Ein Planet mit Ringen | Ein Stern, der explodiert
+Piloten | Kapitäne
+Etwa 8 Sekunden | Etwa 8 Stunden
+1959 | 1989
+Ein ganzes Jahr voller Licht | Die Zeit, in der es hell ist
+Ein kleiner Stern | Ein Mond
+Ein Planet | Ein Stern
+Die Erde schiebt sich vor die Sonne | Die Sonne geht nicht mehr auf
+Der Mond schiebt sich vor die Sonne | Die Sonne leuchtet schwächer
+Montag, Dienstag, Mittwoch | Frühling, Sommer, Herbst, Winter
+Ein einzelner großer Stern | Ein Planet mit Monden
+Neun | Sieben
+Einen | Keinen
+Ein Loch im Mond | Ein dunkler Planet
+Sally Ride | Marie Curie
+Alexander Gerst | Ulf Merbold
+Ein Stern, der leuchtet | Eine Wolke im All
+Gesteinsplaneten | Zwergplaneten
+Etwa 100 Grad | Etwa 1 Million Grad
+Europa | Titan
+Neil Armstrong | Sigmund Jähn
+`);
+
+/* ---------------- Klasse 4 ---------------- */
+mcAdd(4, "Europa", `
+Lyon | Brüssel
+Salzburg | Bern
+Mailand | Neapel
+Manchester | Dublin
+Mit dem Dollar | Mit dem Pfund
+In Italien | In Belgien
+In Italien | In Griechenland
+Dänemark | Schweden
+Spanisch | Englisch
+In Spanien | In Kroatien
+Griechenland | Spanien
+Zürich | Genf
+Rotterdam | Den Haag
+Krakau | Prag
+Sparta | Thessaloniki
+Oslo | Stockholm
+Porto | Madrid
+Die Themse | Die Loire
+Spanien | Polen
+Österreichisch | Italienisch
+Florenz | Mailand
+12 | 50
+Zugspitze | Matterhorn
+Die Nordsee | Die Ostsee
+Amsterdam | Luxemburg
+In Rom | In Florenz
+In Athen | In Paris
+Island | Malta
+Rumänien | Tschechien
+In Italien | In der Türkei
+Die Pyrenäen | Die Karpaten
+Monaco | Liechtenstein
+Vesuv | Stromboli
+Norwegen | Dänemark
+Schweden | Estland
+Rot mit einem weißen Kreuz | Grün mit blauen Sternen
+Fünfzehn | 27
+Bosporus | Ärmelkanal
+In Frankreich (Paris) | In den Niederlanden (Amsterdam)
+Der Rhein | Die Elbe
+Barcelona | Lissabon
+Alpentunnel | Gotthardtunnel
+Oslo | Helsinki
+Budapest | Sofia
+Auf der Balkanhalbinsel | Auf der Apenninhalbinsel
+Monaco | San Marino
+Die Alpen | Die Karpaten
+Ein Fluss in Frankreich | Ein Kanal in Venedig
+Die Donau | Der Rhein
+Belfast | Edinburgh
+`);
+mcAdd(4, "Natur & Technik", `
+Bei 10 Grad | Bei −10 Grad
+Wasser | Wind
+Holz | Glas
+Bei 50 Grad | Bei 200 Grad
+1 kg Steine | 1 kg Federn
+Stein | Beide
+Mit einer Waage | Mit einem Thermometer
+Mit einem Lineal | Mit einer Uhr
+Wind | Wasser
+Wasser und Kälte | Nur Licht
+Kohlendioxid | Stickstoff
+Holz und Kunststoff | Glas und Gummi
+Ein Stoff, der Strom sehr gut leitet – z. B. Kupfer | Ein Stoff, der Wärme speichert – z. B. Wasser
+Windenergie | Atomenergie
+Eine kleine Lampe | Ein Schalter
+Ein Kabel ohne Ende | Ein Kreis aus Batterien
+Schwerkraft | Magnetkraft
+Es kocht | Es verdunstet
+Aus Sauerstoff (und Wasserstoff) | Aus Kohlendioxid
+Er macht Essen warm | Er macht Strom
+Die Reibung | Die Magnetkraft
+Sie ziehen sich an | Nichts passiert
+Mit einem Fernglas | Mit einem Spiegel
+Das Licht wird heller | Etwas spiegelt das Licht
+Schall | Beide gleich schnell
+Kleine Teilchen aus Licht | Ein heller Lichtstrahl
+Wasser wird zu Eis | Dampf wird zu Wasser
+Ein Werkzeug zum Schneiden | Ein Motor
+Er wird zu Eis | Er wird heißer
+Windkraft | Sonnenkraft
+Das Blatt | Die Blüte
+Ein kleiner Spiegel | Eine Batterie
+Kohle, Öl, Gas | Benzin, Diesel, Atomkraft
+Sauerstoff – ein Gas | Ein Metall
+Es ist innen hohl und sehr leicht | Eisen schwimmt immer
+Es macht es heller | Es färbt es rot
+Strom fließt besonders langsam | Eine Batterie ist leer
+Alte Stoffe werden verbrannt | Neue Stoffe werden gekauft
+In Kilogramm | In Metern
+Die Temperatur | Die Windstärke
+Nebel | Rauch
+Albert Einstein | Galileo Galilei
+Eine Zelle im Körper | Ein kleiner Stein
+300 km pro Sekunde | 300.000 km pro Stunde
+Die Sonne wird heißer | Gewächshäuser werden gebaut
+In Watt | In Ampere
+Sie speichert Wasser | Sie macht aus Strom Licht
+Weil das Meer ihn blau färbt | Weil die Sonne blau leuchtet
+Eine Puppe aus Metall | Ein Computer zum Spielen
+Chemie | Physik
+`);
+mcAdd(4, "Sprache", `
+Nomen | Verben
+tapfer | stark
+reicher | klug
+ehrlicher | fröhlich
+Baume | Bäumer
+Kuhs | Küher
+Zahns | Zahnen
+Verb | Adjektiv
+Nomen | Adjektiv
+Nomen | Verb
+Hause | Häuse
+ich laufte | ich bin lief
+ich singte | ich sung
+ich bin gewesen | ich wäre
+ich habte | ich hab
+mehrer, am mehrsten | vieler, am vielsten
+der | das
+Wann? | Wer?
+gingen | gang
+Das Fragezeichen | Der Punkt
+laut – das Adjektiv ist „laut“ | Hund – das Nomen ist „Hund“
+ich spielte | ich werde spielen
+ich habe gefahren | ich fuhr
+ein Buch | liest
+Lena | liest
+Ein Wort aus Nomen und Verb – z. B. Laufband | Ein Wort mit zwei Silben – z. B. Tisch
+Groß | Beides geht
+Fen-ster | Fenst-er
+Ein einzelner Buchstabe | Ein ganzer Satz
+Fart | Beides ist richtig
+früher | morgen
+Subjekt, Prädikat, Objekt, Adverb | Singular, Plural, Präsens, Präteritum
+Museums | Museumse
+Haus, Baum, Tisch … | laufen, gehen, springen …
+Präpositionen (Verhältniswörter) | Pronomen (Fürwörter)
+Ein Märchen mit Prinzessinnen | Ein Gedicht über die Natur
+zb. | z. Bsp.
+Mit ss | Beides geht
+Ein Brief | Ein Lexikon
+Wörter mit gleich vielen Buchstaben | Wörter mit gleicher Bedeutung
+Eine Fabel | Ein Brief
+Die Vergangenheit | Die Gegenwart
+„ein starker Bär“ | „Bären sind stark“
+Rote Augen haben | Gerne Gemüse essen
+Jemandem ein Kuscheltier schenken | Jemandem beim Tragen helfen
+Ein sehr langes Wort (Donaudampfschiff) | Ein Wort mit doppelten Buchstaben (Sonne)
+Fremdwörter | Synonyme
+Ein Satz mit Fragezeichen | Ein sehr kurzer Hauptsatz
+Beim Kochen etwas verschütten | In eine Pfütze springen
+Ein Vergleich mit „wie“, z. B. „mutig wie ein Löwe“ | Ein Wort mit gleicher Bedeutung
+`);
+mcAdd(4, "Kultur & Geschichte", `
+In einem Hochhaus | In einem Zelt
+Ein Bauer | Ein Mönch
+Ein Bürgermeister | Ein Präsident
+Römer | Kelten
+Tempel | Burgen
+Ein Ort, an dem man Bücher ausleiht | Ein Ort, an dem man Theater spielt
+Mammuts | Drachen
+In Burgen | In Zelten aus Stoff
+Bildhauer / Bildhauerin | Dichter / Dichterin
+Eine Mauer aus Holz | Einen Turm
+Griechen | Germanen
+Kaiser | Ritter
+Runen | Keilschrift
+Griechisch | Italienisch
+Steinzeit | Neuzeit
+Ritter | Wikinger
+Marco Polo | Ferdinand Magellan
+Ein ägyptischer Pharao | Ein griechischer Philosoph
+Ein kleines Bauernhaus | Eine Burg aus Holz
+Eine alte Münze | Eine Flagge der Ritter
+Wolfgang Amadeus Mozart | Beide zusammen
+Vincent van Gogh | Pablo Picasso
+Friedrich Schiller | Heinrich Heine
+Wolfgang Amadeus Mozart | Johann Sebastian Bach
+Die Märchen | Die Nationalhymne
+Pfarrer | Ritter
+Die Brüder Grimm | Otto Lilienthal
+In Rom | In Ägypten
+Eine alte Statue aus Stein | Ein Geist aus einem Märchen
+Zum Schmuck der Stadt | Damit niemand hinaus konnte
+Trompete, Flöte, Trommel | Klavier, Orgel, Harfe
+1990 | 1961
+1989 | 1945
+Neil Armstrong | Sigmund Jähn
+Thomas Edison | Carl Benz
+Die Eisenzeit | Das Mittelalter
+Ein Theaterstück ohne Musik | Ein Konzert für Klavier
+Duelle | Ritterspiele zu Fuß
+Erich Kästner | Cornelia Funke
+Claude Monet | Leonardo da Vinci
+Die Brüder Wright | Die Brüder Humboldt
+Ein berühmter Maler | Ein berühmter Komponist
+Für die Erfindung des Telefons | Für ihre Bilder
+Neuzeit | Erneuerung
+Vor etwa 450 Jahren | Vor etwa 45.000 Jahren
+Cornelia Funke | Otfried Preußler
+Ein Preis für Sportler | Ein Preis für das schönste Haus
+Rom | Athen
+Alexander Graham Bell | Werner von Siemens
+Eiszeit | Jurazeit
+`);
+mcAdd(4, "Erde & Natur", `
+Afrika | Europa
+Der Atlantik | Der Indische Ozean
+Land mitten in einem Gebirge | Ein großer See
+Ein einzelner hoher Berg | Eine weite Ebene
+Nadelwald | Mischwald
+Ein sehr kaltes Gebiet | Ein Wald mit vielen Bäumen
+In der Antarktis (am Südpol) | In Afrika
+Ein fließendes Gewässer | Ein Teil vom Meer
+Etwa die Hälfte | Etwa ein Zehntel
+Am Äquator | Beide gleich kalt
+Wasser | Sand
+Kongo-Regenwald | Schwarzwald
+K2 | Kilimandscharo
+Ein starker Sturm | Ein großer Regen
+Land, das rundum von Wasser umgeben ist | Ein Berg im Meer
+Die Arktis | Asien
+Ein starker Wirbelsturm | Ein großes Erdbeben
+Wind und Wasser bauen Berge auf | Pflanzen wachsen ganz schnell
+Auf der Nordhalbkugel | Genau auf dem Äquator
+Der Kongo | Der Amazonas
+Der Albatros | Der Strauß
+Kern, Mantel, Kruste | Mantel, Kruste, Kern
+Die Alpen | Der Himalaya
+Argentinien | Peru
+Ein großer See in den Bergen | Ein Wasserfall
+Durch Vulkane, die wachsen | Durch viel Regen
+Das Wetter von heute | Die Temperatur in einem Raum
+Ein langer, breiter Fluss | Ein See in der Wüste
+In Afrika | In Europa
+Die Stelle, wo ein Fluss entspringt | Eine Brücke über den Fluss
+Die Gobi | Die Kalahari
+Nullmeridian | Wendekreis
+Weil die Sonne mal näher kommt | Weil sich der Mond dreht
+Die Erdkruste | Das Weltall
+Die Wolkenschicht | Die Erdkruste
+Ein großer Berg | Ein Fluss in der Wüste
+Das Wetter wird immer gleich | Die Erde wird kälter
+Tonga-Graben | Grand Canyon
+Regenwasser in Pfützen | Wasser in Flüssen
+Nein, nie | Nur bei Erdbeben
+Der Kongo | Der Niger
+Etwa 1 Kilometer | Etwa 110 Kilometer
+Der Bodensee | Der Baikalsee
+Ein Vulkan, der Lava spuckt | Ein Wasserfall
+Boden, der im Winter gefriert | Ein dicker Gletscher
+Etwa 4500 Jahre | Etwa 4,5 Millionen Jahre
+Der Nil | Der Jangtse
+Ein Berg in der Wüste | Eine Sandwüste
+Erdschichten | Gesteinsbrocken
+Wind | Regen
+`);
+mcAdd(4, "Rätsel", `
+Ein Regenschirm | Eine Pfütze
+Eine Gabel | Ein Löffel
+Ein Teller | Eine Giraffe
+Ein Teppich | Ein Pferd
+Ein Berg | Ein Kuchen
+Ein Knopf | Eine Schere
+8 | 11
+Ein Auto | Der Wind
+Einen Ball | Einen Fisch
+E | F
+Nur der Februar | Keiner
+Ein Stein | Ein Teller
+Ein Schlüssel | Eine Trommel
+Ein Hase | Ein Fisch
+Ein Apfel | Ein Stein
+Ein Glas | Ein Stock
+24 | 20
+25 | 30
+Der Himmel | Die Vergangenheit
+Ein Handtuch | Eine Pfütze
+Ein Lineal | Ein Pfeil
+2 | 4
+4 | 10
+Sechs | Zwölf
+7 | 6
+Dienstag | Donnerstag
+Das L | Das E
+Der Pinguin | Der Pfau
+Ein Stein | Der Wind
+Vier | Sechs
+Dein Fahrrad | Dein Zimmer
+1 kg Eisen | 1 kg Wolle
+„richtig“ | „Fehler“
+Der Buchstabe T | Der Buchstabe E
+36 | 32
+Platz 1 | Platz 3
+Eine Digitaluhr | Eine Sanduhr
+Ein Dorf | Ein Kalender
+Zwei | Sieben
+Ein Schuh | Ein Stuhl
+12 | 14
+20 | 36
+Licht | Sonne
+Zehnmal | Neunmal
+Nach links | Nach rechts
+Fr | So
+100 Minuten | 1 Minute
+Deine Füße | Deine Hände
+1,5 kg | 1 kg
+15 | 18
+`);
+mcAdd(4, "Sport", `
+Zehn | Zwölf
+Mit Stock und Puck | Mit Ball und Handschuh
+Gold | Bronze
+Schienbeinschoner | Ringhandschuhe
+Mit Hockeyschläger und Puck | Mit Tennisschläger und Federball
+Giro d’Italia | Vuelta
+Reiten | Radfahren
+Basketball | Handball
+Rollschuhe | Einen Schläger
+Silber | Gold
+Volleyball | Handball
+EM | FIFA
+Brasilien | Argentinien
+Skifahren | Rodeln
+Einzel | Mixed-Einzel
+Ein Tor mit dem Kopf | Ein Tor in der letzten Minute
+Dressurreiten | Pferderennen
+Vier | Sechs
+Boxen | Fechten
+Auf dem Rasen | Im Wasser
+Silber | Platin
+Fünf | Sieben
+Fünf | Elf
+Etwa 10 Kilometer | Etwa 100 Kilometer
+Carl Lewis | Michael Phelps
+Der Ball ist hinter der Torlinie | Der Torwart verlässt den Strafraum
+9 | 36
+Laufen und Schwimmen | Radfahren und Schießen
+Ein Tor in der Verlängerung | Ein Punkt für die Kampfrichter
+Olympische Schneespiele | Weltcup
+Snowboarden | Rodeln
+2,50 Meter | 4 Meter
+Fünf | Elf
+Laufen, Rudern und Klettern | Schwimmen, Schießen und Reiten
+In Italien | In Frankreich
+UEFA | DFB
+Eine Verwarnung ohne Folgen | Ein Elfmeter für den Gegner
+Matte | Arena
+Federball | Squash
+Zwei | Eins
+Alle 2 Jahre | Jedes Jahr
+11 | 22
+Etwa 3 Meter | Etwa 11 Meter
+In Berlin | In Hamburg
+Brustschwimmen | Rückenschwimmen
+Deutschland | Italien
+Olympische Spiele für Kinder | Spiele nur für Profis
+Etwa 10 Kilometer | Etwa 30 Kilometer
+Kitesurfen | Rudern
+Zwei | Fünf
+`);
+
+/* =====================================================================
+   „Verdreht!“ im Alleinspiel: passende falsche Antworten, eine Zeile je Frage (Reihenfolge wie VERD[k])
+   ===================================================================== */
+const MCV = {};
+function mcvAdd(k, text) { MCV[k] = text.trim().split("\n").map(l => l.split("|").map(s => s.trim())); }
+mcvAdd(1, `
+Das Schaf | Das Pferd
+Blau | Grün
+Die Katze | Die Kuh
+Eier | Wolle
+Gelb | Blau
+Der Weihnachtsmann | Das Huhn
+Karotten | Käse
+Mit einem Löffel | Mit einer Schere
+Ein Hund | Ein Fisch
+Im Nest | Im Wald
+Der Hund | Die Maus
+Blau | Rot
+Milch | Nüsse
+Im Wasser | Im Mauseloch
+Der Elefant | Das Zebra
+Saft | Tee
+Rot | Blau
+Mit den Ohren | Mit der Nase
+Der Mond | Die Sterne
+Die Ziege | Die Kuh
+Handschuhe | Mützen
+Zwei | Sechs
+Regen | Blätter
+Die Ameisen | Die Vögel
+Der Igel | Die Katze
+Mit einem Kamm | Mit einer Gabel
+Der Fisch | Die Ente
+Brot | Äpfel
+Blau | Gelb
+In der Badewanne | Im Schrank
+Die Ente | Der Hund
+Eine Sonnenbrille | Einen Schal
+Die Giraffe | Das Nashorn
+Die Sonne | Der Regenbogen
+Mit dem Messer | Mit dem Lineal
+Das Fohlen | Das Kalb
+Die Kuh | Der Esel
+Beim Metzger | In der Apotheke
+Eine Sandburg | Einen Drachen
+Bäume und Steine | Schnee und Eis
+Mit dem Kamm | Mit der Seife
+Die Schnecke | Der Hase
+Ein Fahrrad | Ein Roller
+Der Bäcker | Der Polizist
+Die Banane | Die Kiwi
+Das Schaf | Der Hund
+Nüsse | Bananen
+In der Erde | Am Strauch
+Grün | Rot
+Saft | Kakao
+Die Katze | Das Pferd
+Gelb | Blau
+Zwei | Sechs
+Suppe oder Brei | Brot oder Käse
+Die Kuh | Die Katze
+Im Nest | Im Teich
+Die Kuh | Das Pferd
+Mit der Gabel | Mit dem Messer
+Socken | Stiefel
+Gelb | Rot
+Der Igel | Das Reh
+Die Wolken | Die Sonne
+Das Kätzchen | Das Fohlen
+Die Ente | Der Frosch
+Die Äpfel | Die Wolken
+Mit dem Handtuch | Mit der Zahnbürste
+Die Zitrone | Die Birne
+Im Badezimmer | Im Schlafzimmer
+Eine Mütze | Einen Hut
+Die Schnecke | Der Igel
+Lesen | Kochen
+Drei | Vier
+Die Ente | Das Huhn
+Eine Sonnenbrille | Eine Krone
+Der Winter | Der Frühling
+Die Prinzessin | Der Zwerg
+Mit Löffeln | Mit Kämmen
+Die Maus | Das Nashorn
+Suppe oder Nudeln | Kuchen oder Eis
+In der Wüste | Im Brunnen
+Der Hase | Der Fuchs
+Ein Gaspedal | Einen Spiegel
+Dienstag | Samstag
+Das Pferd | Der Tiger
+Einen Schneemann | Ein Iglu
+Blau | Gelb
+Schwimmen | Laufen
+Mit den Augen | Mit der Nase
+Die Kuh | Das Huhn
+Karotten | Nüsse
+Im Wasser | Im Keller
+Einen Stuhl | Einen Tisch
+Der Hase | Die Maus
+Blumen | Äpfel
+Grau | Blau
+Lesen | Malen
+Der Osterhase | Der Zauberer
+Die Giraffe | Das Nashorn
+Mit dem Lappen | Mit der Gabel
+Zwei | Sechs
+Federn | Blätter
+Die Ente | Der Fisch
+In der Höhle | Im Bauernhaus
+Milch | Saft
+Die Banane | Die Birne
+Hausschuhe | Sandalen
+Die Kuh | Der Hund
+In der Turnhalle | Im Schwimmbad
+Haare kämmen | Hände waschen
+Der Koala | Das Zebra
+Saft und Dunkelheit | Schnee und Wind
+Der Fisch | Der Frosch
+Mit dem Fahrrad | Mit dem Roller
+Acht | Zwölf
+Das Pferd | Der Hase
+Socken | Blätter
+Im Vogelnest | Im Bienenstock
+Grün | Lila
+Eine Zahnbürste | Eine Gabel
+Der Hund | Die Kuh
+Suppe | Brot
+In der Bücherei | Beim Friseur
+Der Igel | Der Hase
+Mit Löffel und Gabel | Mit Pinsel und Papier
+Einen Kamm | Ein Pflaster
+Grün | Rot
+Der Lokführer | Der Pilot
+Die Taube | Die Eule
+Blätter | Stacheln
+Mit dem Fernseher | Mit dem Radio
+Das Schaf | Die Ziege
+Ein Paket | Ein Bild
+Am Baum | Im Wasser
+Kochen | Rennen
+Der Pinguin | Das Schaf
+Einen Hut | Eine Brille
+Eckig | Dreieckig
+Nudeln und Suppe | Pizza und Pommes
+Am Bahnhof | Im Hafen
+Die Fliege | Die Ameise
+Bücher und Zeitungen | Briefe und Pakete
+Der Daumen | Der Zeigefinger
+Die Kuh | Der Esel
+Fleisch verkaufen | Haare schneiden
+Auf dem Boden | Am Fenster
+Die Ameise | Der Käfer
+Der Bus | Das Schiff
+Rot | Blau
+Spielen | Essen
+Die Katze | Das Pferd
+`);
+mcvAdd(2, `
+Welpe | Fohlen
+Das Zebra | Der Elefant
+Die Maus | Beide gleich groß
+Sechs | Zehn
+Der Winter | Der Frühling
+Sand und Wind | Schnee und Eis
+Beim Metzger | In der Apotheke
+Der Hase | Der Fuchs
+Sonntag | Donnerstag
+Sandalen & Söckchen | Flossen & Badelatschen
+Das Fohlen | Das Lamm
+Dienstag | Samstag
+Eine Biene | Ein Käfer
+Der Wolf | Der Hirsch
+Eine Wollmütze | Einen Regenschirm
+März | Dezember
+Fünf | Zehn
+Am Nordpol | In der Wüste
+Der Igel | Der Käfer
+Wasser | Blätter
+Das Kalb | Das Ferkel
+Die Gurke | Die Tomate
+Das Wetter | Die Temperatur
+Der Sommer | Der Herbst
+Die Polizei | Der Krankenwagen
+Das Pferd | Der Tiger
+In der Bäckerei | In der Schule
+Die Äpfel | Die Wolken
+Aus Äpfeln | Aus Reis
+Der Igel | Der Hase
+Eine Mütze | Eine Krone
+Grün | Orange
+Am Nordpol | Im Wald
+Der Pinguin | Die Ente
+Sandalen | Hausschuhe
+Der Hase | Der Igel
+Zehn | Vierzehn
+Suppe | Salat
+Der Igel | Die Schnecke
+In den Supermarkt | Zum Bahnhof
+Eine Sonnenbrille | Ein Stirnband
+Die Ente | Der Fisch
+Mit der Waage | Mit dem Lineal
+Der Specht | Der Pinguin
+Im Zelt | Im Iglu
+Milch | Saft
+Das Kätzchen | Das Fohlen
+Eine Höhle | Einen Damm
+Der Koala | Der Affe
+Der Wolf | Der Riese
+Das Kalb | Das Kitz
+Juni | März
+Ein Fisch | Eine Libelle
+Zwölf | Sechzig
+Der Otter | Der Specht
+Schnell | Laut
+Am Südpol | In Afrika
+Die Paprika | Die Kartoffel
+Montag | Donnerstag
+Pilze | Blätter
+Lila | Orange
+Der Stall | Das Nest
+Das Wetter | Die Größe
+Der Schmetterling | Die Biene
+Der Bäcker | Der Gärtner
+Dreißig | Hundert
+Wasser | Saft
+Die Banane | Die Ananas
+Im Wohnzimmer | Im Garten
+Der Hund | Die Katze
+Kamm und Seife | Zahnbürste und Shampoo
+Der Frühling | Der Winter
+Die Schildkröte | Die Schnecke
+Kuchen backen | Bilder malen
+Acht | Vier
+Der Strauß | Die Ente
+Fahrrad fahren | Sandburgen bauen
+Der Verlierer | Der Schiedsrichter
+Das Pferd | Der Hund
+Im Supermarkt | Im Schwimmbad
+Eine Schere | Einen Hammer
+Bunt | Laut
+Der Elefant | Das Zebra
+Sie geht unter | Sie wird kalt
+Der Bäcker | Die Lehrerin
+Eckig | Dreieckig
+Drei | Eins
+Die Ameise | Die Wespe
+Eine Sonnenbrille | Badeschuhe
+Der Hund | Das Pferd
+Steine | Sand
+Rot | Blau
+Ihr Futter | Ihre Eier
+Der Briefträger | Der Bäcker
+Das Pferd | Der Tiger
+Groß | Dick
+Ein Flugzeug | Ein Ball
+Der Fuchs | Der Wolf
+Drei | Fünf
+Ein Stein | Ein Tier
+Im Wald | Im Turm
+Der Adler | Der Löwe
+Das Fenster | Die Haustür
+Klein | Groß
+Die Gitarre | Die Trommel
+Sieben | Zwölf
+Im Nest | In der Höhle
+Der Storch | Die Eule
+Eine Krone | Einen Kittel
+Das Lamm | Das Kitz
+Bücher lesen | Schlafen
+Das Zebra | Die Giraffe
+Wasser und Sand | Wind und Sonne
+Drei | Fünf
+Der Igel | Der Biber
+Sand | Blätter
+Rotkäppchen | Rapunzel
+Das Frühstück | Die Suppe
+Achtzehn | Einundzwanzig
+Der Hai | Der Seestern
+Im Ofen | Im Kleiderschrank
+Feucht | Klein
+Der Bagger | Das Taxi
+Das Fohlen | Das Küken
+Schwimmen | Kochen
+Der Bär | Der Hase
+Vier | Sechs
+Am Bananenbaum | Unter der Erde
+Langsam | Hell
+Der Wurm | Die Schnecke
+Ein Fernglas | Eine Lupe
+Mittwoch | Samstag
+In der Luft | In der Erde
+Die Eule | Der Igel
+Eine Höhle | Einen Damm
+Zwei | Zehn
+Ein Fahrrad | Einen Ball
+Die Giraffe | Das Nashorn
+Rot | Gelb
+Klein | Hell
+Brot backen | Haare schneiden
+Der Tiger | Der Elefant
+Fleisch und Fisch | Brot und Nüsse
+Vier | Sechs
+Saft | Wasser
+Laut | Groß
+Die Schnecke | Der Fisch
+Im Keller | Im Meer
+Pakete wiegen | Häuser bauen
+Die Schnecke | Der Hase
+`);
+mcvAdd(3, `
+Hamburg | München
+Den Tiger | Den Elefanten
+Zwölf | Zwanzig
+Der Otter | Der Specht
+Strömung | Welle
+Die Sonne | Der Mars
+Im Supermarkt | Im Rathaus
+Tau | Nebel
+Tausend | Zehn
+Die Birne | Die Pflaume
+Die Elbe | Die Donau
+Saturn | Mars
+Acht | Vier
+Nürnberg | Augsburg
+Die Lunge | Der Magen
+Sand und Wind | Salz und Zucker
+Hundert | Dreißig
+Die Eule | Der Igel
+Die Ostsee | Das Mittelmeer
+Stark | Laut
+Der Spatz | Der Adler
+Dampf | Nebel
+London | Marseille
+Vier | Acht
+Der Biber | Das Känguru
+Die Uhrzeit | Die Temperatur
+Das Krokodil | Der Frosch
+Raupen | Welpen
+Venus | Mars
+Leipzig | Chemnitz
+Nomen | Verb
+Die Brüder Wright | Wolfgang Amadeus Mozart
+Das Zebra | Der Elefant
+Hundert | Zehntausend
+Der Löwe | Das Pferd
+Nomen | Adjektiv
+Juni | April
+Sand | Gift
+Der Fuchs | Der Bär
+Die Zugspitze | Der Brocken
+Kohlendioxid | Stickstoff
+Der Rhein | Die Spree
+Federn | Schuppen
+Die Ameise | Die Biene
+Vier | Sechs
+Milch | Seide
+Der Seestern | Die Qualle
+Die Größe | Die Temperatur
+Jupiter | Venus
+Thomas Edison | Carl Benz
+Barcelona | Rom
+Der Mars | Der Merkur
+Hundert | Fünf
+China | Kanada
+Das Herz | Der Magen
+Der Main | Die Elbe
+Der Elefant | Der Blauwal
+Ehrlicher | Lieb
+Dreißig | Achtundzwanzig
+Der Mond | Der Polarstern
+Der Delfin | Der Hai
+Ein Tuwort | Ein Wiewort
+Berlin | Zürich
+Die Eule | Der Adler
+Eis | Salz
+Sechs | Zehn
+Sauerstoff | Stickstoff
+Sparsamer | Ehrlich
+Sylt | Rügen
+Hundert | Dreißig
+Das Gewicht | Die Zeit
+Das Huhn | Die Schildkröte
+Der Kilimandscharo | Die Zugspitze
+Häuse | Hauser
+Der Koala | Das Eichhörnchen
+Albert Einstein | Carl Benz
+Eukalyptus | Gras
+In Bayern | In Thüringen
+Ich esste | Ich aßte
+Die Qualle | Der Seestern
+Krakau | Prag
+Ein Regenbogen | Ein Sturm
+Sechs | Zwölf
+Jupiter | Mars
+Gewinnen | Spielen
+Der Gecko | Die Schlange
+Nomen | Adjektiv
+Die Elbe | Der Main
+Afrika | Europa
+Tau | Nebel
+Der Löwe | Der Bär
+Die Länge | Die Zeit
+Neun | Sieben
+Das Kaninchen | Der Igel
+Der Amazonas | Der Rhein
+Häuse | Mausen
+Januar | April
+Die Geige | Die Harfe
+Müde | Schnell
+In Norddeutschland | In Ostdeutschland
+Kohlendioxid | Stickstoff
+Der Panda | Das Känguru
+Hamburg | Saarland
+Fleischfresser | Allesfresser
+Der Specht | Die Taube
+Milchzähne | Backenzähne
+Ich laufte | Ich bin lief
+Dreihundert | Tausend
+Blau | Grün
+Ein Tuwort | Ein Namenwort
+Die Giraffe | Das Nashorn
+Mailand | Venedig
+Schmecken | Hören
+Kätzchen | Fohlen
+Die Nordsee | Der Bodensee
+Mitte | Pause
+Zehn | Dreißig
+Der Koala | Das Zebra
+Die Blüte | Das Blatt
+Vierundfünfzig | Achtundvierzig
+Uranus | Saturn
+Ein Lineal | Eine Lupe
+Neujahr | Ostern
+Der Hai | Der Seestern
+Am 31. Dezember | Am 6. Dezember
+Ein Marienkäfer | Ein Frosch
+Thomas Edison | Alexander Graham Bell
+Die Kuh | Der Hund
+Fünfundfünfzig | Fünfundsiebzig
+Dreihundertfünfundsechzig | Dreihundertsechzig
+Der Regenwurm | Die Muschel
+Präposition | Adjektiv
+Die Arktis | Asien
+Bremen | Göttingen
+Die Schildkröte | Die Libelle
+Briefe austragen | Schlafen
+Rot | Blau
+Der Emu | Der Pinguin
+Ein Gerät zum Wiegen | Eine Uhr für Seefahrer
+Der Löwe | Der Hund
+Halbmond | Neumond
+Ich singte | Ich sung
+Spanien | Griechenland
+Zwölf | Zehn
+Die Heuschrecke | Das Känguru
+Büchers | Buchs
+Freiburg | Karlsruhe
+Das Gewicht | Die Zeit
+Die Donau | Die Spree
+Zelt | Hütte
+`);
+mcvAdd(4, `
+Der Feldberg | Der Watzmann
+Jupiter | Mars
+Mailand | Neapel
+Der Elefant | Der Weiße Hai
+Kohlendioxid | Stickstoff
+Die Schnecke | Das Faultier
+Asien | Europa
+Der Koala | Das Kamel
+Der Gecko | Das Krokodil
+Grün | Orange
+Der Atlantik | Der Indische Ozean
+Salzburg | Graz
+Zwölf | Zwanzig
+Uranus | Saturn
+Michelangelo | Vincent van Gogh
+Der Amazonas | Die Donau
+Blei | Eisen
+Griechenland | Mexiko
+Manchester | Liverpool
+Die Giraffe | Das Nashorn
+Das Gewicht | Die Länge
+Astrologie | Geografie
+Fünf | Neun
+Der Harz | Der Schwarzwald
+Mozart | Bach
+Zürich | Genf
+Der Emu | Der Albatros
+Pflanzenfresser | Fleischfresser
+Der Polarstern | Der Mond
+Griechenland | Spanien
+Aus Glas | Aus Eisen
+Peking | Seoul
+Zwanzig | Achtundzwanzig
+Der Rhein | Die Elbe
+Martin Luther | Albert Einstein
+Lava | Basalt
+Der Blauwal | Der Elefant
+Wind | Wärme
+München | Potsdam
+Dreihundert | Hundertachtzig
+Saturn | Mars
+Geologie | Chemie
+Rügen | Usedom
+Rom | Sparta
+Salzkristalle | Rauch
+Der Pinguin | Das Huhn
+Spanisch | Englisch
+Juri Gagarin | Buzz Aldrin
+Die Lunge | Der Magen
+Mars | Pluto
+Bergen | Stockholm
+Der Pazifik | Der Indische Ozean
+Saturn | Neptun
+1990 | 1961
+Die Donau | Der Rhein
+Das Herz | Die Lunge
+Drei | Vier
+Die Brüder Grimm | Astrid Lindgren
+Aarhus | Oslo
+Silber | Kupfer
+Verdunstung | Verdauung
+Der Löwe | Das Pferd
+Hundert | Dreihundertfünfzig
+Der Mount Kenia | Der Mont Blanc
+Russland | Die USA
+Adjektiv | Pronomen
+Porto | Madrid
+Odin | Zeus
+Der Merkur | Der Mars
+Die Gobi | Die Kalahari
+Asien | Europa
+Sparta | Rom
+Europa | Die Antarktis
+Der Hai | Der Seestern
+Zweiunddreißig | Zehn
+Neil Armstrong | Sigmund Jähn
+Oslo | Göteborg
+Die Temperatur | Die Windstärke
+Die Elbe | Die Weser
+Mehrzahl | Einheit
+China | Australien
+Bonn | Düsseldorf
+Zwei | Drei
+Portugiesisch | Englisch
+Bukarest | Belgrad
+Die Pupille | Die Linse
+Die Kobra | Der Skorpion
+Der Chiemsee | Die Müritz
+Beethoven | Bach
+Warschau | Brünn
+Eisen | Zucker
+Tausend | Hundertvierzig
+Der Spatz | Der Adler
+Sol | Terra
+Belfast | Cork
+Sauerstoff | Stickstoff
+Der Nil | Der Indus
+Pflanzenfresser | Fleischfresser
+In Spanien | In Frankreich
+Amsterdam | Antwerpen
+Der Frosch | Der Hai
+Der Kongo-Regenwald | Der Schwarzwald
+Das Atom | Das Organ
+Rotterdam | Den Haag
+Der Mars | Der Merkur
+Fünf | Acht
+Thomas Edison | Carl Benz
+München | Bonn
+Biologie | Astronomie
+Die Ameise | Der Skorpion
+Oslo | Tampere
+Streit | Sieg
+Das Matterhorn | Die Zugspitze
+Hundert | Zehntausend
+Argentinien | Peru
+Die Loire | Die Themse
+Das Herz | Die Lunge
+Belgrad | Split
+Handel | Einkauf
+Poseidon | Thor
+In Spanien | In Griechenland
+Die Venus | Der Jupiter
+Der Elefant | Die Giraffe
+Die Alpen | Die Karpaten
+Istanbul | Athen
+Fasching | Ostern
+Die Zuckerrübe | Der Kaffeestrauch
+Die Seine | Die Donau
+Zehn | Fünfzehn
+Die Arktis | Australien
+Sydney | Melbourne
+Das Schienbein | Der Oberarmknochen
+Dänemark | Belgien
+Ausrufesatz | Aussagesatz
+Toronto | Vancouver
+Die Elbe | Die Donau
+Ein aktiver Vulkan | Ein Unterwasservulkan
+Isaac Newton | Thomas Edison
+Saturn | Neptun
+Alexandria | Casablanca
+Strömung | Welle
+Der Tiger | Der Elefant
+Kleiner Bär | Orion
+In Mexiko | In Kanada
+Sankt Petersburg | Kiew
+Kohlendioxid | Stickstoff
+Die Wolkenschicht | Die Erdkruste
+Claude Monet | Pablo Picasso
+Österreich | Liechtenstein
+Botanik | Geologie
+`);
+
+/* =====================================================================
    QUIZZLYBOARD – Alleinspielen: Kinder spielen allein, sammeln Sterne (0–3)
    und schlagen ihren eigenen Rekord (nur auf diesem Gerät gespeichert).
    ===================================================================== */
@@ -5405,13 +7492,48 @@ function soloMC(g, k, rounds, opts = {}) {
   }
 }
 
+/* Falsche Antworten automatisch passend wählen: gleiche Frageart („Welches Tier …“, „Wo …“),
+   gleiche Antwortform (der/die/das, „Im …“), Zahlwörter → Nachbarzahlen */
+const NUMW = ["Null", "Eins", "Zwei", "Drei", "Vier", "Fünf", "Sechs", "Sieben", "Acht", "Neun", "Zehn", "Elf", "Zwölf", "Dreizehn", "Vierzehn", "Fünfzehn", "Sechzehn", "Siebzehn", "Achtzehn", "Neunzehn", "Zwanzig"];
+const BIGW = { "tausend": ["Hundert", "Zehntausend"], "hundert": ["Tausend", "Zehn"], "vierundzwanzig": ["Zwölf", "Sechzig"], "sechzig": ["Hundert", "Dreißig"], "dreißig": ["Zwanzig", "Vierzig"], "zweiundfünfzig": ["Zwölf", "Hundert"], "dreihundertfünfundsechzig": ["Hundert", "Fünfhundert"] };
+function smartWrong(q, a, list, n = 2) {
+  const A = String(a).trim(), wi = NUMW.findIndex(w => w.toLowerCase() === A.toLowerCase());
+  if (wi >= 0) { const c = shuffle([-2, -1, 1, 2].map(d => wi + d).filter(i => i >= 0 && i < NUMW.length)).slice(0, n); return c.map(i => NUMW[i]); }
+  if (BIGW[A.toLowerCase()]) return BIGW[A.toLowerCase()];
+  if (/^1[0-9]{3}$|^20[0-9]{2}$/.test(A)) { const y = +A, out = new Set(); while (out.size < n) { const d = (1 + rnd(12)) * (Math.random() < .5 ? -1 : 1); if (y + d <= 2025) out.add(String(y + d)); } return [...out]; }
+  if (/^-?\d+(,\d+)?$/.test(A)) return wrongAnswers(A, []);
+  /* Themenwörter: großgeschriebene Wörter der Frage (ohne das erste Wort) */
+  const nouns = s => new Set(s.replace(/[?!.,„“"]/g, "").split(/\s+/).slice(1).filter(w => /^[A-ZÄÖÜ][a-zäöüß]{2,}/.test(w)).map(w => w.replace(/(s|es)$/, "").toLowerCase()));
+  const qk = s => s.toLowerCase().split(/\s+/).slice(0, 2).join(" ");
+  const lead = s => (String(s).match(/^(der|die|das|ein|eine|einen|im|in|an|am|auf|mit|aus|beim|zum|zur|sie|er|es)\b/i) || [""])[0].toLowerCase();
+  const generic = /^(wie heißt|was ist|wie nennt|was macht|was hat|wie heißen|welche stadt|was gibt)$/;
+  const myQ = qk(q), myN = nouns(q), myL = lead(A), len = A.length;
+  const seen = new Set([normA(A)]), scored = [];
+  list.forEach(([q2, a2]) => { a2 = String(a2); const key = normA(a2); if (seen.has(key) || a2.length > 60) return; seen.add(key);
+    let sc = Math.random() * 0.8;
+    const n2 = nouns(q2); let shared = 0; myN.forEach(w => { if (n2.has(w)) shared++; });
+    sc += shared * 5;
+    if (qk(q2) === myQ && !generic.test(myQ)) sc += 3;
+    if (lead(a2) === myL) sc += 2;
+    const r = a2.length / len; if (r > 0.5 && r < 2) sc += 1;
+    if (/^\d/.test(a2) !== /^\d/.test(A)) sc -= 4;
+    scored.push([sc, a2]); });
+  return scored.sort((x, y) => y[0] - x[0]).slice(0, n).map(x => x[1]);
+}
 /* ---------- Wissens-Quiz ---------- */
+/* Falsche Antworten: von Hand passend zur Frage geschrieben (data_mc.js); Zahlen-Aufgaben: Nachbarzahlen */
+function quizWrong(k, c, q, a) {
+  if (!c.gen) {
+    const flat = c.levels.flat(), i = flat.findIndex(x => x[0] === q), mc = (MC[k + "|" + catKey(c.cat)] || [])[i];
+    if (mc && mc.length >= 2 && mc.every(w => w && normA(w) !== normA(a))) return mc.slice(0, 2);
+  }
+  return wrongAnswers(a, c.gen ? [] : c.levels.flat().map(x => x[1]));
+}
 function soloQuiz(k) {
   const g = soloById("jeopardy"), cats = quizCats(k), levels = [0, 0, 1, 1, 2, 2, 3, 3, 4, 4];
   const rounds = levels.map(p => {
     const c = cats[rnd(cats.length)], [q, a] = quizQuestion(k, c, p);
-    const pool = c.gen ? [] : c.levels.flat().map(x => x[1]);
-    return { q, a, wrong: wrongAnswers(a, pool.length > 3 ? pool : cats.flatMap(x => x.gen ? [] : x.levels.flat().map(y => y[1]))), pre: box => box.append(h("span", { class: "pill" }, c.cat + " · " + (p + 1) + (p ? " Punkte" : " Punkt"))) };
+    return { q, a, wrong: quizWrong(k, c, q, a), pre: box => box.append(h("span", { class: "pill" }, c.cat + " · " + (p + 1) + (p ? " Punkte" : " Punkt"))) };
   });
   soloMC(g, k, rounds);
 }
@@ -5427,10 +7549,11 @@ function soloWf(k) {
 }
 /* ---------- Verdreht ---------- */
 function soloVerdreht(k) {
-  const g = soloById("verdreht"), all = VERD[k].map(x => x[1]), pool = fairShuffle("soloverd" + k, VERD[k]).slice(0, 8);
+  const g = soloById("verdreht"), pool = fairShuffle("soloverd" + k, VERD[k]).slice(0, 8);
   soloMC(g, k, pool.map(x => { markUsed(x); const [q, a] = x;
     const scr = q.split(" ").map(w => { const m = w.match(/^(\P{L}*)(\p{L}+)(\P{L}*)$/u); return m ? m[1] + scrambleWord(m[2], k) + m[3] : w; }).join(" ");
-    return { q: scr, a, wrong: wrongAnswers(a, all), noRead: true, after: "Richtig gelesen: „" + q + "“" }; }));
+    const mc = (MCV[k] || [])[VERD[k].indexOf(x)], ok = mc && mc.length >= 2 && mc.every(w => w && normA(w) !== normA(a));
+    return { q: scr, a, wrong: ok ? mc.slice(0, 2) : smartWrong(q, a, VERD[k]), noRead: true, after: "Richtig gelesen: „" + q + "“" }; }));
 }
 /* ---------- Bilderrätsel: Bild deckt sich von allein auf ---------- */
 function soloBild(k) {
