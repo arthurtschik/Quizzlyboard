@@ -4072,7 +4072,7 @@ function gameTitle(id) {
     case "bruecke": return T(id, letters("BRÜCKENBAUER", "plank", (c, i) => ({ style: `--y:${Math.round(Math.sin(i / 11 * Math.PI) * -8)}px` })));
     case "baumeister": return T(id, letters("BAUMEISTER", "blk", (c, i) => ({ style: `--b:${["#ef4444", "#3b82f6", "#eab308", "#22c55e"][i % 4]};--d:${i * 0.1}s` })));
     case "teamsplit": return T(id, h("span", { class: "ppl" }, "👥"), letters("TEAMS EINTEILEN", "l", (c, i) => ({ style: `color:${COLORS[i % 8]};--d:${(i * 0.17) % 1.4}s` })));
-    case "duelmode": return T(id, h("span", { class: "slot7" }, "🎰"), letters("DUELL-MODUS", "reel", (c, i) => ({ style: `--d:${i * 0.12}s` })));
+    case "duelmode": return T(id, h("span", { class: "slot7" }, "⚔️"), letters("DUELL-MODUS", "reel", (c, i) => ({ style: `--d:${i * 0.12}s` })));
   }
   return T("plain", id);
 }
@@ -4095,11 +4095,11 @@ function renderTop(gameId, grade) {
   const spick = location.hash === "#spickzettel"; // Handy-Spickzettel: keine Modus-Knöpfe
   const areaBtn = h("button", { class: "btn small topmode area", title: "Bereich wechseln (alleine / Grundschule / weiterführende Schule)", onclick: () => { store.set("qb_area", null); home(); } }, "⇄", h("span", { class: "tml" }, " Bereich"));
   const left = h("div", { class: "tside" }, gameId ? h("button", { class: "btn small", onclick: () => home() }, "🏠 Start")
-    : spick || !curArea ? null : curArea !== "gs" ? areaBtn : [areaBtn, h("button", { class: "btn small topmode duel", title: "Duell-Modus: Das Glücksrad wählt die Spiele", onclick: () => { ac(); duelSetup(); } }, "🎰", h("span", { class: "tml" }, " Duell-Modus")),
+    : spick || !curArea ? null : curArea !== "gs" ? areaBtn : [areaBtn, h("button", { class: "btn small topmode duel", title: "Duell-Modus: Das Glücksrad wählt die Spiele", onclick: () => { ac(); duelSetup(); } }, "⚔️", h("span", { class: "tml" }, " Duell-Modus")),
        h("button", { class: "btn small topmode split", title: "Kinder zufällig auf die Teams verteilen", onclick: () => { ac(); teamSplit(); } }, "👥", h("span", { class: "tml" }, " Teams einteilen")),
        h("button", { class: "btn small topmode buzz", title: "Großer Buzzer in Teamfarbe", onclick: () => { ac(); buzzer(); } }, buzzIcon(), h("span", { class: "tml" }, " Buzzer"))]);
   const right = h("div", { class: "tside right" });
-  if (grade) right.append(h("span", { class: "badge" }, (DUEL ? `🎰 ${DUEL.i + 1}/${DUEL.list.length} · ` : "") + grade + ". Klasse"));
+  if (grade) right.append(h("span", { class: "badge" }, (DUEL ? `⚔️ ${DUEL.i + 1}/${DUEL.list.length} · ` : "") + grade + ". Klasse"));
   right.append(h("button", { class: "btn round ghost", title: "Ton an/aus", onclick: e => { S.muted = !S.muted; saveS(); e.currentTarget.textContent = S.muted ? "🔇" : "🔊"; if (!S.muted) sfx.tick(); else stopClip(); } }, S.muted ? "🔇" : "🔊"));
   right.append(h("button", { class: "btn round ghost", title: "Vollbild", onclick: toggleFS }, "⛶"));
   right.append(h("button", { class: "btn round ghost", title: "Spielmenü", onclick: () => settingsMenu() }, "⚙️"));
@@ -4119,9 +4119,9 @@ function toggleFS() {
 /* topics: Themen, die man ab-/anwählen kann (min = so viele braucht das Spiel)
    duel:   darf im Duell-Modus vorkommen (nur Spiele mit Teampunkten) */
 const GAMES = [
-  { id: "duell", cat: "mod", ico: "⚡", t: "Gruppen-Duell", d: "Top-Antworten erraten – Team gegen Team.", c1: "#f59e0b", c2: "#b91c1c", run: duell, duel: true,
+  { id: "duell", cat: "mod", ico: "⚔️", t: "Gruppen-Duell", d: "Top-Antworten erraten – Team gegen Team.", c1: "#f59e0b", c2: "#b91c1c", run: duell, duel: true,
     rules: ["Eine Frage erscheint, z. B. „Nenne ein Haustier!“. Auf der Tafel sind die 6 beliebtesten Antworten verdeckt.", "Das Team, das am Zug ist, nennt Antworten. Stimmt eine, tippst du das passende Feld an – die Punkte kommen in den Topf.", "Falsche Antwort? Tippe ✗. Nach 3 ✗ bekommt das andere Team eine Klau-Chance: Es darf EINE Antwort nennen. Stimmt sie, gehört ihm der ganze Topf.", "Bei jeder neuen Frage ist automatisch das nächste Team am Zug.", "Die Lösungen stehen auf deinem Handy-Spickzettel (⚙️ Spielmenü)."] },
-  { id: "reaktion", cat: "1v1", ico: "⚔️", t: "Reaktions-Duell", d: "Zwei Kinder, ein geteiltes Board – wer tippt zuerst richtig?", c1: "#ef4444", c2: "#7c3aed", run: g => reaktion(g), duel: true,
+  { id: "reaktion", cat: "1v1", ico: "⚡", t: "Reaktions-Duell", d: "Zwei Kinder, ein geteiltes Board – wer tippt zuerst richtig?", c1: "#ef4444", c2: "#7c3aed", run: g => reaktion(g), duel: true,
     rules: ["Zwei Kinder stehen nebeneinander an der Tafel – jedes hat seine eigene Hälfte.", "Sind beide bereit, tippst du auf „Start“.", "Oben erscheint eine Aufgabe, z. B. „Tippe auf die 7!“.", "Wer zuerst richtig tippt, gewinnt die Runde. Danach sind beide Seiten gesperrt.", "Falsch getippt? Die eigene Seite ist kurz gesperrt.", "Unten vergibst du den Punkt. Wer zuerst 3 Runden gewinnt, hat das Duell gewonnen."] },
   { id: "bombe", cat: "1v1", ico: "💣", t: "Tick-Tack-Bumm", d: "Jedes Team hat ein Zeitkonto. Wessen Bombe platzt zuerst?", c1: "#475569", c2: "#dc2626", run: g => bombe(g), duel: true,
     rules: ["Zwei Teams spielen gegeneinander. Jedes Team hat ein Zeitkonto (Standard: 60 Sekunden, einstellbar).", "Eine Münze entscheidet, wer anfängt. Bei diesem Team läuft die Uhr.", "Ein Kind beantwortet die Frage. Richtig? Tippe den großen Knopf – jetzt läuft die Uhr des anderen Teams.", "Zu schwer? Mit „Überspringen“ kommt eine neue Frage – die Uhr läuft aber weiter!", "Ist die Zeit eines Teams abgelaufen, platzt seine Bombe. Das andere Team gewinnt 3 Punkte."] },
@@ -4134,7 +4134,7 @@ const GAMES = [
     rules: ["Teile den Raum in drei Bereiche: 1, 2 und 3.", "Die Frage wird gezeigt. Auf „Los“ läuft die Zeit mit Musik.", "Alle Kinder springen in das Feld, das sie für richtig halten – bis zum Stopp-Signal.", "Dann wird die Lösung aufgedeckt: Das Licht springt hin und her und bleibt beim richtigen Feld stehen.", "„Ob ihr wirklich richtig steht, seht ihr, wenn das Licht angeht!“"] },
   { id: "wf", cat: "board", ico: "✅", t: "Wahr oder Falsch", d: "Stimmt der Satz? Links wahr, rechts falsch.", c1: "#22c55e", c2: "#0f766e", run: g => lauf(g, "wf"),
     rules: ["Linke Raumseite = WAHR, rechte Raumseite = FALSCH.", "Die Aussage wird gezeigt, auf „Los“ läuft die Zeit.", "Alle stellen sich auf die Seite, die sie für richtig halten.", "Bei der Lösung gibt es eine kurze Erklärung."] },
-  { id: "hoehe", cat: "board", ico: "📈", t: "Höher oder Tiefer", d: "Ist das Nächste mehr oder weniger? Baut die längste Kette!", c1: "#0ea5e9", c2: "#4338ca", run: hoehe,
+  { id: "hoehe", cat: "board", ico: "↕️", t: "Höher oder Tiefer", d: "Ist das Nächste mehr oder weniger? Baut die längste Kette!", c1: "#0ea5e9", c2: "#4338ca", run: hoehe,
     topics: { min: 1, list: k => HOCH_GRADES[k].map(id => HOCH[id].t) },
     rules: ["Links liegt eine offene Karte, z. B. „Hund – 20 kg“. Rechts liegt eine verdeckte Karte.", "Ist der Wert der verdeckten Karte MEHR oder WENIGER?", "Alle stellen sich auf die Seite ⬆ MEHR oder ⬇ WENIGER.", "Dann wird aufgedeckt. Richtig? Die Kette wächst! Wie lang wird euer Rekord?"] },
   { id: "memory", cat: "board", ico: "🐯", t: "Tier-Memory", d: "Echte Tierlaute! Finde die Paare.", c1: "#ff8a3d", c2: "#e11d48", run: memory, duel: true,
@@ -4403,7 +4403,7 @@ function duelSetup() {
         ? h("div", { class: "stepper" }, h("span", null, "Anzahl Spiele"), h("button", { class: "btn ghost round", onclick: () => { n = Math.max(2, n - 1); draw(); } }, "−"), h("b", null, String(n)), h("button", { class: "btn ghost round", onclick: () => { n = Math.min(12, n + 1); draw(); } }, "+"))
         : h("div", { class: "gpick" }, elig.map(g => h("button", { class: "gchip" + (pick.has(g.id) ? " on" : ""), style: `--c1:${g.c1};--c2:${g.c2}`, onclick: () => { pick.has(g.id) ? pick.delete(g.id) : pick.add(g.id); draw(); } }, (pick.has(g.id) ? "✓ " : "") + g.ico + " " + g.t))),
       h("div", { class: "hintline" }, mode === "rand" ? "Jedes Spiel wird als kurze Runde gespielt. Die Punkte zählen über das ganze Duell." : `Ausgewählt: ${pick.size} ${pick.size === 1 ? "Spiel" : "Spiele"}.`),
-      h("button", { class: "btn green big", disabled: mode === "pick" && !pick.size, onclick: start }, "🎰 Duell starten"));
+      h("button", { class: "btn green big", disabled: mode === "pick" && !pick.size, onclick: start }, "⚔️ Duell starten"));
   }
   show(view, "duelmode", 0); draw();
 }
@@ -4617,14 +4617,14 @@ function duelWheel() {
 function duelNext() {
   if (!DUEL) { home(); return; }
   DUEL.i++;
-  if (DUEL.i >= DUEL.list.length) { DUEL = null; winnerSheet(() => duelSetup(), "🎰 Duell beendet!"); return; }
+  if (DUEL.i >= DUEL.list.length) { DUEL = null; winnerSheet(() => duelSetup(), "⚔️ Duell beendet!"); return; }
   sfx.fan();
   const sorted = teams.map((t, i) => ({ ...t, i })).sort((a, b) => b.score - a.score);
   openOverlay(h("div", { class: "sheet" },
     h("div", { class: "trophy" }, "✅"),
     h("h3", null, `Runde ${DUEL.i} von ${DUEL.list.length} geschafft!`),
     h("div", { class: "row" }, sorted.map(t => h("div", { class: "pill", style: "color:" + COLORS[t.i] }, t.name + ": " + t.score))),
-    h("button", { class: "btn gold big", onclick: () => { closeOverlay(); duelWheel(); } }, "🎰 Weiter zum Glücksrad")));
+    h("button", { class: "btn gold big", onclick: () => { closeOverlay(); duelWheel(); } }, "⚔️ Weiter zum Glücksrad")));
 }
 
 /* =====================================================================
@@ -4634,7 +4634,7 @@ function duelNext() {
 /* Wissens-Quiz im Spickzettel: Gruppe = Kategorie · Punkte, Nr. = Position im Feld (wie auf dem Board) */
 const quizSpick = k => quizCats(k).filter(c => !c.gen).flatMap(c => c.levels.flatMap((list, p) => list.map(([q, a], i) => ({ nr: quizNr(k, c.cat, p, i), grp: c.cat + " · " + (p + 1) + " P", q, a }))));
 const SPICK = [
-  { id: "duell", label: "⚡ Gruppen-Duell", items: k => DUELL[k].map(([q, a], i) => ({ nr: spickNr(k, i), q, a: a.map(([t, p], j) => `${j + 1}. ${t}  (${p})`).join("\n") })) },
+  { id: "duell", label: "⚔️ Gruppen-Duell", items: k => DUELL[k].map(([q, a], i) => ({ nr: spickNr(k, i), q, a: a.map(([t, p], j) => `${j + 1}. ${t}  (${p})`).join("\n") })) },
   { id: "jeopardy", label: "❓ Wissens-Quiz", note: "Nummer = Klasse · Kategorie · Punkte · Frage (z. B. 37305). Mathe-Felder sind Zufallsaufgaben – die Lösung erscheint auf dem Board unter „Antwort zeigen“.", items: quizSpick },
   { id: "mauer", label: "🟢 Die Mauer", note: "Nutzt die Fragen aus dem Wissens-Quiz (gleiche Nummern).", items: quizSpick },
   { id: "verdreht", label: "🔀 Verdreht!", items: k => VERD[k].map(([q, a], i) => ({ nr: spickNr(k, i), q, a })) },
@@ -7388,7 +7388,7 @@ const SOLO = [
   { id: "verdreht", ico: "🔀", t: "Verdreht!", d: "Lies die verdrehte Frage und finde die Antwort.", c1: "#14b8a6", c2: "#0891b2", run: soloVerdreht },
   { id: "bild", ico: "🖼️", t: "Bilderrätsel", d: "Das Bild deckt sich auf – was ist es?", c1: "#ec4899", c2: "#9333ea", run: soloBild },
   { id: "wortsalat", ico: "🔤", t: "Wortsalat", d: "Tippe die Buchstaben in der richtigen Reihenfolge.", c1: "#e879f9", c2: "#7c3aed", run: soloWortsalat },
-  { id: "hoehe", ico: "📈", t: "Höher oder Tiefer", d: "Mehr oder weniger? Baue eine lange Kette!", c1: "#3b82f6", c2: "#1e40af", run: soloHoehe }
+  { id: "hoehe", ico: "↕️", t: "Höher oder Tiefer", d: "Mehr oder weniger? Baue eine lange Kette!", c1: "#3b82f6", c2: "#1e40af", run: soloHoehe }
 ];
 const soloById = id => SOLO.find(g => g.id === id);
 /* replaceChildren ohne leere Werte (null würde sonst als Wort „null“ erscheinen) */
@@ -8631,7 +8631,7 @@ function makeTask(g) {
 function reaktion(g, opts = {}) {
   if (teams.length < 2) { needTwo(); return; }
   const tb = opts.tiebreak;
-  if (!tb && !opts.pair) { pickTeams("⚔️ Reaktions-Duell", pair => reaktion(g, { pair })); return; }
+  if (!tb && !opts.pair) { pickTeams("⚡ Reaktions-Duell", pair => reaktion(g, { pair })); return; }
   const P = tb || opts.pair, target = tb ? 2 : lim("reaktion", 3);
   const wins = [0, 0]; let round = 0;
   const view = h("div", { class: "rxwrap" });
@@ -8762,15 +8762,15 @@ function bombe(g, opts = {}) {
     h("button", { class: "btn ghost round", onclick: () => setStart(START - 10) }, "−"), secIn, h("span", null, "Sekunden"),
     h("button", { class: "btn ghost round", onclick: () => setStart(START + 10) }, "+"));
   function flip() {
-    setStart(secIn.value); setup.remove(); go.replaceChildren(); label.textContent = "🪙 Die Münze entscheidet …";
+    setStart(secIn.value); setup.remove(); go.replaceChildren(); label.textContent = "Die Münze entscheidet …";
     const turns = 6 + startTeam * 0.5;
     coin.animate([{ transform: "rotateY(0deg) translateY(0)" }, { transform: `rotateY(${turns * 180}deg) translateY(-8vmin)`, offset: 0.5 }, { transform: `rotateY(${turns * 360}deg) translateY(0)` }],
       { duration: REDUCED ? 50 : 2400, easing: "cubic-bezier(.3,.6,.3,1)", fill: "forwards" }).onfinish = () => {
-      sfx.tada(); label.textContent = "🪙 " + teams[P[startTeam]].name + " fängt an!";
+      sfx.tada(); label.textContent = teams[P[startTeam]].name + " fängt an!";
       go.append(h("button", { class: "btn green big", onclick: () => { closeOverlay(); cur = startTeam; running = true; last = performance.now(); lastSec = START; nextQ(); paint(); } }, "💣 Uhr starten"));
     };
   }
-  go.append(h("button", { class: "btn gold big", onclick: flip }, "🪙 Münze werfen"));
+  go.append(h("button", { class: "btn gold big", onclick: flip }, "Münze werfen"));
   openOverlay(h("div", { class: "sheet" }, label, setup, h("div", { class: "coinstage" }, coin), go));
   raf = requestAnimationFrame(loop);
 }
