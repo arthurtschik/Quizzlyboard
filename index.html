@@ -612,7 +612,7 @@ h1,h2,h3,h4,.btn,.pill,.badge{font-family:var(--display)}
 
 /* Reaktions-Duell Start, Tick-Tack-Bumm Zeit, Wortsalat-Staffel */
 .rready{flex:1;display:grid;place-items:center;font-size:clamp(60px,14vmin,150px);opacity:.6}
-.secrow{display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:center;font-family:var(--display);font-weight:600;font-size:clamp(18px,2.6vmin,26px)}
+.timerow{display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:center;font-family:var(--display);font-weight:600;font-size:clamp(18px,2.6vmin,26px)}
 .secin{width:4.2em;font:inherit;font-size:1.3em;text-align:center;padding:6px;border-radius:12px;border:3px solid var(--yellow);background:#0e0a33;color:#fff;-webkit-user-select:text;user-select:text}
 .pill.star.hot{background:var(--red);color:#fff}
 .relay{font-family:var(--display);font-weight:600;font-size:clamp(18px,3vmin,32px);min-height:1.3em;text-align:center}
@@ -906,6 +906,9 @@ body.buzzmode #top, body.buzzmode #score{display:none}
 .bmsw{width:clamp(46px,7.5vmin,66px);height:clamp(46px,7.5vmin,66px);border-radius:14px;background:var(--b);border:4px solid rgba(255,255,255,.25);box-shadow:inset 0 -6px 0 rgba(0,0,0,.25);cursor:pointer;font-size:clamp(22px,4vmin,34px);transition:transform .15s}
 .bmsw.er{background:#e5e7eb}
 .bmsw.on{border-color:#fff;transform:scale(1.15);box-shadow:0 0 0 4px rgba(255,255,255,.35),inset 0 -6px 0 rgba(0,0,0,.25)}
+/* Die Mauer: Kugeln pro Team einstellen */
+.mset{align-items:center;gap:18px}
+.mnum{font-family:var(--display);font-weight:700;font-size:clamp(48px,9vmin,96px);min-width:1.6em;text-align:center;color:#ffd23f;line-height:1}
 
 </style>
 </head>
@@ -4144,7 +4147,7 @@ const GAMES = [
   { id: "bild", cat: "board", ico: "🖼️", t: "Bilderrätsel", d: "Das Bild wird Stück für Stück sichtbar.", c1: "#ec4899", c2: "#9333ea", run: bild, duel: true,
     rules: ["Ein Bild ist hinter 24 Feldern versteckt.", "Felder antippen oder automatisch aufdecken lassen.", "Wer erkennt, was es ist, ruft es rein (oder meldet sich).", "Je früher geraten, desto mehr Punkte (5 bis 1)."] },
   { id: "mauer", cat: "board", ico: "🟢", t: "Die Mauer", d: "Richtige Antwort = grüne Kugel. Wo landet sie?", c1: "#16a34a", c2: "#0f172a", run: mauer, duel: true,
-    rules: ["Das Team am Zug wählt oben eine Startposition für die Kugel.", "Dann kommt eine Frage. Richtig beantwortet? Eine GRÜNE Kugel fällt – ihre Punkte gibt es dazu.", "Falsch? Eine ROTE Kugel fällt – ihre Punkte werden abgezogen.", "Wo die Kugel landet, entscheidet der Zufall. Spannung bis zum Schluss!"] },
+    rules: ["Vor dem Start legt ihr fest, wie viele Kugeln jedes Team bekommt (3 bis 10, Standard 5).", "Das Team am Zug wählt oben eine Startposition für die Kugel.", "Dann kommt eine Frage. Richtig beantwortet? Eine GRÜNE Kugel fällt – ihre Punkte gibt es dazu.", "Falsch? Eine ROTE Kugel fällt – ihre Punkte werden abgezogen.", "Wo die Kugel landet, entscheidet der Zufall. Spannung bis zum Schluss!"] },
   { id: "reihe", cat: "board", ico: "🔃", t: "Reihenfolge", d: "Tauschen, bis alles in der richtigen Reihenfolge ist.", c1: "#06b6d4", c2: "#2563eb", run: reihe,
     rules: ["Die Karten sind durcheinander.", "Tippe zwei Karten nacheinander an – sie tauschen die Plätze.", "Oben ist „zuerst“, unten „zuletzt“.", "Mit „Prüfen“ siehst du, welche Karten schon richtig liegen (grün)."] },
   { id: "wimmel", cat: "board", ico: "🔍", t: "Wimmelbild", d: "Finde die versteckten Dinge im Gewimmel!", c1: "#84cc16", c2: "#15803d", run: wimmel, duel: true,
@@ -5215,7 +5218,7 @@ const TUTS = {
     { el: ".rnext", say: "Stehen die nächsten zwei Kinder bereit, geht es mit Nächste Runde weiter." },
     { el: ".rtally", say: "Wer zuerst drei Runden gewinnt, hat das Duell gewonnen." }] },
   bombe: { start: () => bombe(1, { pair: [0, 1] }), steps: [
-    { el: ".secrow", say: "Zuerst stellst du ein, wie viel Zeit jedes Team hat." },
+    { el: ".timerow", say: "Zuerst stellst du ein, wie viel Zeit jedes Team hat." },
     { el: () => byText(".sheet .btn", "Münze werfen"), say: "Dann entscheidet eine Münze, wer anfängt.", act: tap, wait: 2600 },
     { el: () => byText(".sheet .btn", "Uhr starten"), say: "Und los geht's!", act: tap, wait: 300 },
     { el: ".bclock.on", say: "Bei diesem Team läuft jetzt die Zeit." },
@@ -8180,7 +8183,8 @@ function verdreht(g) {
 /* ---------- 1, 2 oder 3  &  Wahr oder Falsch ---------- */
 function lauf(g, kind) {
   const abc = kind === "abc";
-  const pool = fairShuffle(kind + g, withNr(abc ? ABC[g] : WF[g], g)); let idx = -1;
+  /* 10 Fragen pro Runde (faire Reihenfolge sorgt dafür, dass die nächste Runde andere Fragen bringt) */
+  const pool = fairShuffle(kind + g, withNr(abc ? ABC[g] : WF[g], g)).slice(0, 10); let idx = -1;
   let secs = TUT ? 6 : store.get("qb_secs_" + kind, abc ? 20 : 12);
   const view = h("div", { class: "lwrap" });
   show(view, kind, g);
@@ -8758,7 +8762,7 @@ function bombe(g, opts = {}) {
   const go = h("div", { class: "row" });
   const setStart = v => { START = Math.max(10, Math.min(600, Math.round(+v) || 60)); time[0] = time[1] = START; secIn.value = START; store.set("qb_bomb_secs", START); paint(); };
   const secIn = h("input", { type: "number", id: "bomb-secs", class: "secin", min: 10, max: 600, step: 5, value: START, onchange: e => setStart(e.target.value) });
-  const setup = h("div", { class: "secrow" }, h("span", null, "⏱ Zeit pro Team:"),
+  const setup = h("div", { class: "timerow" }, h("span", null, "⏱ Zeit pro Team:"),
     h("button", { class: "btn ghost round", onclick: () => setStart(START - 10) }, "−"), secIn, h("span", null, "Sekunden"),
     h("button", { class: "btn ghost round", onclick: () => setStart(START + 10) }, "+"));
   function flip() {
@@ -8865,7 +8869,9 @@ function mauer(g) {
   // Fragen kommen aus den Wissens-Quiz-Pools (zufällige Kategorie und Stufe, ohne schnelle Wiederholung)
   const mcats = quizCats(g);
   const nextQ = () => { const c = mcats[rnd(mcats.length)], p = rnd(5), [q, a, nr] = quizQuestion(g, c, p); return [c.cat, p + 1, q, a, nr]; };
-  const order = []; for (let b = 0; b < lim("mauer", 2); b++) teams.forEach((_, i) => order.push(i));
+  /* Kugeln pro Team: vor dem Spiel einstellbar (gemerkt), im Duell-Modus Kurzrunde, im Tutorial 2 */
+  const order = [];
+  const setOrder = n => { order.length = 0; for (let b = 0; b < n; b++) teams.forEach((_, i) => order.push(i)); };
   let turn = -1, phase = "pick", ball = null, raf = 0, picked = -1;
   const canvas = h("canvas", { class: "mcanvas" });
   const cbox = h("div", { class: "mcbox" }, canvas);
@@ -8982,7 +8988,20 @@ function mauer(g) {
       h("div", { class: "mpick" }, SLOTS.map((_, i) => h("button", { class: "btn ghost", onclick: () => choose(i) }, "▼ " + (i + 1)))),
       h("div", { class: "hintline" }, "Richtige Antwort = grüne Kugel (Punkte dazu). Falsche Antwort = rote Kugel (Punkte weg)."));
   }
-  requestAnimationFrame(() => { layout(); nextTurn(); });
+  function setup() {
+    let n = Math.max(3, Math.min(10, +store.get("qb_mauer_n", 5) || 5));
+    phase = "setup"; draw();
+    const num = h("div", { class: "mnum" }, String(n));
+    const total = h("div", { class: "hintline" });
+    const upd = d => { n = Math.max(3, Math.min(10, n + d)); num.textContent = n; store.set("qb_mauer_n", n); total.textContent = `Insgesamt ${n * teams.length} Kugeln – jedes Team ist ${n}-mal dran.`; if (d) sfx.tick(); };
+    upd(0);
+    panel.replaceChildren(h("div", { class: "mq" }, "Wie viele Kugeln bekommt jedes Team?"),
+      h("div", { class: "row mset" }, h("button", { class: "btn ghost round", "aria-label": "Weniger", onclick: () => upd(-1) }, "−"), num,
+        h("button", { class: "btn ghost round", "aria-label": "Mehr", onclick: () => upd(1) }, "+")),
+      total,
+      h("div", { class: "row mctrl" }, h("button", { class: "btn green big", onclick: () => { ac(); setOrder(n); nextTurn(); } }, "▶ Los geht’s!")));
+  }
+  requestAnimationFrame(() => { layout(); if (DUEL || TUT) { setOrder(lim("mauer", 2)); nextTurn(); } else setup(); });
 }
 
 /* =====================================================================
