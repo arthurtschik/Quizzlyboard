@@ -910,6 +910,32 @@ body.buzzmode #top, body.buzzmode #score{display:none}
 .mset{align-items:center;gap:18px}
 .mnum{font-family:var(--display);font-weight:700;font-size:clamp(48px,9vmin,96px);min-width:1.6em;text-align:center;color:#ffd23f;line-height:1}
 
+/* ===== Weiterführende Schule (Klasse 5–10): ruhigerer, erwachsenerer Look ===== */
+body.sek{--stage:#0b1220;--display:"Nunito","Trebuchet MS","Segoe UI",system-ui,sans-serif}
+body.sek::before{background:radial-gradient(70vmax 60vmax at 10% 0%,rgba(30,64,175,.45),transparent 60%),
+  radial-gradient(60vmax 50vmax at 95% 100%,rgba(15,118,110,.35),transparent 60%),var(--stage)}
+body.sek::after{opacity:.12}
+body.sek .logo .lt{color:#e2e8f0!important;text-shadow:0 .04em 0 rgba(0,0,0,.4)}
+body.sek .logo .lt:nth-child(n+8){color:#38bdf8!important}
+body.sek .logo .word{font-weight:900;letter-spacing:.04em}
+body.sek h1,body.sek h2,body.sek h3,body.sek .btn,body.sek .pill,body.sek .badge{font-weight:800}
+body.sek .game{border-radius:16px;box-shadow:0 8px 24px rgba(0,0,0,.35)}
+body.sek .game h2{font-weight:900}
+.sekk button{font-family:var(--display);font-weight:800;font-size:clamp(14px,1.9vmin,18px);color:#0f172a}
+.sekrow{display:grid;grid-template-columns:1fr 2fr;gap:0 14px;max-width:1400px;margin:0 auto;width:100%}
+.sekrow .games{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+@media (max-width:860px){.sekrow{grid-template-columns:1fr}}
+/* PIN */
+.pincard{max-width:420px}
+.pinmsg{opacity:.85;text-align:center;min-height:1.4em}
+.pindots{display:flex;gap:16px;justify-content:center;margin:6px 0}
+.pindots span{width:18px;height:18px;border-radius:50%;border:2px solid #cbd5e1;transition:background .15s}
+.pindots span.on{background:#38bdf8;border-color:#38bdf8}
+.pinpad{display:grid;grid-template-columns:repeat(3,72px);gap:12px;justify-content:center}
+.pinkey{height:64px;border-radius:16px;background:rgba(255,255,255,.12);font-family:var(--display);font-weight:800;font-size:28px;box-shadow:0 4px 0 rgba(0,0,0,.3)}
+.pinkey:active{transform:translateY(3px);box-shadow:none}
+body.sek .readbtn{display:none}
+
 </style>
 </head>
 <body>
@@ -1175,6 +1201,13 @@ const BLITZ = {
 /* Rechenaufgabe passend zur Klasse */
 function blitzMath(g) {
   const r = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
+  if (g >= 5) { // weiterführende Schule: nur ganzzahlige Ergebnisse (werden auch im Reaktions-Duell als Zahl genutzt)
+    const t = Math.random();
+    if (g === 5) { if (t < 0.4) { const a = r(12, 25), b = r(3, 9); return [`${a} · ${b} = ?`, String(a * b)]; } if (t < 0.7) { const b = r(3, 12), c = r(5, 15); return [`${b * c} : ${b} = ?`, String(c)]; } const a = r(150, 900), b = r(120, 600); return [`${a} + ${b} = ?`, String(a + b)]; }
+    if (g === 7) { if (t < 0.4) { const a = -r(3, 30), b = r(5, 40); return [`(−${-a}) + ${b} = ?`, String(a + b)]; } if (t < 0.7) { const p = [10, 20, 25, 50][r(0, 3)], v = [40, 60, 80, 120, 200][r(0, 4)]; return [`${p} % von ${v} = ?`, String(p * v / 100)]; } const a = r(12, 19), b = r(11, 19); return [`${a} · ${b} = ?`, String(a * b)]; }
+    if (t < 0.4) { const n = r(11, 25); return [`${n}² = ?`, String(n * n)]; } if (t < 0.7) { const n = r(11, 20); return [`√${n * n} = ?`, String(n)]; }
+    const [b, e] = [[2, 6], [2, 8], [3, 4], [5, 3], [2, 9]][r(0, 4)]; return [`${b} hoch ${e} = ?`, String(b ** e)];
+  }
   if (g === 1) { const a = r(1, 9), b = r(1, 9); return Math.random() < 0.6 || a === b ? [`${a} + ${b} = ?`, String(a + b)] : [`${Math.max(a, b)} − ${Math.min(a, b)} = ?`, String(Math.max(a, b) - Math.min(a, b))]; }
   if (g === 2) { if (Math.random() < 0.5) { const a = r(5, 15), b = r(2, 9); return [`${a} + ${b} = ?`, String(a + b)]; } const a = r(2, 5), b = r(2, 10); return [`${a} · ${b} = ?`, String(a * b)]; }
   if (g === 3) { if (Math.random() < 0.6) { const a = r(2, 10), b = r(2, 10); return [`${a} · ${b} = ?`, String(a * b)]; } const b = r(2, 9), c = r(2, 9); return [`${b * c} : ${b} = ?`, String(c)]; }
@@ -3673,6 +3706,1117 @@ QUIZ_MORE[4] = {
 };
 
 /* =====================================================================
+   QUIZZLYBOARD – Inhalte für die weiterführende Schule (Klasse 5–10)
+   Doppelstufen: Schlüssel 5 = Klasse 5/6, 7 = Klasse 7/8, 9 = Klasse 9/10.
+   Kein Vorlesen in diesem Bereich (keine Sprachaufnahmen nötig).
+   Neue Inhalte immer HINTEN anhängen – die Spickzettel-Nummern hängen an der Position.
+   ===================================================================== */
+
+/* Wissens-Quiz: eine Zeile je Frage „Stufe | Frage | Antwort“ (Stufe 1 = leicht … 5 = schwer).
+   Die erste Frage jeder Stufe landet in JEO, die übrigen in QUIZ_MORE. */
+function sekQuiz(k, cats) {
+  JEO[k] = []; QUIZ_MORE[k] = {};
+  cats.forEach(([cat, text]) => {
+    const lv = [[], [], [], [], []];
+    if (text) text.trim().split("\n").forEach(l => { const [p, q, a] = l.split("|").map(s => s.trim()); lv[+p - 1].push([q, a]); });
+    else for (let p = 0; p < 5; p++) lv[p].push(["(zufällig erzeugte Rechenaufgabe)", "–"]);
+    JEO[k].push([cat, lv.map(x => x[0])]);
+    QUIZ_MORE[k][cat.replace(/^\S+\s+/, "")] = lv.map(x => x.slice(1));
+  });
+}
+
+/* Kurzschreibweisen für die übrigen Spiele (eine Zeile je Eintrag, Felder mit „|“ getrennt) */
+const sekLines = t => t.trim().split("\n").map(l => l.split("|").map(x => x.trim()));
+const sekABC = (k, t) => { ABC[k] = sekLines(t).map(([q, ...o]) => [q, o]); };                       // Frage | richtig | falsch | falsch
+const sekWF = (k, t) => { WF[k] = sekLines(t).map(([w, q, e]) => [q, w === "W", e]); };               // W/F | Aussage | Erklärung
+const sekBlitz = (k, t) => { BLITZ[k] = sekLines(t).map(([q, a]) => [q, a]); };                       // Frage | Antwort
+const sekDuell = (k, t) => { DUELL[k] = sekLines(t).map(([q, a]) => [q, a.split(";").map(x => { const m = x.trim().match(/^(.*?)\s+(\d+)$/); return [m[1], +m[2]]; })]); }; // Frage | Antwort 30; Antwort 25 …
+const sekReih = (k, t) => { REIH[k] = sekLines(t).map(([q, a]) => [q, a.split(">").map(x => x.trim())]); };   // Titel | erstes > zweites > …
+const sekZuord = (k, t) => { ZUORD[k] = sekLines(t).map(([q, g, it]) => [q, g.split("/").map(x => x.trim()), it.split(";").map(x => { const [n, i] = x.split("="); return [n.trim(), +i - 1]; })]); }; // Titel | Gruppe 1 / Gruppe 2 | Begriff=1; Begriff=2 …
+
+/* ---------------- Klasse 5/6 ---------------- */
+sekQuiz(5, [
+  ["🧮 Mathe", ""],
+  ["📖 Deutsch", `
+1 | Welche Wortart ist „schnell“? | Adjektiv
+1 | Wie heißt die Mehrzahl von „Museum“? | Museen
+1 | Welches Satzzeichen steht am Ende eines Fragesatzes? | Das Fragezeichen
+1 | Welche Wortart ist „unter“ in „unter dem Tisch“? | Präposition
+1 | Schreibt man „das Laufen“ groß oder klein? | Groß – es ist nominalisiert
+2 | Wie heißt „ich laufe“ im Präteritum? | ich lief
+2 | Wie heißt die Grundform eines Verbs? | Infinitiv
+2 | In welchem Fall steht „dem Hund“? | Im Dativ
+2 | Wie nennt man Wörter mit gleicher Bedeutung? | Synonyme
+2 | Was ist das Gegenteil von „Synonym“? | Antonym
+3 | Was ist das Subjekt in „Morgen schreibt die Klasse eine Arbeit“? | die Klasse
+3 | Wie nennt man eine Geschichte, in der Tiere sprechen und die eine Lehre hat? | Fabel
+3 | Wie heißt das Perfekt von „wir schwimmen“? | wir sind geschwommen
+3 | Was ist ein Kompositum? | Ein zusammengesetztes Wort (z. B. Haustür)
+3 | Welche Steigerungsform ist „am schönsten“? | Superlativ
+4 | Wie nennt man die Satzglieder, die man mit „wen oder was?“ erfragt? | Akkusativobjekt
+4 | Was ist ein Vers? | Eine Zeile in einem Gedicht
+4 | Wie nennt man die Reimform aabb? | Paarreim
+4 | Wer schrieb „Das doppelte Lottchen“ und „Emil und die Detektive“? | Erich Kästner
+4 | Was ist eine Personifikation? | Dinge oder Tiere bekommen menschliche Eigenschaften
+5 | Wie heißt die Reimform abab? | Kreuzreim
+5 | Wie heißt die Reimform abba? | Umarmender Reim
+5 | Was ist ein Adverbial der Zeit? Nenne ein Beispiel! | Eine Zeitangabe, z. B. „gestern“
+5 | Wie nennt man den Teil einer Erzählung, in dem die Spannung am größten ist? | Höhepunkt
+5 | Was ist ein Kommentar in der Zeitung? | Ein Text mit der Meinung des Autors
+`],
+  ["💬 Englisch", `
+1 | Was heißt „Hund“ auf Englisch? | dog
+1 | Was heißt „Montag“ auf Englisch? | Monday
+1 | Was bedeutet „apple“? | Apfel
+1 | Wie sagt man „Guten Morgen“ auf Englisch? | Good morning
+1 | Was heißt „rot“ auf Englisch? | red
+2 | Wie heißt die Mehrzahl von „child“? | children
+2 | Was heißt „Ich heiße …“ auf Englisch? | My name is …
+2 | Welche Zahl ist „twelve“? | 12
+2 | Was ist das Gegenteil von „big“? | small / little
+2 | Wie heißt „Freundin/Freund“ auf Englisch? | friend
+3 | Wie heißt die Mehrzahl von „mouse“? | mice
+3 | Ergänze: „She ___ a cat.“ (have) | has
+3 | Was bedeutet „Wednesday“? | Mittwoch
+3 | Wie heißt „ich bin“ auf Englisch? | I am
+3 | Ergänze: „They ___ from Germany.“ (be) | are
+4 | Wie heißt die Vergangenheit von „go“? | went
+4 | Was ist das „simple past“ von „see“? | saw
+4 | Wie heißt die Mehrzahl von „foot“? | feet
+4 | Ergänze: „I ___ playing football now.“ (be) | am
+4 | Was bedeutet „because“? | weil
+5 | Wie heißt die Vergangenheit von „buy“? | bought
+5 | Was ist der Unterschied zwischen „some“ und „any“? | „some“ in Aussagesätzen, „any“ meist in Fragen und Verneinungen
+5 | Ergänze: „He doesn’t ___ milk.“ (like) | like
+5 | Wie steigert man „good“? | good – better – best
+5 | Übersetze: „Ich habe gestern Fußball gespielt.“ | I played football yesterday.
+`],
+  ["🌿 Biologie", `
+1 | Wie nennt man Tiere mit Wirbelsäule? | Wirbeltiere
+1 | Zu welcher Tierklasse gehört der Frosch? | Amphibien (Lurche)
+1 | Was brauchen Pflanzen zur Fotosynthese? | Licht, Wasser und Kohlenstoffdioxid
+1 | Zu welcher Tierklasse gehört der Wal? | Säugetiere
+1 | Wie viele Beine haben Insekten? | Sechs
+2 | Wie heißen die drei Körperteile eines Insekts? | Kopf, Brust, Hinterleib
+2 | Wie nennt man Tiere, deren Körpertemperatur sich der Umgebung anpasst? | Wechselwarme Tiere
+2 | Was ist die Aufgabe der roten Blutkörperchen? | Sauerstoff transportieren
+2 | Wie nennt man die Übertragung von Pollen auf die Narbe? | Bestäubung
+2 | Welches Organ reinigt das Blut? | Die Niere
+3 | Wie heißen die Atmungsorgane der Fische? | Kiemen
+3 | Was entsteht nach der Befruchtung aus dem Fruchtknoten? | Die Frucht
+3 | Wie viele Zähne hat ein Erwachsener normalerweise? | 32
+3 | Wie heißt der Vorgang, bei dem eine Raupe zum Schmetterling wird? | Metamorphose
+3 | Was speichert ein Kamel in seinen Höckern? | Fett
+4 | Wie heißen die Blutgefäße, die vom Herzen wegführen? | Arterien
+4 | Wie heißt der grüne Farbstoff in Pflanzen? | Chlorophyll (Blattgrün)
+4 | Welche Tiere sind Säugetiere: Fledermaus, Pinguin oder Hai? | Die Fledermaus
+4 | Wie heißt die kleinste lebende Einheit? | Die Zelle
+4 | Wie nennt man Tiere, die Pflanzen und Fleisch fressen? | Allesfresser
+5 | Welches Gas entsteht bei der Fotosynthese? | Sauerstoff
+5 | Wie heißt der Teil der Pflanzenzelle, in dem die Fotosynthese stattfindet? | Chloroplast
+5 | Wie heißt die Verdauungsflüssigkeit im Mund? | Speichel
+5 | Wie viele Kammern hat das menschliche Herz? | Vier
+5 | Wie heißen Lebewesen, die sich von toten Pflanzen und Tieren ernähren? | Zersetzer (Destruenten)
+`],
+  ["🌍 Erdkunde", `
+1 | Wie heißt die Hauptstadt von Deutschland? | Berlin
+1 | Wie viele Bundesländer hat Deutschland? | 16
+1 | Wie heißt der höchste Berg Deutschlands? | Die Zugspitze
+1 | Auf welchem Kontinent liegt Ägypten? | Afrika
+1 | Wie viele Kontinente gibt es? | Sieben
+2 | Wie heißt der längste Fluss Deutschlands? | Der Rhein
+2 | Welches Meer liegt im Nordosten Deutschlands? | Die Ostsee
+2 | Wie heißt die Hauptstadt von Nordrhein-Westfalen? | Düsseldorf
+2 | Wie nennt man die gedachte Linie, die die Erde in Nord- und Südhalbkugel teilt? | Äquator
+2 | Was zeigt der Maßstab einer Karte? | Wie stark die Wirklichkeit verkleinert ist
+3 | Wie heißt der größte Ozean der Erde? | Der Pazifik
+3 | Wie nennt man die Linien von Pol zu Pol auf dem Globus? | Längengrade (Meridiane)
+3 | Wie heißt die Hauptstadt von Sachsen? | Dresden
+3 | Wie nennt man die Gezeiten an der Nordsee? | Ebbe und Flut
+3 | Welches Gebirge trennt Europa und Asien? | Der Ural
+4 | Wie heißt die Hauptstadt von Mecklenburg-Vorpommern? | Schwerin
+4 | Wie heißt der größte See Deutschlands (komplett in Deutschland)? | Die Müritz
+4 | Welcher Fluss fließt durch Dresden und Hamburg? | Die Elbe
+4 | Wie heißt die Landschaft mit dem Brocken als höchstem Berg? | Der Harz
+4 | Wie nennt man eine Karte mit Bergen und Tälern in Farben? | Physische Karte
+5 | Wie heißt die Hauptstadt von Schleswig-Holstein? | Kiel
+5 | Wie nennt man den Küstenbereich der Nordsee, der bei Ebbe trockenfällt? | Watt (Wattenmeer)
+5 | Nenne die Großlandschaften Deutschlands von Nord nach Süd! | Norddeutsches Tiefland, Mittelgebirge, Alpenvorland, Alpen
+5 | Wie heißt der Nullmeridian? | Der Längengrad durch Greenwich (London)
+5 | In welchem Bundesland liegt die Insel Rügen? | Mecklenburg-Vorpommern
+`],
+  ["🏛️ Geschichte", `
+1 | Wie hießen die Herrscher im alten Ägypten? | Pharaonen
+1 | Wie nennt man die älteste Zeit der Menschheit? | Steinzeit
+1 | In welcher Stadt stand das Kolosseum? | In Rom
+1 | Wie nennt man die Schrift der alten Ägypter? | Hieroglyphen
+1 | Welche Sprache sprachen die alten Römer? | Latein
+2 | Wie nannte man die Menschen, die als Jäger und Sammler umherzogen? | Nomaden
+2 | Wo fanden die ersten Olympischen Spiele statt? | In Olympia (Griechenland)
+2 | Wie hieß der Grenzwall der Römer in Germanien? | Limes
+2 | Was bauten die Ägypter als Gräber für ihre Könige? | Pyramiden
+2 | Was änderte sich in der Jungsteinzeit für die Menschen? | Sie wurden sesshaft (Ackerbau und Viehzucht)
+3 | Welcher Fluss war die Lebensader des alten Ägypten? | Der Nil
+3 | Wie hieß die Volksherrschaft im antiken Athen? | Demokratie
+3 | Wer war Julius Caesar? | Ein römischer Feldherr und Politiker
+3 | In welchem Jahr brach der Vesuv aus und begrub Pompeji? | 79 n. Chr.
+3 | Wie hieß der griechische Göttervater? | Zeus
+4 | Wie heißt die Zeit zwischen Antike und Neuzeit? | Mittelalter
+4 | Wie hieß der berühmte Frankenkönig, der 800 Kaiser wurde? | Karl der Große
+4 | Wie nennt man die Gesellschaftsordnung im Mittelalter mit Lehnsherren? | Lehnswesen (Feudalismus)
+4 | Wie hieß die Schlacht im Jahr 9 n. Chr., in der Germanen die Römer besiegten? | Varusschlacht (Schlacht im Teutoburger Wald)
+4 | Wo lebten Mönche und Nonnen? | Im Kloster
+5 | Wie hieß der Anführer der Germanen in der Varusschlacht? | Arminius
+5 | Wie nennt man die Kriegszüge ins Heilige Land im Mittelalter? | Kreuzzüge
+5 | Wer stand in der mittelalterlichen Ständegesellschaft ganz oben? | Der König (Kaiser)
+5 | Was bedeutet „Stadtluft macht frei“? | Leibeigene wurden nach einem Jahr in der Stadt frei
+5 | Wie hieß das Bündnis von Handelsstädten im Mittelalter? | Die Hanse
+`],
+  ["🔬 Naturwissenschaften", `
+1 | Bei wie viel Grad Celsius kocht Wasser? | 100 °C
+1 | Bei wie viel Grad Celsius gefriert Wasser? | 0 °C
+1 | Welche Metalle zieht ein Magnet an? | Eisen, Nickel und Kobalt
+1 | Was braucht ein Feuer zum Brennen? | Brennstoff, Sauerstoff und Wärme (Zündtemperatur)
+1 | In welcher Einheit misst man Länge? | Meter
+2 | Wie nennt man die drei Zustände von Wasser? | Fest, flüssig, gasförmig
+2 | Wie heißt der Übergang von flüssig zu gasförmig? | Verdampfen (Sieden)
+2 | Was ist ein Stromkreis? | Ein geschlossener Weg, in dem Strom fließt
+2 | Welche Stoffe leiten Strom gut? | Metalle
+2 | Wie nennt man Stoffe, die keinen Strom leiten? | Isolatoren (Nichtleiter)
+3 | Wie heißen die beiden Pole eines Magneten? | Nordpol und Südpol
+3 | Was passiert, wenn man zwei gleiche Magnetpole nähert? | Sie stoßen sich ab
+3 | Wie heißt die Mischung aus Salz und Wasser? | Lösung (Salzlösung)
+3 | Wie kann man Salz aus Salzwasser zurückgewinnen? | Durch Verdampfen (Eindampfen)
+3 | Wie heißt der Übergang von fest zu flüssig? | Schmelzen
+4 | Wie nennt man eine Schaltung, bei der alle Lampen hintereinander liegen? | Reihenschaltung
+4 | Wie heißt der Übergang von gasförmig zu flüssig? | Kondensieren
+4 | Warum schwimmt Holz auf Wasser? | Es hat eine geringere Dichte als Wasser
+4 | Woraus besteht Luft hauptsächlich? | Aus Stickstoff (ca. 78 %)
+4 | Wie heißt das Trennverfahren mit einem Filterpapier? | Filtrieren
+5 | Wie viel Prozent Sauerstoff enthält die Luft etwa? | Etwa 21 %
+5 | Wie nennt man die Schaltung, bei der Lampen nebeneinander liegen? | Parallelschaltung
+5 | Wie schnell ist Licht ungefähr? | Etwa 300.000 km pro Sekunde
+5 | Wie nennt man den Übergang von fest direkt zu gasförmig? | Sublimieren
+5 | In welcher Einheit misst man die Kraft? | In Newton (N)
+`],
+  ["💡 Allgemeinwissen", `
+1 | Wie viele Tage hat ein Schaltjahr? | 366
+1 | Wie heißt die Währung in der Schweiz? | Schweizer Franken
+1 | Welcher Planet ist der Sonne am nächsten? | Merkur
+1 | Wie viele Spieler hat eine Fußballmannschaft auf dem Platz? | Elf
+1 | Wie viele Minuten hat ein Tag? | 1440
+2 | Wer malte die „Mona Lisa“? | Leonardo da Vinci
+2 | Wie heißt das größte Land der Erde? | Russland
+2 | Welches Tier ist das größte der Welt? | Der Blauwal
+2 | Wie heißt der größte Planet unseres Sonnensystems? | Jupiter
+2 | In welchem Land steht der Eiffelturm? | In Frankreich
+3 | Wie viele Saiten hat eine Geige? | Vier
+3 | Wie heißt das kleinste Land der Welt? | Vatikanstadt
+3 | Wer komponierte die „Zauberflöte“? | Wolfgang Amadeus Mozart
+3 | Wie viele Sterne hat die Europaflagge? | Zwölf
+3 | Welche Stadt nennt man „Big Apple“? | New York
+4 | Wer erfand den Buchdruck mit beweglichen Lettern? | Johannes Gutenberg
+4 | Wie heißt die Notrufnummer in Europa? | 112
+4 | In welchem Jahr fiel die Berliner Mauer? | 1989
+4 | Wie heißt die Hauptstadt von Kanada? | Ottawa
+4 | Was misst ein Barometer? | Den Luftdruck
+5 | Wie viele Knochen hat ein erwachsener Mensch etwa? | 206
+5 | Wie heißt der längste Fluss der Welt? | Der Nil
+5 | Was bedeutet die Abkürzung „UNO“? | Vereinte Nationen
+5 | Wer war der erste Mensch auf dem Mond? | Neil Armstrong (1969)
+5 | Wie viele Zeitzonen hat Russland? | Elf
+`]
+]);
+
+sekABC(5, `
+Welche Wortart ist „Freundschaft“? | Nomen | Verb | Adjektiv
+Wie heißt die Mehrzahl von „Museum“? | Museen | Museums | Musea
+Welches Wort ist richtig geschrieben? | Rhythmus | Rytmus | Rhytmus
+Was ist ein Antonym zu „großzügig“? | geizig | freundlich | spendabel
+Welcher Fall antwortet auf „Wessen?“ | Genitiv | Dativ | Akkusativ
+Was heißt „Wednesday“? | Mittwoch | Donnerstag | Dienstag
+Wie heißt die Vergangenheit von „go“? | went | goed | gone
+Welche Zahl ist „forty“? | 40 | 14 | 400
+Was bedeutet „kitchen“? | Küche | Kirche | Kissen
+Wie heißt die Mehrzahl von „woman“? | women | womans | womens
+Zu welcher Tierklasse gehört die Eidechse? | Reptilien | Amphibien | Säugetiere
+Welches Organ pumpt das Blut? | Das Herz | Die Lunge | Die Leber
+Was entsteht bei der Fotosynthese? | Sauerstoff und Traubenzucker | Kohlenstoffdioxid | Stickstoff
+Wie viele Beine hat eine Spinne? | Acht | Sechs | Zehn
+Wie heißt der längste Fluss Deutschlands? | Rhein | Elbe | Donau
+Wie heißt die Hauptstadt von Bayern? | München | Nürnberg | Augsburg
+Welcher Ozean ist der größte? | Pazifik | Atlantik | Indischer Ozean
+Wie nennt man die Linie, die die Erde in Nord- und Südhalbkugel teilt? | Äquator | Nullmeridian | Wendekreis
+Wie hießen die Könige im alten Ägypten? | Pharaonen | Cäsaren | Sultane
+Welche Stadt war das Zentrum des Römischen Reiches? | Rom | Athen | Karthago
+Wie hieß der römische Grenzwall in Germanien? | Limes | Hadrianswall | Rubikon
+Wie heißt der Übergang von flüssig zu fest? | Erstarren | Schmelzen | Verdampfen
+Welcher Stoff leitet Strom? | Kupfer | Holz | Gummi
+Wohin zeigt eine Kompassnadel? | Nach Norden | Nach Süden | Nach Osten
+Wie viel sind 3/4 von 100? | 75 | 34 | 25
+Was ist das kgV von 4 und 6? | 12 | 24 | 2
+Wie viele Ecken hat ein Würfel? | 8 | 6 | 12
+Wie heißt ein Winkel mit genau 90°? | Rechter Winkel | Spitzer Winkel | Stumpfer Winkel
+Welcher Planet hat die auffälligsten Ringe? | Saturn | Mars | Venus
+Wer malte die Mona Lisa? | Leonardo da Vinci | Michelangelo | Rembrandt
+`);
+sekWF(5, `
+W | Der Wal ist ein Säugetier. | Wale atmen mit Lungen und säugen ihre Jungen.
+F | Spinnen sind Insekten. | Spinnen haben acht Beine und sind Spinnentiere.
+W | Pflanzen geben bei der Fotosynthese Sauerstoff ab. | Sauerstoff entsteht als Nebenprodukt.
+F | Fledermäuse sind Vögel. | Fledermäuse sind Säugetiere.
+W | Das menschliche Herz hat vier Kammern. | Zwei Vorhöfe und zwei Herzkammern.
+F | Die Donau fließt in die Nordsee. | Die Donau mündet ins Schwarze Meer.
+W | Berlin ist die größte Stadt Deutschlands. | Berlin hat rund 3,7 Millionen Einwohner.
+F | Der Äquator verläuft durch Europa. | Der Äquator verläuft durch Afrika, Südamerika und Asien.
+W | Die Zugspitze liegt in Bayern. | Sie ist mit 2.962 m der höchste Berg Deutschlands.
+F | Hamburg liegt an der Ostsee. | Hamburg liegt an der Elbe, nahe der Nordsee.
+W | Die alten Ägypter bauten Pyramiden als Gräber. | Die Pyramiden waren Grabmäler der Pharaonen.
+F | Die Römer sprachen Griechisch. | Die Römer sprachen Latein.
+W | Karl der Große wurde im Jahr 800 Kaiser. | Er wurde in Rom gekrönt.
+F | Die Steinzeit kam nach dem Mittelalter. | Die Steinzeit ist die älteste Epoche.
+W | Wasser kocht auf Meereshöhe bei 100 °C. | Auf hohen Bergen kocht es schon früher.
+F | Holz leitet Strom sehr gut. | Trockenes Holz ist ein Isolator.
+W | Gleiche Magnetpole stoßen sich ab. | Ungleiche Pole ziehen sich an.
+F | Eis ist schwerer als die gleiche Menge Wasser. | Eis hat eine geringere Dichte – darum schwimmt es.
+W | Ein Rechteck hat vier rechte Winkel. | Alle vier Winkel sind 90° groß.
+F | Ein Dreieck hat eine Winkelsumme von 360°. | Die Winkelsumme im Dreieck ist 180°.
+W | 1/2 ist dasselbe wie 50 %. | Die Hälfte entspricht 50 Prozent.
+F | 0,5 ist kleiner als 0,25. | 0,5 ist doppelt so groß wie 0,25.
+W | „went“ ist die Vergangenheit von „go“. | go – went – gone.
+F | „children“ ist die Einzahl von „child“. | „children“ ist die Mehrzahl.
+W | Adjektive kann man steigern. | z. B. schön – schöner – am schönsten.
+F | „Haus“ ist ein Verb. | „Haus“ ist ein Nomen.
+W | Eine Fabel hat oft eine Lehre (Moral). | Am Ende steht häufig, was man daraus lernen soll.
+F | Ein Gedicht muss sich immer reimen. | Es gibt auch Gedichte ohne Reim.
+W | Der Mond kreist um die Erde. | Für eine Umrundung braucht er etwa 27 Tage.
+F | Die Sonne ist ein Planet. | Die Sonne ist ein Stern.
+`);
+sekDuell(5, `
+Nenne ein Schulfach! | Mathe 30; Deutsch 25; Englisch 15; Sport 12; Kunst 10; Musik 8
+Nenne ein Haustier! | Hund 32; Katze 28; Kaninchen 14; Meerschweinchen 10; Hamster 9; Wellensittich 7
+Nenne etwas, das in einer Schultasche ist! | Federmappe 30; Hefte 22; Bücher 18; Brotdose 14; Trinkflasche 10; Taschenrechner 6
+Nenne eine Sportart mit Ball! | Fußball 38; Basketball 18; Handball 14; Volleyball 12; Tennis 10; Tischtennis 8
+Nenne einen Planeten unseres Sonnensystems! | Mars 26; Jupiter 22; Saturn 18; Venus 14; Merkur 12; Neptun 8
+Nenne ein Land in Europa! | Frankreich 25; Italien 22; Spanien 18; Österreich 15; Polen 12; Niederlande 8
+Nenne etwas, das man im Sommer macht! | Schwimmen 34; Eis essen 22; Grillen 16; Urlaub machen 14; Fahrrad fahren 8; Zelten 6
+Nenne ein Tier, das im Meer lebt! | Hai 26; Wal 22; Delfin 20; Krake 12; Qualle 12; Seestern 8
+Nenne ein Musikinstrument! | Gitarre 30; Klavier 26; Geige 14; Schlagzeug 12; Flöte 10; Trompete 8
+Nenne etwas, das man mit dem Handy macht! | Telefonieren 28; Nachrichten schreiben 24; Spielen 18; Fotos machen 14; Videos schauen 10; Musik hören 6
+Nenne ein Fast-Food-Gericht! | Pommes 30; Burger 28; Pizza 20; Döner 12; Hotdog 6; Currywurst 4
+Nenne einen Beruf, bei dem man eine Uniform trägt! | Polizist 36; Feuerwehrmann 26; Pilot 14; Soldat 12; Arzt 6; Postbote 6
+Nenne ein Fach, das man in der 5. Klasse neu bekommt! | Englisch 30; Biologie 22; Erdkunde 18; Geschichte 14; Physik 10; Latein/Französisch 6
+Nenne etwas, das man im Zoo sieht! | Löwe 26; Elefant 24; Affe 20; Giraffe 14; Pinguin 10; Zebra 6
+Nenne eine Farbe des Regenbogens! | Rot 28; Blau 24; Gelb 18; Grün 16; Orange 8; Violett 6
+Nenne ein Obst, das nicht in Deutschland wächst! | Banane 36; Ananas 20; Mango 16; Orange 14; Kiwi 8; Kokosnuss 6
+Nenne etwas, das man bei einer Klassenfahrt mitnimmt! | Kleidung 26; Zahnbürste 22; Handy 18; Schlafsack 14; Kuscheltier 12; Süßigkeiten 8
+Nenne einen Wochentag! | Montag 24; Freitag 22; Samstag 18; Sonntag 16; Mittwoch 12; Dienstag 8
+Nenne ein Gerät in der Küche! | Kühlschrank 28; Herd 24; Mikrowelle 18; Backofen 14; Wasserkocher 10; Toaster 6
+Nenne eine Großstadt in Deutschland! | Berlin 32; Hamburg 24; München 20; Köln 14; Frankfurt 6; Stuttgart 4
+`);
+sekBlitz(5, `
+Mehrzahl von „Museum“? | Museen
+Englisch für „Hund“? | dog
+Englisch für „Schule“? | school
+Vergangenheit von „go“? | went
+Wortart von „schön“? | Adjektiv
+Gegenteil von „früh“? | spät
+Zahl „fifteen“? | 15
+Englisch für „Freitag“? | Friday
+Hauptstadt von Frankreich? | Paris
+Hauptstadt von Italien? | Rom
+Längster Fluss Deutschlands? | Rhein
+Höchster Berg Deutschlands? | Zugspitze
+Wie viele Bundesländer hat Deutschland? | 16
+Wie viele Kontinente gibt es? | 7
+Größter Ozean? | Pazifik
+Herrscher im alten Ägypten? | Pharao
+Sprache der alten Römer? | Latein
+Schrift der alten Ägypter? | Hieroglyphen
+Griechischer Göttervater? | Zeus
+Römischer Grenzwall in Germanien? | Limes
+Siedepunkt von Wasser in °C? | 100
+Gefrierpunkt von Wasser in °C? | 0
+Wie viele Beine hat ein Insekt? | 6
+Tierklasse des Frosches? | Amphibien
+Tierklasse der Schlange? | Reptilien
+Organ, das das Blut pumpt? | Herz
+Grüner Farbstoff der Pflanzen? | Chlorophyll
+Planet, der der Sonne am nächsten ist? | Merkur
+Größter Planet? | Jupiter
+Wie viele Ecken hat ein Würfel? | 8
+Winkel mit 90°? | rechter Winkel
+Winkelsumme im Dreieck? | 180°
+Die Hälfte von 3,6? | 1,8
+Ein Viertel von 200? | 50
+Wie viele Minuten hat eine Stunde? | 60
+Wie viele Gramm sind ein Kilogramm? | 1000
+Wie viele Zentimeter sind ein Meter? | 100
+Was zieht ein Magnet an? | Eisen
+Wer malte die Mona Lisa? | Leonardo da Vinci
+Wie viele Spieler hat eine Fußballmannschaft? | 11
+`);
+sekReih(5, `
+Epochen – von alt nach neu | Steinzeit > Antike > Mittelalter > Neuzeit
+Vom kleinsten zum größten Planeten | Merkur > Mars > Erde > Jupiter
+Die Entwicklung des Schmetterlings | Ei > Raupe > Puppe > Schmetterling
+Vom Frosch: von Anfang an | Laich > Kaulquappe > Jungfrosch > Frosch
+Längeneinheiten – von klein nach groß | Millimeter > Zentimeter > Meter > Kilometer
+Aggregatzustände beim Erwärmen von Eis | fest > flüssig > gasförmig
+Zahlen – von klein nach groß | 0,05 > 0,5 > 1/2 + 1/4 > 1,2
+Die ersten vier Monate | Januar > Februar > März > April
+Von Nord nach Süd | Kiel > Hamburg > Frankfurt > München
+Die Steigerung von „gut“ | gut > besser > am besten
+Englische Zahlen – von klein nach groß | three > eight > twelve > twenty
+Vom Getreide zum Brot | Säen > Ernten > Mahlen > Backen
+Kontinente nach Fläche – von klein nach groß | Australien > Europa > Afrika > Asien
+Erzählung – der Aufbau | Einleitung > Hauptteil > Höhepunkt > Schluss
+Zeitstrahl Rom | Gründung Roms > Caesar > Ausbruch des Vesuvs > Ende Westroms
+`);
+sekZuord(5, `
+Wirbeltier-Klassen | Säugetier / Reptil | Wal=1; Fledermaus=1; Delfin=1; Mensch=1; Eidechse=2; Krokodil=2; Schildkröte=2; Schlange=2
+Leiter oder Nichtleiter? | Leitet Strom / Leitet nicht | Kupfer=1; Eisen=1; Aluminium=1; Silber=1; Holz=2; Gummi=2; Glas=2; Kunststoff=2
+Nomen oder Verb? | Nomen / Verb | Freundschaft=1; Tisch=1; Gedanke=1; Mut=1; laufen=2; denken=2; schreiben=2; lachen=2
+Antike oder Mittelalter? | Antike / Mittelalter | Pyramiden=1; Caesar=1; Olympische Spiele (Griechenland)=1; Pompeji=1; Ritterburg=2; Karl der Große=2; Hanse=2; Kreuzzüge=2
+Nordsee oder Alpen? | Nordsee / Alpen | Watt=1; Helgoland=1; Ebbe und Flut=1; Sylt=1; Zugspitze=2; Gletscher=2; Almhütte=2; Gipfelkreuz=2
+Englisch – Tier oder Essen? | Tier / Essen | horse=1; rabbit=1; sheep=1; bird=1; bread=2; cheese=2; apple=2; soup=2
+Magnetisch oder nicht? | Wird angezogen / Wird nicht angezogen | Eisennagel=1; Büroklammer (Stahl)=1; Schraube (Eisen)=1; Nickel=1; Kupfermünze=2; Holzlöffel=2; Glas=2; Alufolie=2
+Fest oder flüssig (bei 20 °C)? | Fest / Flüssig | Eisen=1; Holz=1; Salz=1; Zucker=1; Wasser=2; Öl=2; Milch=2; Quecksilber=2
+Stadt im Norden oder im Süden? | Norden / Süden | Kiel=1; Hamburg=1; Bremen=1; Rostock=1; München=2; Stuttgart=2; Freiburg=2; Nürnberg=2
+Bruch, Dezimalzahl, Prozent – gleich ½ oder ¼? | Gleich ½ / Gleich ¼ | 0,5=1; 50 %=1; 2/4=1; 5/10=1; 0,25=2; 25 %=2; 2/8=2; 25/100=2
+`);
+
+/* ---------------- Klasse 7/8 ---------------- */
+sekQuiz(7, [
+  ["🧮 Mathe", ""],
+  ["📖 Deutsch", `
+1 | Wie heißt „er geht“ im Plusquamperfekt? | er war gegangen
+1 | Welche Wortart ist „weil“? | Konjunktion
+1 | Was ist ein Nebensatz? | Ein Satz, der nicht allein stehen kann
+1 | Was ist eine Inhaltsangabe? | Eine sachliche Zusammenfassung im Präsens
+1 | In welcher Zeitform schreibt man eine Inhaltsangabe? | Im Präsens
+2 | Wie nennt man die Aussageweise „Er sagte, er sei krank“? | Konjunktiv I (indirekte Rede)
+2 | Was ist eine Ballade? | Ein erzählendes Gedicht mit Handlung und oft Dialogen
+2 | Wer schrieb die Ballade „Der Erlkönig“? | Johann Wolfgang von Goethe
+2 | Was ist eine Metapher? | Ein bildlicher Ausdruck ohne „wie“ (z. B. „Löwenherz“)
+2 | Was ist ein Relativsatz? | Ein Nebensatz, der ein Nomen näher beschreibt
+3 | Wie heißt das Satzglied, das man mit „wem?“ erfragt? | Dativobjekt
+3 | Was ist eine Kurzgeschichte? | Kurzer Text mit offenem Anfang und oft offenem Ende
+3 | Was bedeutet „Aktiv“ und „Passiv“? | Handlungsform: Wer handelt (Aktiv) / was geschieht (Passiv)
+3 | Bilde das Passiv: „Der Hund beißt den Mann.“ | Der Mann wird vom Hund gebissen.
+3 | Was ist eine Erörterung? | Ein Text, der Argumente abwägt
+4 | Wie heißt der Aufbau eines Arguments? | These, Begründung, Beispiel
+4 | Wer schrieb „Die Bürgschaft“? | Friedrich Schiller
+4 | Was ist ein Lyrisches Ich? | Der Sprecher in einem Gedicht
+4 | Was ist eine Alliteration? | Gleicher Anfangslaut aufeinanderfolgender Wörter („Milch macht müde Männer munter“)
+4 | Was ist eine rhetorische Frage? | Eine Frage, auf die keine Antwort erwartet wird
+5 | Wie nennt man ein Gedicht mit 14 Versen (4-4-3-3)? | Sonett
+5 | Was ist ein Jambus? | Versmaß: unbetont – betont
+5 | Was ist der Unterschied zwischen „das“ und „dass“? | „dass“ ist Konjunktion, „das“ Artikel oder Pronomen
+5 | Was ist eine Anapher? | Wiederholung desselben Wortes am Satz- oder Versanfang
+5 | Wie heißt die Erzählform, bei der der Erzähler alles weiß? | Auktoriales Erzählverhalten (allwissender Erzähler)
+`],
+  ["💬 Englisch", `
+1 | Wie heißt das „past participle“ von „write“? | written
+1 | Was bedeutet „although“? | obwohl
+1 | Wie bildet man das „present perfect“? | have/has + 3. Form (past participle)
+1 | Was heißt „Erfahrung“ auf Englisch? | experience
+1 | Ergänze: „I have ___ been to London.“ (nie) | never
+2 | Was ist die „-ing“-Form von „swim“? | swimming
+2 | Bilde das Adverb von „careful“! | carefully
+2 | Wann benutzt man das „present progressive“? | Für Handlungen, die gerade jetzt passieren
+2 | Was bedeutet „to borrow“? | (sich) ausleihen
+2 | Wie heißt das Gegenteil von „expensive“? | cheap
+3 | Ergänze: „If it rains, I ___ stay at home.“ | will
+3 | Was ist ein „relative pronoun“? Nenne zwei! | who, which, that
+3 | Wie heißt „ich würde“ auf Englisch? | I would
+3 | Was ist „since“ und „for“ im Present Perfect? | „since“ = Zeitpunkt, „for“ = Zeitraum
+3 | Wie heißt die 3. Form von „take“? | taken
+4 | Bilde das Passiv: „They build houses.“ | Houses are built.
+4 | Ergänze: „If I ___ rich, I would travel.“ (be) | were
+4 | Was bedeutet „to suggest“? | vorschlagen
+4 | Wie heißen die vier Landesteile des Vereinigten Königreichs? | England, Schottland, Wales, Nordirland
+4 | Was ist ein „false friend“? Beispiel: „become“ | Ein Wort, das ähnlich aussieht, aber etwas anderes bedeutet („become“ = werden)
+5 | Bilde die indirekte Rede: She said: „I am tired.“ | She said (that) she was tired.
+5 | Was bedeutet „nevertheless“? | trotzdem / dennoch
+5 | Ergänze: „He has lived here ___ 2015.“ | since
+5 | Wie heißt die Hauptstadt von Schottland? | Edinburgh
+5 | Was ist ein „question tag“? Beispiel? | Frageanhängsel, z. B. „…, isn’t it?“
+`],
+  ["🌿 Biologie", `
+1 | Wie heißt die Erbinformation in den Zellen? | DNA (Erbgut)
+1 | Wo im Körper findet die Verdauung hauptsächlich statt? | Im Dünndarm
+1 | Was ist die Aufgabe der Lunge? | Gasaustausch: Sauerstoff aufnehmen, CO₂ abgeben
+1 | Wie nennt man Krankheitserreger wie Bakterien und Viren? | Mikroorganismen (Erreger)
+1 | Welche Blutzellen bekämpfen Krankheitserreger? | Weiße Blutkörperchen
+2 | Wie heißen die winzigen Lungenbläschen? | Alveolen
+2 | Was ist ein Ökosystem? | Lebewesen und ihr Lebensraum mit allen Wechselbeziehungen
+2 | Wie nennt man die Kette „Pflanze → Hase → Fuchs“? | Nahrungskette
+2 | Was sind Produzenten in einem Ökosystem? | Pflanzen, die Nährstoffe herstellen
+2 | Was ist eine Impfung? | Der Körper bildet Abwehrstoffe, ohne krank zu werden
+3 | Wie heißt der Zellkern-Bestandteil, der die Erbinformation trägt? | Chromosomen
+3 | Was unterscheidet Viren von Bakterien? | Viren können sich nur in fremden Zellen vermehren
+3 | Wie heißen die kleinsten Blutgefäße? | Kapillaren
+3 | Was regelt das Hormon Insulin? | Den Blutzuckerspiegel
+3 | Was ist Fotosynthese als Formel in Worten? | Kohlenstoffdioxid + Wasser → Traubenzucker + Sauerstoff (mit Licht)
+4 | Was ist ein Enzym? | Ein Eiweiß, das chemische Reaktionen beschleunigt
+4 | Wie heißt der Vorgang, bei dem Zellen Energie aus Zucker gewinnen? | Zellatmung
+4 | Was ist die Pubertät? | Die Zeit der Geschlechtsreife und körperlichen Veränderungen
+4 | Wie heißen die Nervenzellen? | Neuronen
+4 | Was sind Antibiotika? | Medikamente gegen Bakterien
+5 | Wie heißt die Zellteilung bei Körperzellen? | Mitose
+5 | Welches Organ produziert Gallenflüssigkeit? | Die Leber
+5 | Was ist Symbiose? Nenne ein Beispiel! | Zusammenleben zum gegenseitigen Nutzen, z. B. Biene und Blüte
+5 | Wie nennt man die Anpassung von Lebewesen über viele Generationen? | Evolution
+5 | Wer stellte die Evolutionstheorie auf? | Charles Darwin
+`],
+  ["🌍 Erdkunde", `
+1 | Wie heißt der höchste Berg der Erde? | Mount Everest
+1 | Wie heißt die größte Wüste der Erde (heiß)? | Sahara
+1 | Auf welchem Kontinent liegt der Amazonas-Regenwald? | Südamerika
+1 | Wie heißt die Hauptstadt von Japan? | Tokio
+1 | Was ist ein Vulkan? | Eine Öffnung, aus der Magma als Lava austritt
+2 | Wie nennt man die großen Platten der Erdkruste? | Kontinentalplatten (Lithosphärenplatten)
+2 | Was ist ein Monsun? | Ein Wind, der mit den Jahreszeiten die Richtung wechselt
+2 | Wie heißen die Klimazonen von Äquator zum Pol? | Tropen, Subtropen, gemäßigte Zone, kalte Zone
+2 | Welches Land hat die meisten Einwohner? | Indien
+2 | Wie heißt der längste Fluss Europas? | Die Wolga
+3 | Was ist ein Tsunami? | Eine riesige Flutwelle, meist nach einem Seebeben
+3 | Wie nennt man das Klima mit Tagen heiß und Nächten kalt in der Wüste? | Tageszeitenklima
+3 | Wie heißt das Gebirge in Südamerika? | Die Anden
+3 | Was ist der Treibhauseffekt? | Gase in der Atmosphäre halten Wärme zurück
+3 | Welche Stadt ist die Hauptstadt von Brasilien? | Brasília
+4 | Was sind Passatwinde? | Beständige Winde in den Tropen Richtung Äquator
+4 | Wie heißt die Grenze zwischen zwei Erdplatten, die auseinanderdriften? | Divergente Plattengrenze (z. B. Mittelatlantischer Rücken)
+4 | Was ist Permafrost? | Dauerhaft gefrorener Boden
+4 | Wie heißt die Hauptstadt von Australien? | Canberra
+4 | Was bedeutet „Nachhaltigkeit“? | Nur so viel nutzen, wie nachwachsen kann
+5 | Was ist die Richterskala? | Eine Skala zur Messung der Stärke von Erdbeben
+5 | Wie heißt der größte Binnensee der Erde? | Das Kaspische Meer
+5 | Was ist ein Delta? | Eine Flussmündung, die sich in viele Arme aufteilt
+5 | Wie nennt man das Abbrennen von Wald, um Ackerland zu gewinnen? | Brandrodung
+5 | Wie heißt die tiefste Stelle der Weltmeere? | Marianengraben (ca. 11 km)
+`],
+  ["🏛️ Geschichte", `
+1 | In welchem Jahr entdeckte Kolumbus Amerika? | 1492
+1 | Wer schlug 1517 seine Thesen an? | Martin Luther
+1 | Wie heißt die Zeit der „Wiedergeburt“ von Kunst und Wissenschaft? | Renaissance
+1 | Wer erfand um 1450 den Buchdruck? | Johannes Gutenberg
+1 | Welche Revolution begann 1789? | Die Französische Revolution
+2 | Wie hieß der Krieg von 1618 bis 1648? | Dreißigjähriger Krieg
+2 | Wie nennt man die Herrschaftsform, in der ein König allein regiert? | Absolutismus
+2 | Welcher König sagte angeblich „Der Staat bin ich“? | Ludwig XIV.
+2 | Was forderten die Revolutionäre 1789? | Freiheit, Gleichheit, Brüderlichkeit
+2 | Wer krönte sich 1804 zum Kaiser der Franzosen? | Napoleon Bonaparte
+3 | Was ist die Reformation? | Die Erneuerung der Kirche, die zur Spaltung in katholisch und evangelisch führte
+3 | Wie nennt man die Zeit der neuen Maschinen und Fabriken ab etwa 1800? | Industrialisierung (Industrielle Revolution)
+3 | Welche Erfindung trieb die Industrialisierung an? | Die Dampfmaschine
+3 | Wann wurde das Deutsche Kaiserreich gegründet? | 1871
+3 | Wer war der erste Reichskanzler des Kaiserreichs? | Otto von Bismarck
+4 | Wie hieß das Parlament von 1848 in der Frankfurter Paulskirche? | Frankfurter Nationalversammlung
+4 | Was war die „soziale Frage“? | Die Not der Arbeiter in der Industrialisierung
+4 | Welche Gesetze führte Bismarck für Arbeiter ein? | Sozialversicherungen (Kranken-, Unfall-, Rentenversicherung)
+4 | Wie nennt man die Eroberung fremder Länder durch europäische Staaten? | Kolonialismus / Imperialismus
+4 | Wer entdeckte den Seeweg nach Indien um Afrika herum (1498)? | Vasco da Gama
+5 | Wann begann der Erste Weltkrieg? | 1914
+5 | Welches Attentat löste den Ersten Weltkrieg aus? | Das Attentat von Sarajevo auf den österreichischen Thronfolger
+5 | Wie hieß der Vertrag, der 1919 den Ersten Weltkrieg beendete? | Versailler Vertrag
+5 | Was war der „Wiener Kongress“ (1814/15)? | Neuordnung Europas nach Napoleon
+5 | Wie hieß die erste demokratische Republik in Deutschland? | Weimarer Republik
+`],
+  ["⚗️ Physik & Chemie", `
+1 | Was ist die chemische Formel von Wasser? | H₂O
+1 | In welcher Einheit misst man elektrische Spannung? | Volt
+1 | Was zeigt der pH-Wert an? | Ob etwas sauer, neutral oder basisch ist
+1 | Welchen pH-Wert hat reines Wasser? | 7 (neutral)
+1 | Was ist ein Atom? | Kleinster Baustein eines Elements
+2 | Wie lautet das chemische Symbol für Sauerstoff? | O
+2 | Wie lautet das chemische Symbol für Gold? | Au
+2 | In welcher Einheit misst man die Stromstärke? | Ampere
+2 | Wie heißt die Formel für die Geschwindigkeit? | v = s : t (Weg durch Zeit)
+2 | Was entsteht, wenn Eisen rostet? | Eisenoxid
+3 | Wie lautet das Ohmsche Gesetz? | U = R · I
+3 | Was ist eine Oxidation? | Eine Reaktion mit Sauerstoff
+3 | Wie viele Elemente stehen etwa im Periodensystem? | 118
+3 | Woraus besteht ein Atomkern? | Aus Protonen und Neutronen
+3 | In welcher Einheit misst man den Widerstand? | Ohm
+4 | Was ist die Dichte? | Masse pro Volumen
+4 | Welche Ladung hat ein Elektron? | Negativ
+4 | Was ist Kohlenstoffdioxid als Formel? | CO₂
+4 | Wie heißt das Gesetz „Actio = Reactio“? | Drittes newtonsches Gesetz (Wechselwirkungsprinzip)
+4 | Was ist eine Säure? | Ein Stoff, der in Wasser H⁺-Ionen abgibt (pH unter 7)
+5 | Wie heißt die Formel für die elektrische Leistung? | P = U · I
+5 | Was ist die Brechung von Licht? | Richtungsänderung beim Übergang in ein anderes Medium
+5 | Welches Element hat das Symbol Na? | Natrium
+5 | Was sind Edelgase? Nenne eins! | Sehr reaktionsträge Elemente, z. B. Helium, Neon, Argon
+5 | Was besagt der Energieerhaltungssatz? | Energie geht nicht verloren, sie wird nur umgewandelt
+`],
+  ["💡 Allgemeinwissen", `
+1 | Wer malte die „Sternennacht“? | Vincent van Gogh
+1 | Wie viele Mitgliedsstaaten hat die EU (Stand 2025)? | 27
+1 | Wie heißt das deutsche Parlament? | Bundestag
+1 | Welcher Komponist wurde in Bonn geboren? | Ludwig van Beethoven
+1 | Wie heißt der Erfinder des Telefons? | Alexander Graham Bell
+2 | Alle wie viele Jahre wird der Bundestag gewählt? | Alle vier Jahre
+2 | Wer ist das Staatsoberhaupt in Deutschland? | Der Bundespräsident / die Bundespräsidentin
+2 | Wie heißt die Verfassung Deutschlands? | Grundgesetz
+2 | Was ist die Hauptstadt der USA? | Washington, D. C.
+2 | Wer schrieb „Romeo und Julia“? | William Shakespeare
+3 | Wie viele Bundesländer grenzen an das Meer? | Fünf
+3 | Was bedeutet „www“? | World Wide Web
+3 | In welcher Stadt sitzt das Bundesverfassungsgericht? | Karlsruhe
+3 | Wie heißt der Nationalfeiertag in Deutschland? | Tag der Deutschen Einheit (3. Oktober)
+3 | Wer entwickelte die Relativitätstheorie? | Albert Einstein
+4 | Was ist ein Algorithmus? | Eine eindeutige Schritt-für-Schritt-Anleitung
+4 | Wie heißt die Hauptstadt der Türkei? | Ankara
+4 | Was bedeutet „KI“? | Künstliche Intelligenz
+4 | In welchen Artikeln des Grundgesetzes stehen die Grundrechte? | Artikel 1 bis 19
+4 | Wer war die erste Bundeskanzlerin Deutschlands? | Angela Merkel
+5 | Was steht in Artikel 1 des Grundgesetzes? | Die Würde des Menschen ist unantastbar
+5 | Wofür steht die Abkürzung „NATO“? | Nordatlantikvertrag-Organisation (Militärbündnis)
+5 | Wer bekam als erste Frau einen Nobelpreis? | Marie Curie
+5 | Was ist Inflation? | Ein allgemeiner Anstieg der Preise (Geld verliert an Wert)
+5 | Welches Land hat die größte Fläche in Südamerika? | Brasilien
+`]
+]);
+
+sekABC(7, `
+Welche Wortart ist „obwohl“? | Konjunktion | Präposition | Adverb
+Wie heißt „ich gehe“ im Plusquamperfekt? | ich war gegangen | ich bin gegangen | ich ging
+Welches Wort ist richtig? | Er sagte, dass er kommt. | Er sagte, das er kommt. | Er sagte dass er kommt.
+Welches Stilmittel ist „Milch macht müde Männer munter“? | Alliteration | Metapher | Personifikation
+Wer schrieb „Der Erlkönig“? | Goethe | Schiller | Heine
+Was ist das „past participle“ von „write“? | written | wrote | writed
+Ergänze: „If it rains, I ___ stay at home.“ | will | would | am
+Was bedeutet „although“? | obwohl | deshalb | außerdem
+Welches englische Wort sieht aus wie „bekommen“, heißt aber „werden“? | become | receive | obtain
+Wie heißt die Hauptstadt von Schottland? | Edinburgh | Glasgow | Dublin
+Wo findet die Verdauung hauptsächlich statt? | Im Dünndarm | Im Magen | In der Leber
+Welche Blutzellen wehren Krankheitserreger ab? | Weiße Blutkörperchen | Rote Blutkörperchen | Blutplättchen
+Was regelt Insulin? | Den Blutzucker | Den Blutdruck | Die Körpertemperatur
+Wer stellte die Evolutionstheorie auf? | Charles Darwin | Gregor Mendel | Isaac Newton
+Wie heißen die kleinsten Blutgefäße? | Kapillaren | Venen | Arterien
+Welches Land hat die meisten Einwohner? | Indien | China | USA
+Wie heißt die Hauptstadt von Australien? | Canberra | Sydney | Melbourne
+Wie heißt das Gebirge in Südamerika? | Anden | Rocky Mountains | Himalaya
+Was misst die Richterskala? | Erdbeben | Windstärke | Niederschlag
+Wann entdeckte Kolumbus Amerika? | 1492 | 1517 | 1789
+Wer veröffentlichte 1517 seine 95 Thesen? | Martin Luther | Johannes Calvin | Karl V.
+Wann begann die Französische Revolution? | 1789 | 1815 | 1848
+Wer war der erste Reichskanzler des Kaiserreichs? | Otto von Bismarck | Wilhelm II. | Friedrich Ebert
+Wann begann der Erste Weltkrieg? | 1914 | 1918 | 1939
+Was ist H₂O? | Wasser | Wasserstoff | Sauerstoff
+Welches Symbol hat Gold? | Au | Go | Ag
+In welcher Einheit misst man Spannung? | Volt | Ampere | Ohm
+Wie lautet das Ohmsche Gesetz? | U = R · I | P = U · I | v = s : t
+Welchen pH-Wert hat reines Wasser? | 7 | 0 | 14
+Wie viele Mitgliedsstaaten hat die EU (2025)? | 27 | 28 | 25
+`);
+sekWF(7, `
+W | Die Verdauung findet hauptsächlich im Dünndarm statt. | Dort werden die meisten Nährstoffe aufgenommen.
+F | Antibiotika helfen gegen Viren. | Antibiotika wirken nur gegen Bakterien.
+W | Insulin senkt den Blutzuckerspiegel. | Es wird in der Bauchspeicheldrüse gebildet.
+F | Die Lunge pumpt das Blut durch den Körper. | Das macht das Herz.
+W | Charles Darwin stellte die Evolutionstheorie auf. | „Über die Entstehung der Arten“, 1859.
+F | Der Mount Everest liegt in den Alpen. | Er liegt im Himalaya.
+W | Indien hat mehr Einwohner als China. | Seit etwa 2023 ist Indien das bevölkerungsreichste Land.
+F | Sydney ist die Hauptstadt von Australien. | Die Hauptstadt ist Canberra.
+W | Die Kontinente bewegen sich. | Die Erdplatten wandern einige Zentimeter pro Jahr.
+F | Die Wolga fließt durch Deutschland. | Die Wolga fließt durch Russland.
+W | Kolumbus erreichte 1492 Amerika. | Er glaubte, in Indien gelandet zu sein.
+F | Martin Luther erfand den Buchdruck. | Den Buchdruck erfand Johannes Gutenberg.
+W | Das Deutsche Kaiserreich wurde 1871 gegründet. | Die Gründung fand in Versailles statt.
+F | Der Erste Weltkrieg endete 1945. | Er endete 1918, der Zweite Weltkrieg 1945.
+W | Napoleon krönte sich 1804 selbst zum Kaiser. | In der Kathedrale Notre-Dame in Paris.
+F | Die Industrialisierung begann in Frankreich. | Sie begann in England.
+W | Reines Wasser hat einen pH-Wert von 7. | Es ist neutral.
+F | Elektronen sind positiv geladen. | Elektronen sind negativ, Protonen positiv.
+W | Das chemische Symbol für Natrium ist Na. | Von lateinisch „Natrium“.
+F | Strom misst man in Volt. | Die Stromstärke misst man in Ampere, die Spannung in Volt.
+W | Rost ist Eisenoxid. | Eisen reagiert mit Sauerstoff und Wasser.
+F | Licht ist langsamer als Schall. | Licht ist fast eine Million Mal schneller.
+W | „Although“ bedeutet „obwohl“. | z. B. „Although it was cold, we swam.“
+F | „become“ heißt „bekommen“. | „become“ heißt „werden“ – ein „false friend“.
+W | Das present perfect bildet man mit have/has und der 3. Form. | z. B. „I have seen“.
+F | Eine Inhaltsangabe schreibt man im Präteritum. | Man schreibt sie im Präsens.
+W | „Der Erlkönig“ ist eine Ballade. | Geschrieben von Goethe.
+F | Eine Metapher braucht immer das Wort „wie“. | Mit „wie“ ist es ein Vergleich.
+W | Der Bundestag wird alle vier Jahre gewählt. | So steht es im Grundgesetz.
+F | Der Bundeskanzler ist das Staatsoberhaupt. | Staatsoberhaupt ist der Bundespräsident.
+`);
+sekDuell(7, `
+Nenne ein Social-Media-Netzwerk! | Instagram 30; TikTok 28; YouTube 16; WhatsApp 12; Snapchat 10; Facebook 4
+Nenne einen Grund, warum man zu spät zur Schule kommt! | Verschlafen 36; Bus verpasst 24; Stau 14; Wecker nicht gehört 12; Handy vergessen 8; Arzttermin 6
+Nenne ein Land, in das Deutsche gern in Urlaub fahren! | Spanien 30; Italien 26; Österreich 14; Türkei 12; Griechenland 10; Frankreich 8
+Nenne etwas, das man für eine Party braucht! | Musik 30; Essen 22; Getränke 20; Freunde 14; Deko 8; Luftballons 6
+Nenne eine Sportart bei den Olympischen Spielen! | Leichtathletik 24; Schwimmen 22; Fußball 18; Turnen 14; Radfahren 12; Boxen 10
+Nenne ein Gericht aus Italien! | Pizza 40; Spaghetti 26; Lasagne 16; Risotto 8; Tiramisu 6; Ravioli 4
+Nenne einen bekannten Erfinder! | Albert Einstein 24; Thomas Edison 22; Gutenberg 16; Carl Benz 14; Graham Bell 14; Nikola Tesla 10
+Nenne etwas, das man im Chemieraum findet! | Bunsenbrenner 30; Reagenzglas 26; Schutzbrille 16; Waschbecken 12; Periodensystem 10; Kittel 6
+Nenne eine Hauptstadt in Europa! | Berlin 26; Paris 24; Rom 18; London 14; Madrid 10; Wien 8
+Nenne etwas, das Jugendliche nervt! | Hausaufgaben 34; Früh aufstehen 22; Eltern 14; Schlechtes WLAN 12; Aufräumen 10; Langeweile 8
+Nenne einen Beruf, für den man studieren muss! | Arzt 36; Lehrer 26; Anwalt 14; Ingenieur 12; Apotheker 6; Tierarzt 6
+Nenne ein Streaming-Angebot oder eine App für Musik! | Spotify 52; YouTube Music 16; Apple Music 14; Amazon Music 10; Deezer 4; SoundCloud 4
+Nenne etwas, das man bei einem Gewitter nicht tun sollte! | Schwimmen 30; Unter einem Baum stehen 28; Draußen bleiben 18; Duschen 10; Fahrrad fahren 8; Telefonieren 6
+Nenne ein Tier, das in Afrika lebt! | Löwe 30; Elefant 24; Giraffe 18; Zebra 14; Nashorn 8; Nilpferd 6
+Nenne eine Automarke! | VW 28; BMW 22; Mercedes 20; Audi 14; Tesla 10; Opel 6
+Nenne ein Organ des Menschen! | Herz 34; Lunge 22; Gehirn 16; Leber 12; Niere 10; Magen 6
+Nenne etwas, das man in den Ferien macht! | Ausschlafen 30; Verreisen 24; Freunde treffen 18; Zocken 14; Schwimmen 8; Lesen 6
+Nenne einen Fluss in Deutschland! | Rhein 32; Elbe 22; Donau 20; Main 12; Weser 8; Spree 6
+Nenne etwas, das man mit 18 darf! | Autofahren 36; Wählen 26; Alkohol trinken 14; Ausgehen ohne Zeitlimit 12; Verträge unterschreiben 8; Tattoo 4
+Nenne einen Superhelden! | Spider-Man 30; Batman 26; Superman 18; Iron Man 14; Captain America 6; Wonder Woman 6
+`);
+sekBlitz(7, `
+Plusquamperfekt von „ich gehe“? | ich war gegangen
+Wortart von „weil“? | Konjunktion
+Stilmittel bei „Haus und Hof“? | Alliteration
+Wer schrieb „Die Bürgschaft“? | Schiller
+3. Form von „write“? | written
+3. Form von „take“? | taken
+Englisch für „obwohl“? | although
+Englisch für „Erfahrung“? | experience
+Hauptstadt von Schottland? | Edinburgh
+Organ, das Insulin bildet? | Bauchspeicheldrüse
+Kleinste Blutgefäße? | Kapillaren
+Wer stellte die Evolutionstheorie auf? | Darwin
+Zellteilung bei Körperzellen? | Mitose
+Erbinformation in drei Buchstaben? | DNA
+Höchster Berg der Erde? | Mount Everest
+Größte heiße Wüste? | Sahara
+Hauptstadt von Australien? | Canberra
+Gebirge in Südamerika? | Anden
+Längster Fluss Europas? | Wolga
+Bevölkerungsreichstes Land? | Indien
+Jahr der Entdeckung Amerikas durch Kolumbus? | 1492
+Jahr von Luthers Thesen? | 1517
+Beginn der Französischen Revolution? | 1789
+Gründung des Kaiserreichs? | 1871
+Beginn des Ersten Weltkriegs? | 1914
+Erster Reichskanzler? | Bismarck
+Krieg von 1618 bis 1648? | Dreißigjähriger Krieg
+Formel von Wasser? | H₂O
+Symbol von Gold? | Au
+Symbol von Natrium? | Na
+Einheit der Stromstärke? | Ampere
+Einheit des Widerstands? | Ohm
+pH-Wert von reinem Wasser? | 7
+Ladung eines Elektrons? | negativ
+Was ist CO₂? | Kohlenstoffdioxid
+Deutsches Parlament? | Bundestag
+Deutsche Verfassung? | Grundgesetz
+Wahlperiode des Bundestags in Jahren? | 4
+Wer malte „Sternennacht“? | van Gogh
+Wer schrieb „Romeo und Julia“? | Shakespeare
+`);
+sekReih(7, `
+Neuzeit – von früh nach spät | Buchdruck (um 1450) > Kolumbus (1492) > Thesenanschlag (1517) > Dreißigjähriger Krieg (1618)
+Revolutionen und Kaiser | Französische Revolution > Napoleon wird Kaiser > Wiener Kongress > Revolution 1848
+19. und 20. Jahrhundert | Revolution 1848 > Kaiserreich 1871 > Erster Weltkrieg 1914 > Weimarer Republik 1919
+Der Weg der Nahrung | Mund > Speiseröhre > Magen > Dünndarm
+Nahrungskette | Gras > Heuschrecke > Frosch > Storch
+Der Weg des Blutes ab der Lunge | Lunge > Herz > Körperarterien > Kapillaren
+Erdschalen von außen nach innen | Erdkruste > Erdmantel > äußerer Kern > innerer Kern
+Klimazonen vom Äquator zum Pol | Tropen > Subtropen > gemäßigte Zone > kalte Zone
+Zeitformen von „gehen“ – von Vergangenheit zu Zukunft | ich war gegangen > ich ging > ich gehe > ich werde gehen
+Argument richtig aufbauen | These > Begründung > Beispiel > Schlussfolgerung
+Einheiten der Spannung – von klein nach groß | Millivolt > Volt > Kilovolt > Megavolt
+pH-Werte – von sauer nach basisch | Magensaft > Essig > reines Wasser > Seifenlauge
+Englische Zahlwörter – von klein nach groß | ten > hundred > thousand > million
+Große Länder nach Fläche – vom größten zum kleinsten | Russland > Kanada > Brasilien > Australien
+Vom Erz zum Werkstück | Erz abbauen > Schmelzen im Hochofen > Stahl gießen > Walzen
+`);
+sekZuord(7, `
+Viren oder Bakterien? | Virus / Bakterium | Grippe=1; Masern=1; Windpocken=1; Corona=1; Scharlach=2; Salmonellen=2; Tetanus=2; Borreliose=2
+Säure oder Base? | Sauer (pH < 7) / Basisch (pH > 7) | Zitronensaft=1; Essig=1; Cola=1; Magensaft=1; Seifenlauge=2; Natronlauge=2; Backpulverlösung=2; Kalkwasser=2
+Reformation oder Revolution? | Reformation (16. Jh.) / Französische Revolution (18. Jh.) | Martin Luther=1; 95 Thesen=1; Wittenberg=1; Bibelübersetzung=1; Sturm auf die Bastille=2; Menschenrechte=2; Ludwig XVI.=2; Robespierre=2
+Element oder Verbindung? | Element / Verbindung | Sauerstoff=1; Eisen=1; Gold=1; Helium=1; Wasser=2; Kochsalz=2; Kohlenstoffdioxid=2; Rost=2
+Englisch: Verb oder Adjektiv? | Verb / Adjektiv | borrow=1; suggest=1; explain=1; arrive=1; expensive=2; careful=2; lazy=2; brave=2
+Einheit gehört zu … | Elektrizität / Mechanik | Volt=1; Ampere=1; Ohm=1; Watt=1; Newton=2; Meter pro Sekunde=2; Kilogramm=2; Joule=2
+Kontinent? | Asien / Südamerika | Indien=1; Japan=1; China=1; Thailand=1; Brasilien=2; Argentinien=2; Peru=2; Chile=2
+Stilmittel oder Satzglied? | Stilmittel / Satzglied | Metapher=1; Alliteration=1; Anapher=1; Personifikation=1; Subjekt=2; Prädikat=2; Akkusativobjekt=2; Adverbial=2
+Organsystem | Verdauung / Atmung | Magen=1; Dünndarm=1; Speiseröhre=1; Leber=1; Lunge=2; Luftröhre=2; Bronchien=2; Alveolen=2
+Absolutismus oder Kaiserreich? | Absolutismus / Kaiserreich 1871 | Ludwig XIV.=1; Versailles (Schloss)=1; „Der Staat bin ich“=1; Merkantilismus=1; Bismarck=2; Wilhelm II.=2; Sozialversicherung=2; Reichstag=2
+`);
+
+/* ---------------- Klasse 9/10 ---------------- */
+sekQuiz(9, [
+  ["🧮 Mathe", ""],
+  ["📖 Deutsch", `
+1 | Wer schrieb „Faust“? | Johann Wolfgang von Goethe
+1 | Was ist ein Drama? | Ein Text für die Bühne mit Dialogen
+1 | Wie heißt die Epoche um 1770 mit Goethe und Schiller als jungen Autoren? | Sturm und Drang
+1 | Was ist ein Essay? | Ein kurzer, persönlich gefärbter Text zu einem Thema
+1 | Was ist ein Protagonist? | Die Hauptfigur
+2 | Wer schrieb „Die Verwandlung“? | Franz Kafka
+2 | Was ist eine Novelle? | Eine kürzere Erzählung über ein „unerhörtes Ereignis“
+2 | Was ist eine Ellipse als Stilmittel? | Ein unvollständiger Satz („Je früher, desto besser.“)
+2 | Was ist ein Oxymoron? | Verbindung von Gegensätzen („bittersüß“)
+2 | Wer schrieb „Kabale und Liebe“? | Friedrich Schiller
+3 | Wie heißt die Epoche, in der Vernunft im Mittelpunkt stand (18. Jh.)? | Aufklärung
+3 | Was ist eine Parabel? | Eine Erzählung mit verschlüsselter Lehre, die man übertragen muss
+3 | Was ist ein Konjunktiv II? Beispiel! | Möglichkeitsform, z. B. „Ich wäre gern dort.“
+3 | Was ist eine Klimax als Stilmittel? | Eine Steigerung („Ich kam, sah und siegte.“)
+3 | Wer schrieb „Nathan der Weise“? | Gotthold Ephraim Lessing
+4 | Was will Brechts episches Theater? | Zum Nachdenken anregen, statt nur mitfühlen zu lassen
+4 | Was ist ein innerer Monolog? | Die unausgesprochenen Gedanken einer Figur in der Ich-Form
+4 | Welche Epoche folgte auf die Klassik und betonte Gefühl und Natur? | Romantik
+4 | Wer schrieb „Der Besuch der alten Dame“? | Friedrich Dürrenmatt
+4 | Was ist eine Sachtextanalyse? | Eine Untersuchung von Inhalt, Aufbau, Sprache und Absicht eines Sachtextes
+5 | Wie heißt die Dramenform nach Gustav Freytag? | Pyramide: Exposition, steigende Handlung, Höhepunkt, fallende Handlung, Katastrophe
+5 | Was ist ein Euphemismus? | Eine beschönigende Umschreibung („entschlafen“ statt „sterben“)
+5 | Was ist der Unterschied zwischen Erzähler und Autor? | Der Erzähler ist eine Figur im Text, der Autor die reale Person
+5 | Welche Epoche nennt man auch „Literatur nach 1945“, mit Trümmerliteratur? | Nachkriegsliteratur
+5 | Wer schrieb „Draußen vor der Tür“? | Wolfgang Borchert
+`],
+  ["💬 Englisch", `
+1 | Was bedeutet „to achieve“? | erreichen
+1 | Wie heißt das „past perfect“ von „they go“? | they had gone
+1 | Was bedeutet „environment“? | Umwelt
+1 | Welche Sprache spricht man offiziell in Kanada außer Englisch? | Französisch
+1 | Was bedeutet „to apply for a job“? | sich um eine Stelle bewerben
+2 | Ergänze: „If I had known, I ___ have come.“ | would
+2 | Was ist ein „gerund“? | Die -ing-Form als Nomen („Swimming is fun.“)
+2 | Was bedeutet „sustainable“? | nachhaltig
+2 | Wie heißt der Amtssitz des US-Präsidenten? | The White House
+2 | Was bedeutet „to persuade“? | überzeugen / überreden
+3 | Welche Bedingungssatz-Art ist „If it rained, I would stay home“? | Conditional II (if-clause type 2)
+3 | Bilde das Passiv im Present Perfect: „They have built a bridge.“ | A bridge has been built.
+3 | Was bedeutet „however“? | jedoch
+3 | Was ist ein „cover letter“? | Ein Bewerbungsanschreiben
+3 | Wie heißen die zwei großen Parteien in den USA? | Democrats und Republicans
+4 | Was ist „reported speech“ von: He said, „I will come.“? | He said (that) he would come.
+4 | Was bedeutet „to emphasise“? | betonen
+4 | Was ist das Gegenteil von „to increase“? | to decrease
+4 | Was war der „American Dream“? | Die Idee, dass jeder durch Fleiß aufsteigen kann
+4 | Wie heißt der Unterschied zwischen „make“ und „do“? Beispiel? | „make“ = herstellen (make a cake), „do“ = tun (do homework)
+5 | Ergänze das Conditional III: „If she had studied, she ___.“ (pass) | would have passed
+5 | Was bedeutet „to take something for granted“? | etwas für selbstverständlich halten
+5 | Was war die „Civil Rights Movement“? | Die US-Bürgerrechtsbewegung gegen Rassentrennung
+5 | Wer hielt die Rede „I Have a Dream“? | Martin Luther King
+5 | Was bedeutet „Brexit“? | Der Austritt Großbritanniens aus der EU
+`],
+  ["🌿 Biologie", `
+1 | Wie viele Chromosomen hat eine menschliche Körperzelle? | 46
+1 | Wer gilt als Begründer der Vererbungslehre? | Gregor Mendel
+1 | Was ist ein Gen? | Ein Abschnitt der DNA mit einer Erbinformation
+1 | Wie heißt die Form der DNA? | Doppelhelix
+1 | Was ist eine Mutation? | Eine Veränderung der Erbinformation
+2 | Wie heißt die Zellteilung, bei der Keimzellen entstehen? | Meiose
+2 | Was sind Hormone? | Botenstoffe im Körper
+2 | Wie heißt die Hirnanhangdrüse mit Fachbegriff? | Hypophyse
+2 | Was ist ein Allel? | Eine Ausprägungsform eines Gens
+2 | Wie heißen die Basen der DNA? | Adenin, Thymin, Guanin, Cytosin
+3 | Was bedeutet dominant und rezessiv? | Dominant setzt sich durch, rezessiv wird überdeckt
+3 | Was ist Trisomie 21? | Das Chromosom 21 liegt dreifach vor (Down-Syndrom)
+3 | Was macht das Immunsystem bei einer Impfung? | Es bildet Antikörper und Gedächtniszellen
+3 | Wie heißen die Zellorgane, die Energie bereitstellen? | Mitochondrien
+3 | Was ist Selektion in der Evolution? | Die natürliche Auslese der am besten angepassten Lebewesen
+4 | Was ist Gentechnik? | Gezielte Veränderung von Erbgut
+4 | Was ist eine Synapse? | Die Kontaktstelle zwischen Nervenzellen
+4 | Was ist das Reflexbogen-Prinzip? | Reiz → Rückenmark → Muskel, ohne Gehirn
+4 | Was sind Stammzellen? | Unspezialisierte Zellen, die sich zu verschiedenen Zellen entwickeln können
+4 | Was ist Biodiversität? | Die Vielfalt des Lebens
+5 | Wie heißt die Übersetzung der DNA-Information in Proteine? | Proteinbiosynthese
+5 | Was ist der Unterschied zwischen Homologie und Analogie? | Homolog = gleicher Ursprung, analog = gleiche Funktion
+5 | Was ist ein Neurotransmitter? | Botenstoff, der Signale an Synapsen überträgt
+5 | Was ist CRISPR/Cas? | Eine „Genschere“ zum gezielten Verändern von DNA
+5 | Wer entdeckte das Penicillin? | Alexander Fleming
+`],
+  ["🌍 Erdkunde", `
+1 | Was ist Globalisierung? | Die weltweite Vernetzung von Wirtschaft, Politik und Kultur
+1 | Wie viele Menschen leben etwa auf der Erde? | Rund 8 Milliarden
+1 | Was ist ein Entwicklungsland? | Ein Land mit niedrigem Einkommen und schwacher Wirtschaft
+1 | Was bedeutet „Urbanisierung“? | Verstädterung – immer mehr Menschen leben in Städten
+1 | Was ist erneuerbare Energie? Nenne zwei! | Energie aus Sonne, Wind, Wasser …
+2 | Was misst das BIP? | Den Wert aller Waren und Dienstleistungen eines Landes
+2 | Was ist der demografische Wandel? | Veränderung der Bevölkerung, z. B. Alterung
+2 | Was ist eine Megastadt? | Eine Stadt mit über 10 Millionen Einwohnern
+2 | Was bedeutet „Strukturwandel“ im Ruhrgebiet? | Wechsel von Kohle und Stahl zu Dienstleistungen
+2 | Was ist der Klimawandel? | Die Erwärmung der Erde, vor allem durch Treibhausgase
+3 | Was ist das Pariser Klimaabkommen? | Ziel: Erwärmung auf deutlich unter 2 °C begrenzen
+3 | Wie heißt die Form einer Bevölkerungspyramide bei vielen Kindern? | Pyramidenform
+3 | Was sind Push- und Pull-Faktoren? | Gründe, ein Land zu verlassen (push) und in ein anderes zu ziehen (pull)
+3 | Was ist eine Sonderwirtschaftszone? | Ein Gebiet mit besonderen Wirtschaftsregeln, z. B. in China
+3 | Was ist Desertifikation? | Ausbreitung wüstenähnlicher Gebiete
+4 | Was ist der Golfstrom? | Eine warme Meeresströmung, die Europas Klima mildert
+4 | Was ist „Fairer Handel“? | Handel mit gerechten Preisen für Produzenten
+4 | Was ist ein Schwellenland? Nenne eins! | Ein Land zwischen Entwicklungs- und Industrieland, z. B. Brasilien, Indien
+4 | Was ist der ökologische Fußabdruck? | Die Fläche, die man für seinen Lebensstil verbraucht
+4 | Wie heißt der Zusammenschluss von 27 europäischen Staaten? | Europäische Union
+5 | Was bedeutet „Disparität“? | Ungleichheit, z. B. zwischen Stadt und Land
+5 | Was ist der HDI? | Index der menschlichen Entwicklung (Bildung, Lebenserwartung, Einkommen)
+5 | Was ist eine Subduktionszone? | Wo eine Erdplatte unter eine andere abtaucht
+5 | Wie heißt das Wetterphänomen mit warmem Pazifikwasser vor Südamerika? | El Niño
+5 | Was ist virtuelles Wasser? | Wasser, das zur Herstellung eines Produkts verbraucht wurde
+`],
+  ["🏛️ Geschichte", `
+1 | Wann begann der Zweite Weltkrieg? | 1939
+1 | Wann endete der Zweite Weltkrieg in Europa? | 8. Mai 1945
+1 | Wann wurde die Bundesrepublik Deutschland gegründet? | 1949
+1 | Wann fiel die Berliner Mauer? | 9. November 1989
+1 | Wann wurde Deutschland wiedervereinigt? | 3. Oktober 1990
+2 | Wann kamen die Nationalsozialisten an die Macht? | 1933
+2 | Wie nennt man den Völkermord an den europäischen Juden? | Holocaust (Shoah)
+2 | Wie hieß der Staat im Osten Deutschlands von 1949 bis 1990? | DDR (Deutsche Demokratische Republik)
+2 | Wer war der erste Bundeskanzler der BRD? | Konrad Adenauer
+2 | Wann wurde die Berliner Mauer gebaut? | 1961
+3 | Was war der „Kalte Krieg“? | Konflikt zwischen USA und Sowjetunion ohne direkten Krieg
+3 | Was geschah in der Pogromnacht am 9. November 1938? | Synagogen wurden angezündet, Juden verfolgt
+3 | Wie hieß die Hilfe der USA für Westeuropa nach 1945? | Marshallplan
+3 | Was war die Luftbrücke 1948/49? | Versorgung West-Berlins aus der Luft während der Blockade
+3 | Wie hieß das Militärbündnis des Ostblocks? | Warschauer Pakt
+4 | Was geschah am 20. Juli 1944? | Ein Attentat auf Hitler (Stauffenberg)
+4 | Was war die „Weiße Rose“? | Eine Widerstandsgruppe um Sophie und Hans Scholl
+4 | Wer war Michail Gorbatschow? | Letzter Staatschef der Sowjetunion, Reformer
+4 | Was bedeutet „Ostpolitik“ unter Willy Brandt? | Annäherung an die Staaten des Ostblocks
+4 | Was war die Kubakrise 1962? | Ein Atomkriegs-Konflikt zwischen USA und UdSSR wegen Raketen auf Kuba
+5 | Was war das „Ermächtigungsgesetz“ 1933? | Es erlaubte Hitler, Gesetze ohne Parlament zu erlassen
+5 | Was beschloss die Wannseekonferenz 1942? | Die Organisation des Völkermords an den Juden
+5 | Wie heißt der Vertrag von 1990, der die außenpolitischen Fragen der Einheit regelte? | Zwei-plus-Vier-Vertrag
+5 | Was waren die Montagsdemonstrationen? | Friedliche Proteste 1989 in Leipzig und anderen Städten der DDR
+5 | Wann wurde die EU mit dem Vertrag von Maastricht gegründet? | 1992 (in Kraft 1993)
+`],
+  ["⚗️ Chemie & Physik", `
+1 | Was ist die chemische Formel von Kochsalz? | NaCl
+1 | Was ist eine Ionenbindung? | Bindung zwischen positiv und negativ geladenen Ionen
+1 | Welche Teilchen umkreisen den Atomkern? | Elektronen
+1 | Was ist Radioaktivität? | Zerfall instabiler Atomkerne unter Aussendung von Strahlung
+1 | Wie lautet die Formel von Methan? | CH₄
+2 | Was ist ein Isotop? | Atome desselben Elements mit unterschiedlicher Neutronenzahl
+2 | Was ist eine Redoxreaktion? | Reaktion mit gleichzeitiger Oxidation und Reduktion
+2 | Wie lautet Newtons zweites Gesetz? | F = m · a
+2 | Was ist die Halbwertszeit? | Die Zeit, in der die Hälfte der Atomkerne zerfallen ist
+2 | Was ist ein Katalysator? | Ein Stoff, der eine Reaktion beschleunigt, ohne verbraucht zu werden
+3 | Was ist eine Neutralisation? | Säure + Base → Salz + Wasser
+3 | Was sind Alkane? | Kohlenwasserstoffe mit nur Einfachbindungen
+3 | Wie lautet die Formel der kinetischen Energie? | E = ½ · m · v²
+3 | Was ist Kernspaltung? | Zerlegung schwerer Atomkerne, z. B. Uran
+3 | Welches Gas entsteht bei der vollständigen Verbrennung von Kohlenstoff? | Kohlenstoffdioxid
+4 | Was ist Induktion? | Erzeugung von Spannung durch ein sich änderndes Magnetfeld
+4 | Was ist ein Transformator? | Ein Gerät, das Wechselspannungen umwandelt
+4 | Was ist die Elektronegativität? | Das Bestreben eines Atoms, Bindungselektronen anzuziehen
+4 | Was ist Ethanol? | Ein Alkohol (C₂H₅OH)
+4 | Wie lautet die Formel der Lageenergie? | E = m · g · h
+5 | Wie heißt die Formel E = m · c²? | Äquivalenz von Masse und Energie (Einstein)
+5 | Was ist Kernfusion? | Verschmelzung leichter Atomkerne, z. B. in der Sonne
+5 | Was ist eine Polymerisation? | Verknüpfung vieler kleiner Moleküle zu Kunststoffen
+5 | Wie groß ist die Fallbeschleunigung auf der Erde? | Etwa 9,81 m/s²
+5 | Was ist ein Ester? | Verbindung aus Alkohol und Säure (oft Duftstoffe)
+`],
+  ["🗳️ Politik & Gesellschaft", `
+1 | Wie viele Stimmen hat man bei der Bundestagswahl? | Zwei (Erst- und Zweitstimme)
+1 | Wer wählt den Bundeskanzler? | Der Bundestag
+1 | Ab welchem Alter darf man an der Bundestagswahl teilnehmen? | Ab 18
+1 | Was ist Gewaltenteilung? | Aufteilung in Legislative, Exekutive und Judikative
+1 | Wie heißt die Vertretung der Bundesländer? | Bundesrat
+2 | Wer ist die Legislative in Deutschland? | Der Bundestag (mit dem Bundesrat)
+2 | Was ist die Fünf-Prozent-Hürde? | Parteien brauchen mindestens 5 % der Zweitstimmen für den Bundestag
+2 | Wer wählt den Bundespräsidenten? | Die Bundesversammlung
+2 | Was ist Föderalismus? | Aufteilung der Macht zwischen Bund und Ländern
+2 | Was ist eine Koalition? | Ein Bündnis mehrerer Parteien zur Regierungsbildung
+3 | Was ist das Bundesverfassungsgericht? | Das oberste Gericht, das über das Grundgesetz wacht
+3 | Was bedeutet Pressefreiheit? | Medien dürfen ohne staatliche Zensur berichten
+3 | Was ist Lobbyismus? | Einflussnahme von Interessengruppen auf die Politik
+3 | Was ist ein Misstrauensvotum? | Abwahl des Kanzlers durch Wahl eines neuen
+3 | Was ist die soziale Marktwirtschaft? | Freier Markt mit sozialem Ausgleich durch den Staat
+4 | Wie heißen die drei Gewalten auf Deutsch? | Gesetzgebung, ausführende Gewalt, Rechtsprechung
+4 | Was bedeutet Rechtsstaat? | Der Staat ist an Recht und Gesetz gebunden
+4 | Was ist Populismus? | Politik, die einfache Lösungen verspricht und „Volk gegen Elite“ stellt
+4 | Was ist das Europäische Parlament? | Die von den EU-Bürgern gewählte Volksvertretung
+4 | Was macht die EZB? | Sie sorgt für einen stabilen Euro (Europäische Zentralbank)
+5 | Was regelt Artikel 20 des Grundgesetzes? | Deutschland ist demokratischer und sozialer Bundesstaat
+5 | Was ist eine „Ewigkeitsklausel“? | Teile des Grundgesetzes, die nicht geändert werden dürfen (Art. 79 Abs. 3)
+5 | Wie viele Abgeordnete hat der Bundestag seit der Wahlrechtsreform höchstens? | 630
+5 | Was ist der UN-Sicherheitsrat? | Das UN-Gremium für Frieden und Sicherheit mit fünf ständigen Mitgliedern
+5 | Was sind „Fake News“? | Bewusst falsche Nachrichten, die sich als echt ausgeben
+`]
+]);
+
+sekABC(9, `
+Wer schrieb „Faust“? | Goethe | Schiller | Lessing
+Welche Epoche stellte die Vernunft in den Mittelpunkt? | Aufklärung | Romantik | Barock
+Was ist ein Oxymoron? | „bittersüß“ | „Haus und Hof“ | „Ich kam, sah und siegte“
+Wer schrieb „Die Verwandlung“? | Franz Kafka | Thomas Mann | Bertolt Brecht
+Welcher Modus ist „Er sagte, er sei müde“? | Konjunktiv I | Konjunktiv II | Indikativ
+Ergänze: „If I had known, I ___ have come.“ | would | will | had
+Was bedeutet „sustainable“? | nachhaltig | zuverlässig | bezahlbar
+Wer hielt die Rede „I Have a Dream“? | Martin Luther King | Barack Obama | John F. Kennedy
+Was ist „environment“? | Umwelt | Unterhaltung | Regierung
+Wie viele Chromosomen hat eine menschliche Körperzelle? | 46 | 23 | 48
+Wie heißt die Zellteilung zur Bildung von Keimzellen? | Meiose | Mitose | Osmose
+Wer entdeckte das Penicillin? | Alexander Fleming | Robert Koch | Louis Pasteur
+Welche Base gehört NICHT zur DNA? | Uracil | Adenin | Guanin
+Wie viele Menschen leben etwa auf der Erde? | 8 Milliarden | 5 Milliarden | 12 Milliarden
+Was misst das BIP? | Wirtschaftsleistung | Bevölkerungszahl | Lebenserwartung
+Wie heißt die warme Strömung, die Europas Klima mildert? | Golfstrom | Humboldtstrom | El Niño
+Wann begann der Zweite Weltkrieg? | 1939 | 1933 | 1941
+Wann wurde die Berliner Mauer gebaut? | 1961 | 1949 | 1989
+Wer war der erste Bundeskanzler? | Konrad Adenauer | Willy Brandt | Ludwig Erhard
+Wie hieß die Hilfe der USA für Europa nach 1945? | Marshallplan | Morgenthau-Plan | Truman-Doktrin
+Wann wurde Deutschland wiedervereinigt? | 1990 | 1989 | 1991
+Was ist NaCl? | Kochsalz | Natron | Salzsäure
+Wie lautet Newtons zweites Gesetz? | F = m · a | E = m · c² | U = R · I
+Was ist die Halbwertszeit? | Zeit, bis die Hälfte zerfallen ist | Halbe Lebenszeit eines Atoms | Zeit bis zum Siedepunkt
+Was entsteht bei einer Neutralisation? | Salz und Wasser | Säure und Gas | Base und Sauerstoff
+Wie viele Stimmen hat man bei der Bundestagswahl? | Zwei | Eine | Drei
+Wer wählt den Bundespräsidenten? | Bundesversammlung | Bundestag | das Volk direkt
+Wie hoch ist die Sperrklausel bei der Bundestagswahl? | 5 % | 3 % | 10 %
+Wie heißt die rechtsprechende Gewalt? | Judikative | Legislative | Exekutive
+Wo sitzt das Bundesverfassungsgericht? | Karlsruhe | Berlin | Leipzig
+`);
+sekWF(9, `
+W | Goethe schrieb „Faust“. | Teil I erschien 1808.
+F | Kafka schrieb „Kabale und Liebe“. | Das Drama ist von Friedrich Schiller.
+W | Ein Oxymoron verbindet Gegensätze. | z. B. „alter Knabe“, „bittersüß“.
+F | Die Romantik kam vor der Aufklärung. | Die Aufklärung (18. Jh.) war vorher.
+W | Eine Novelle erzählt oft ein „unerhörtes Ereignis“. | So beschrieb es Goethe.
+F | „Sustainable“ bedeutet „gefährlich“. | Es bedeutet „nachhaltig“.
+W | Conditional III bildet man mit „would have“ + 3. Form. | z. B. „I would have gone.“
+F | Die USA haben drei große Parteien. | Es gibt zwei große: Demokraten und Republikaner.
+W | Martin Luther King kämpfte für Bürgerrechte. | „I Have a Dream“, 1963.
+F | Menschen haben 23 Chromosomen in jeder Körperzelle. | Es sind 46 (23 Paare).
+W | Mitochondrien liefern der Zelle Energie. | Man nennt sie „Kraftwerke der Zelle“.
+F | Antikörper werden in der Leber gebildet. | Sie werden von B-Zellen (Plasmazellen) gebildet.
+W | Gregor Mendel entdeckte Regeln der Vererbung. | Mit Erbsen-Kreuzungsversuchen.
+F | Der Golfstrom macht Europa kälter. | Er bringt warmes Wasser und mildert das Klima.
+W | Eine Megastadt hat über 10 Millionen Einwohner. | z. B. Tokio, Delhi, Shanghai.
+F | Erneuerbare Energien sind Kohle und Erdöl. | Das sind fossile Energien.
+W | Der Zweite Weltkrieg begann 1939. | Mit dem Überfall auf Polen.
+F | Die Berliner Mauer fiel 1961. | Sie wurde 1961 gebaut und fiel 1989.
+W | Konrad Adenauer war der erste Bundeskanzler. | Von 1949 bis 1963.
+F | Die DDR war Mitglied der NATO. | Die DDR gehörte zum Warschauer Pakt.
+W | Die Wiedervereinigung war am 3. Oktober 1990. | Seitdem ist der 3. Oktober Nationalfeiertag.
+F | NaCl ist die Formel für Zucker. | NaCl ist Kochsalz (Natriumchlorid).
+W | Bei der Kernfusion verschmelzen Atomkerne. | So erzeugt die Sonne Energie.
+F | Ein Katalysator wird bei der Reaktion verbraucht. | Er beschleunigt sie, ohne verbraucht zu werden.
+W | Die Fallbeschleunigung auf der Erde beträgt etwa 9,81 m/s². | Man rechnet oft mit 10 m/s².
+F | Den Bundeskanzler wählt das Volk direkt. | Der Bundestag wählt ihn.
+W | Für den Bundestag gilt eine Fünf-Prozent-Hürde. | Ausnahmen gibt es z. B. über Direktmandate.
+F | Der Bundesrat ist das Parlament des Volkes. | Im Bundesrat sind die Landesregierungen vertreten.
+W | Die Würde des Menschen steht in Artikel 1 GG. | „Die Würde des Menschen ist unantastbar.“
+F | Die EU hat 30 Mitgliedsstaaten. | Es sind 27 (Stand 2025).
+`);
+sekDuell(9, `
+Nenne einen Beruf, den man nach der Schule lernen kann! | Mechatroniker 22; Kaufmann/-frau 20; Erzieher/-in 18; Elektriker 16; Friseur/-in 14; Koch/Köchin 10
+Nenne eine Partei im Bundestag! | CDU 26; SPD 24; Grüne 18; AfD 14; FDP 10; Linke 8
+Nenne etwas, das man für ein Vorstellungsgespräch vorbereitet! | Kleidung 28; Lebenslauf 24; Antworten auf Fragen 18; Infos zur Firma 14; Anfahrt 10; Zeugnisse 6
+Nenne ein Land in der EU! | Frankreich 26; Italien 22; Spanien 18; Österreich 14; Polen 12; Niederlande 8
+Nenne eine erneuerbare Energiequelle! | Sonne 34; Wind 32; Wasser 18; Biomasse 8; Erdwärme 6; Gezeiten 2
+Nenne einen deutschen Dichter oder eine Dichterin! | Goethe 38; Schiller 26; Kafka 10; Brecht 10; Heine 8; Fontane 8
+Nenne etwas, das man mit 16 darf! | Rollerführerschein (AM) 26; Wählen bei manchen Wahlen 22; Bis 24 Uhr ausgehen 20; Bier/Wein trinken 14; Ausbildung beginnen 10; Moped fahren 8
+Nenne ein Gerät, das Strom spart, wenn man es ausschaltet! | Fernseher 30; Computer 24; Licht 20; Spielkonsole 12; Ladegerät 8; Router 6
+Nenne einen Grund, warum Menschen ihre Heimat verlassen! | Krieg 34; Armut 22; Arbeit 18; Verfolgung 12; Klimawandel 8; Familie 6
+Nenne etwas, das man an Silvester macht! | Feuerwerk 36; Feiern 24; Bleigießen/Wachsgießen 12; Anstoßen 12; Raclette/Fondue 10; Vorsätze fassen 6
+Nenne ein Organ, das man spenden kann! | Niere 36; Herz 22; Leber 18; Lunge 12; Hornhaut 6; Bauchspeicheldrüse 6
+Nenne eine Sprache, die viele Menschen auf der Welt sprechen! | Englisch 32; Chinesisch 24; Spanisch 18; Hindi 10; Arabisch 10; Französisch 6
+Nenne etwas, das in einem Lebenslauf steht! | Name 26; Schulabschluss 22; Geburtsdatum 18; Praktika 14; Hobbys 12; Sprachkenntnisse 8
+Nenne ein soziales Netzwerk, das Jugendliche nutzen! | TikTok 32; Instagram 30; YouTube 16; Snapchat 12; WhatsApp 6; Discord 4
+Nenne ein Thema, über das bei Wahlen gestritten wird! | Klima 26; Migration 24; Rente 18; Wirtschaft 14; Bildung 10; Mieten 8
+Nenne eine Kunstepoche oder einen Stil! | Barock 22; Renaissance 22; Romantik 18; Impressionismus 16; Expressionismus 12; Pop-Art 10
+Nenne ein Land, in dem man Englisch spricht! | USA 30; England 28; Kanada 14; Australien 14; Irland 8; Neuseeland 6
+Nenne etwas, das man nach dem Schulabschluss machen kann! | Ausbildung 32; Studium 26; Auslandsjahr 16; FSJ 12; Arbeiten 10; Reisen 4
+Nenne eine berühmte Person der deutschen Geschichte! | Bismarck 22; Adenauer 20; Luther 18; Merkel 16; Willy Brandt 14; Sophie Scholl 10
+Nenne ein Element aus dem Periodensystem! | Sauerstoff 28; Wasserstoff 22; Eisen 16; Gold 14; Kohlenstoff 12; Helium 8
+`);
+sekBlitz(9, `
+Wer schrieb „Faust“? | Goethe
+Wer schrieb „Die Verwandlung“? | Kafka
+Wer schrieb „Draußen vor der Tür“? | Borchert
+Epoche der Vernunft? | Aufklärung
+Stilmittel „bittersüß“? | Oxymoron
+Englisch für „Umwelt“? | environment
+Englisch für „nachhaltig“? | sustainable
+Wer sagte „I Have a Dream“? | Martin Luther King
+Chromosomen in einer Körperzelle? | 46
+Form der DNA? | Doppelhelix
+Begründer der Vererbungslehre? | Mendel
+Kraftwerke der Zelle? | Mitochondrien
+Entdecker des Penicillins? | Fleming
+Menschen auf der Erde (gerundet)? | 8 Milliarden
+Warme Strömung für Europa? | Golfstrom
+Wetterphänomen im Pazifik? | El Niño
+Stadt mit über 10 Mio. Einwohnern? | Megastadt
+Beginn des Zweiten Weltkriegs? | 1939
+Ende des Zweiten Weltkriegs in Europa? | 1945
+Gründung der Bundesrepublik? | 1949
+Bau der Berliner Mauer? | 1961
+Fall der Berliner Mauer? | 1989
+Deutsche Einheit? | 1990
+Erster Bundeskanzler? | Adenauer
+Hilfsprogramm der USA nach 1945? | Marshallplan
+Widerstandsgruppe der Geschwister Scholl? | Weiße Rose
+Formel von Kochsalz? | NaCl
+Formel von Methan? | CH₄
+Newtons zweites Gesetz? | F = m · a
+Einsteins berühmte Formel? | E = m · c²
+Fallbeschleunigung auf der Erde? | 9,81 m/s²
+Säure plus Base ergibt? | Salz und Wasser
+Energie der Sonne entsteht durch? | Kernfusion
+Wie viele Stimmen bei der Bundestagswahl? | 2
+Wer wählt den Bundeskanzler? | Bundestag
+Wer wählt den Bundespräsidenten? | Bundesversammlung
+Sperrklausel bei der Bundestagswahl? | 5 %
+Sitz des Bundesverfassungsgerichts? | Karlsruhe
+Rechtsprechende Gewalt? | Judikative
+Mitgliedsstaaten der EU? | 27
+`);
+sekReih(9, `
+Deutsche Geschichte im 20. Jahrhundert | Erster Weltkrieg > Weimarer Republik > Machtergreifung 1933 > Zweiter Weltkrieg
+Nachkriegszeit | Kriegsende 1945 > Gründung von BRD und DDR > Mauerbau > Mauerfall
+Epochen der Literatur | Aufklärung > Sturm und Drang > Klassik > Romantik
+Freytags Dramenaufbau | Exposition > Steigende Handlung > Höhepunkt > Katastrophe
+Vom Gen zum Protein | DNA > mRNA > Ribosom > Protein
+Ablauf einer Impfung | Impfstoff wird gespritzt > Immunsystem erkennt Antigene > Antikörper werden gebildet > Gedächtniszellen bleiben
+Gesetzgebung in Deutschland | Gesetzentwurf > Beratung im Bundestag > Bundesrat > Unterschrift des Bundespräsidenten
+Vom Atom zum Molekül – kleinste Teilchen zuerst | Elektron > Atomkern > Atom > Molekül
+Bevölkerungsreiche Länder – vom größten zum kleinsten | Indien > China > USA > Indonesien
+Energieumwandlung im Wasserkraftwerk | Lageenergie > Bewegungsenergie > Generator > elektrische Energie
+Englische Bedingungssätze – Typ I bis III | If it rains, I will stay. > If it rained, I would stay. > If it had rained, I would have stayed.
+Bewerbung – die richtige Reihenfolge | Stellenanzeige lesen > Bewerbung schreiben > Vorstellungsgespräch > Zusage
+Europäische Einigung | Montanunion (1951) > Römische Verträge (1957) > Vertrag von Maastricht (1992) > Euro als Bargeld (2002)
+Der Weg einer Wahl | Wahlkampf > Stimmabgabe > Auszählung > Regierungsbildung
+Kalter Krieg | Berlin-Blockade > Mauerbau > Kubakrise > Mauerfall
+`);
+sekZuord(9, `
+Gewaltenteilung | Legislative / Judikative | Bundestag=1; Bundesrat=1; Landtag=1; Gesetze beschließen=1; Bundesverfassungsgericht=2; Amtsgericht=2; Richterin=2; Urteile sprechen=2
+BRD oder DDR? | BRD / DDR | Konrad Adenauer=1; Bonn=1; NATO=1; D-Mark=1; Walter Ulbricht=2; Stasi=2; Warschauer Pakt=2; FDJ=2
+Erneuerbar oder fossil? | Erneuerbar / Fossil | Sonnenenergie=1; Windkraft=1; Wasserkraft=1; Erdwärme=1; Kohle=2; Erdöl=2; Erdgas=2; Braunkohle=2
+Literatur-Epoche | Aufklärung / Romantik | Lessing=1; Vernunft=1; „Nathan der Weise“=1; Toleranz=1; Eichendorff=2; Sehnsucht=2; Blaue Blume=2; Novalis=2
+Mitose oder Meiose? | Mitose / Meiose | Wachstum=1; Wundheilung=1; zwei gleiche Tochterzellen=1; Körperzellen=1; Keimzellen=2; halber Chromosomensatz=2; Eizellen und Spermien=2; vier Tochterzellen=2
+Säure oder Base? | Säure / Base | Salzsäure (HCl)=1; Schwefelsäure=1; Essigsäure=1; Kohlensäure=1; Natronlauge (NaOH)=2; Kalilauge=2; Ammoniak-Lösung=2; Kalkwasser=2
+Erster oder Zweiter Weltkrieg? | Erster Weltkrieg / Zweiter Weltkrieg | Attentat von Sarajevo=1; Verdun=1; Kaiser Wilhelm II.=1; Versailler Vertrag=1; Überfall auf Polen=2; Stalingrad=2; D-Day=2; Hiroshima=2
+Englisch: Conditional I oder II? | Typ I (real) / Typ II (unwahrscheinlich) | If it rains, we’ll stay.=1; If you hurry, you’ll catch the bus.=1; If I see her, I’ll tell her.=1; If he calls, I’ll answer.=1; If I were rich, I’d travel.=2; If I had time, I’d help.=2; If she knew, she’d tell us.=2; If we lived in Spain, we’d speak Spanish.=2
+Stilmittel | Bildlich / Klanglich | Metapher=1; Personifikation=1; Vergleich=1; Symbol=1; Alliteration=2; Reim=2; Lautmalerei=2; Assonanz=2
+Industrieland oder Schwellenland? | Industrieland / Schwellenland | Deutschland=1; Japan=1; Kanada=1; Frankreich=1; Brasilien=2; Indien=2; Mexiko=2; Südafrika=2
+`);
+
+/* ---------------- Höher oder Tiefer: Themen für Klasse 5–10 ---------------- */
+Object.assign(HOCH, {
+  einwohner: { t: "Wie viele Einwohner? (Stand etwa 2024)", items: [["🌏", "Indien", 1440, "1,44 Mrd."], ["🌏", "China", 1410, "1,41 Mrd."], ["🌎", "USA", 340, "340 Mio."],
+    ["🌏", "Indonesien", 280, "280 Mio."], ["🌍", "Nigeria", 225, "225 Mio."], ["🌎", "Brasilien", 212, "212 Mio."], ["🌍", "Russland", 144, "144 Mio."], ["🌏", "Japan", 124, "124 Mio."],
+    ["🌍", "Deutschland", 84, "84 Mio."], ["🌍", "Frankreich", 68, "68 Mio."], ["🌍", "Italien", 59, "59 Mio."], ["🌍", "Spanien", 48, "48 Mio."], ["🌎", "Kanada", 41, "41 Mio."],
+    ["🌍", "Polen", 37, "37 Mio."], ["🌏", "Australien", 27, "27 Mio."], ["🌍", "Österreich", 9.1, "9,1 Mio."], ["🌍", "Dänemark", 5.9, "5,9 Mio."], ["🌍", "Island", 0.39, "390.000"]] },
+  flaeche: { t: "Wie groß ist das Land (Fläche)?", items: [["🌍", "Russland", 17100, "17,1 Mio. km²"], ["🌎", "Kanada", 9980, "9,98 Mio. km²"], ["🌏", "China", 9600, "9,6 Mio. km²"],
+    ["🌎", "Brasilien", 8500, "8,5 Mio. km²"], ["🌏", "Australien", 7700, "7,7 Mio. km²"], ["🌏", "Indien", 3300, "3,3 Mio. km²"], ["🌎", "Argentinien", 2780, "2,8 Mio. km²"],
+    ["🌍", "Algerien", 2380, "2,4 Mio. km²"], ["🌍", "Frankreich", 552, "552.000 km²"], ["🌍", "Deutschland", 357, "357.000 km²"], ["🌍", "Italien", 302, "302.000 km²"],
+    ["🌍", "Großbritannien", 243, "243.000 km²"], ["🌍", "Österreich", 84, "84.000 km²"], ["🌍", "Schweiz", 41, "41.000 km²"], ["🌍", "Luxemburg", 2.6, "2.600 km²"], ["🌍", "Vatikanstadt", 0.00044, "0,44 km²"]] },
+  jahr: { t: "Wann war das? (später = mehr)", items: [["📜", "Bau der Cheops-Pyramide", -2560, "um 2560 v. Chr."], ["🏛️", "Gründung Roms (Sage)", -753, "753 v. Chr."],
+    ["⚔️", "Varusschlacht", 9, "9 n. Chr."], ["👑", "Kaiserkrönung Karls des Großen", 800, "800"], ["📖", "Buchdruck von Gutenberg", 1450, "um 1450"], ["⛵", "Kolumbus erreicht Amerika", 1492, "1492"],
+    ["📜", "Luthers 95 Thesen", 1517, "1517"], ["🗼", "Beginn der Französischen Revolution", 1789, "1789"], ["🚂", "Erste deutsche Eisenbahn", 1835, "1835"], ["👑", "Gründung des Kaiserreichs", 1871, "1871"],
+    ["🚗", "Benz’ erstes Automobil", 1886, "1886"], ["✈️", "Erster Motorflug der Brüder Wright", 1903, "1903"], ["💥", "Beginn des Ersten Weltkriegs", 1914, "1914"],
+    ["🚀", "Erste Mondlandung", 1969, "1969"], ["🧱", "Fall der Berliner Mauer", 1989, "1989"], ["📱", "Erstes iPhone", 2007, "2007"]] },
+  planet: { t: "Wie groß ist der Durchmesser?", items: [["☀️", "Sonne", 1392700, "1,39 Mio. km"], ["🪐", "Jupiter", 139820, "139.820 km"], ["🪐", "Saturn", 116460, "116.460 km"],
+    ["🟢", "Uranus", 50724, "50.724 km"], ["🔵", "Neptun", 49244, "49.244 km"], ["🌍", "Erde", 12742, "12.742 km"], ["🟠", "Venus", 12104, "12.104 km"], ["🔴", "Mars", 6779, "6.779 km"],
+    ["⚫", "Merkur", 4879, "4.879 km"], ["🌕", "Mond", 3474, "3.474 km"], ["⚪", "Pluto (Zwergplanet)", 2377, "2.377 km"]] },
+  siede: { t: "Bei welcher Temperatur siedet es?", items: [["🎈", "Helium", -269, "−269 °C"], ["🧪", "Wasserstoff", -253, "−253 °C"], ["🧪", "Stickstoff", -196, "−196 °C"],
+    ["🧪", "Sauerstoff", -183, "−183 °C"], ["🧪", "Aceton (Nagellackentferner)", 56, "56 °C"], ["🍷", "Alkohol (Ethanol)", 78, "78 °C"], ["💧", "Wasser", 100, "100 °C"],
+    ["🌡️", "Quecksilber", 357, "357 °C"], ["🧂", "Kochsalz", 1465, "1.465 °C"], ["🔶", "Kupfer", 2562, "2.562 °C"], ["🔩", "Eisen", 2862, "2.862 °C"]] }
+});
+HOCH_GRADES[5] = ["einwohner", "planet", "hoehe", "tempo"];
+HOCH_GRADES[7] = ["einwohner", "flaeche", "jahr", "planet"];
+HOCH_GRADES[9] = ["jahr", "flaeche", "einwohner", "siede"];
+
+/* =====================================================================
    QUIZZLYBOARD – Fragen-Pools für das Wissens-Quiz (und Die Mauer)
    - Jedes Feld (Kategorie × Punktstufe) hat bis zu 10 Fragen: die erste aus data.js (JEO),
      der Rest aus quiz_more.js (QUIZ_MORE).
@@ -3681,7 +4825,7 @@ QUIZ_MORE[4] = {
    - Ein „Zufallsbeutel“ pro Feld sorgt dafür, dass sich Fragen erst wiederholen,
      wenn alle anderen dieses Feldes einmal dran waren (auch über mehrere Spiele hinweg).
    ===================================================================== */
-const QUIZ_MATH = { 1: "Zahlen", 2: "Mathe", 3: "Mathe", 4: "Mathe" };
+const QUIZ_MATH = { 1: "Zahlen", 2: "Mathe", 3: "Mathe", 4: "Mathe", 5: "Mathe", 7: "Mathe", 9: "Mathe" };
 const catKey = cat => cat.replace(/^\S+\s+/, ""); // Emoji vorne weg: "🐾 Tiere" → "Tiere"
 
 /* Alle Kategorien einer Klasse mit ihren Fragen pro Stufe */
@@ -3735,6 +4879,7 @@ function mathQ(k, lv) {
   const durch = (a, b) => [`Wie viel ist ${a * b} : ${a}?`, String(b)];
   const names = ["Lena", "Tom", "Mia", "Ben", "Emma", "Paul", "Lina", "Finn", "Ella", "Noah"];
   const nm = () => names[r(0, names.length - 1)];
+  if (k >= 5) return mathSek(k, lv);
   if (k === 1) {
     if (lv === 1) { const a = r(1, 4); return plus(a, r(1, 5 - a)); }
     if (lv === 2) { const a = r(2, 8); return plus(a, r(1, 10 - a)); }
@@ -3773,6 +4918,42 @@ function mathQ(k, lv) {
     return [`Ein Film beginnt um ${h}:${String(m).padStart(2, "0")} Uhr und dauert ${d} Minuten. Wann ist er zu Ende?`, `${Math.floor(end / 60)}:${String(end % 60).padStart(2, "0")} Uhr`]; }
   if (t === 2) { const p = r(2, 9), q = r(3, 8); return [`${n} kauft ${q} Brötchen zu je ${p}0 Cent. Wie viel muss ${n} bezahlen?`, `${(p * q / 10).toFixed(2).replace(".", ",")} €`]; }
   const a = r(3, 9) * 100; return [`Ein Zug fährt ${a} km in 2 Stunden. Wie weit fährt er in 1 Stunde?`, `${a / 2} km`];
+}
+
+/* ---------- Mathe-Aufgaben weiterführende Schule: k = 5 (5/6), 7 (7/8), 9 (9/10), Stufe 1–5 ---------- */
+function mathSek(k, lv) {
+  const r = (a, b) => a + Math.floor(Math.random() * (b - a + 1)), pick = a => a[r(0, a.length - 1)];
+  const de = x => String(x).replace(".", ","), neg = x => x < 0 ? `(−${-x})` : String(x), minus = x => x < 0 ? "−" + -x : String(x);
+  const gcd = (a, b) => b ? gcd(b, a % b) : a;
+  if (k === 5) {
+    if (lv === 1) { if (Math.random() < 0.5) { const a = r(12, 49), b = r(3, 9); return [`Wie viel ist ${a} · ${b}?`, String(a * b)]; } const b = r(3, 9), c = r(12, 40); return [`Wie viel ist ${b * c} : ${b}?`, String(c)]; }
+    if (lv === 2) { const [z, n] = pick([[1, 2], [1, 3], [2, 3], [1, 4], [3, 4], [1, 5], [2, 5], [3, 5]]), m = n * r(3, 15); return [`Wie viel sind ${z}/${n} von ${m}?`, String(m / n * z)]; }
+    if (lv === 3) { const a = r(11, 99) / 10, b = r(11, 99) / 10; return Math.random() < 0.6 ? [`Wie viel ist ${de(a)} + ${de(b)}?`, de(Math.round((a + b) * 10) / 10)] : [`Wie viel ist ${de(Math.max(a, b))} − ${de(Math.min(a, b))}?`, de(Math.round((Math.max(a, b) - Math.min(a, b)) * 10) / 10)]; }
+    if (lv === 4) { const [a, b] = pick([[4, 6], [6, 8], [3, 4], [6, 9], [4, 10], [8, 12], [5, 6], [9, 12], [10, 15]]); return Math.random() < 0.5 ? [`Was ist das kleinste gemeinsame Vielfache (kgV) von ${a} und ${b}?`, String(a * b / gcd(a, b))] : [`Was ist der größte gemeinsame Teiler (ggT) von ${a * 2} und ${b * 2}?`, String(gcd(a, b) * 2)]; }
+    const l = r(4, 15), w = r(2, 9);
+    return Math.random() < 0.5 ? [`Ein Rechteck ist ${l} cm lang und ${w} cm breit. Wie groß ist sein Flächeninhalt?`, `${l * w} cm²`] : [`Ein Rechteck ist ${l} cm lang und ${w} cm breit. Wie groß ist sein Umfang?`, `${2 * (l + w)} cm`];
+  }
+  if (k === 7) {
+    if (lv === 1) {
+      if (Math.random() < 0.5) { const a = -r(2, 20), b = r(2, 25); return [`Wie viel ist ${neg(a)} + ${b}?`, minus(a + b)]; }
+      const c = -r(2, 9), d = r(2, 9); return [`Wie viel ist ${neg(c)} · ${d}?`, minus(c * d)];
+    }
+    if (lv === 2) { const p = pick([10, 20, 25, 50, 75, 5]), g = pick([40, 60, 80, 120, 200, 240, 300, 400]); return [`Wie viel sind ${p} % von ${g}?`, de(p * g / 100)]; }
+    if (lv === 3) { const x = r(2, 12), a = r(2, 9), b = r(1, 20); return [`Löse die Gleichung: ${a}x + ${b} = ${a * x + b}`, `x = ${x}`]; }
+    if (lv === 4) { const n = r(2, 6), p = r(2, 5), m = r(n + 1, 12); return [`${n} Hefte kosten ${n * p} €. Wie viel kosten ${m} Hefte?`, `${m * p} €`]; }
+    if (Math.random() < 0.5) { const a = r(30, 80), b = r(30, 150 - a - 10); return [`Zwei Winkel eines Dreiecks sind ${a}° und ${b}° groß. Wie groß ist der dritte Winkel?`, `${180 - a - b}°`]; }
+    const preis = pick([40, 60, 80, 120, 150, 200]), rab = pick([10, 20, 25, 50]); return [`Ein Pullover kostet ${preis} €. Es gibt ${rab} % Rabatt. Was kostet er jetzt?`, `${de(preis * (100 - rab) / 100)} €`];
+  }
+  // k === 9
+  if (lv === 1) { const n = r(11, 20); return Math.random() < 0.5 ? [`Wie viel ist ${n}²?`, String(n * n)] : [`Was ist die Wurzel aus ${n * n}?`, String(n)]; }
+  if (lv === 2) { const [b, e] = pick([[2, 5], [2, 6], [2, 7], [3, 3], [3, 4], [5, 3], [10, 4], [4, 3], [2, 10]]), sup = "⁰¹²³⁴⁵⁶⁷⁸⁹"; return [`Wie viel ist ${b}${String(e).split("").map(d => sup[d]).join("")}?`, String(b ** e)]; }
+  if (lv === 3) { const m = r(2, 5) * pick([1, -1]), t = r(-6, 9), x = r(-3, 6); return [`Gegeben ist y = ${m}x ${t < 0 ? "− " + -t : "+ " + t}. Welchen Wert hat y für x = ${x}?`, minus(m * x + t)]; }
+  if (lv === 4) { const [a, b, c] = pick([[3, 4, 5], [6, 8, 10], [5, 12, 13], [9, 12, 15], [8, 15, 17], [12, 16, 20]]); return [`Ein rechtwinkliges Dreieck hat die Katheten ${a} cm und ${b} cm. Wie lang ist die Hypotenuse?`, `${c} cm`]; }
+  if (Math.random() < 0.5) { const K = pick([200, 400, 500, 800, 1000, 1200]), p = pick([2, 3, 4, 5]); return [`${K} € werden ein Jahr lang mit ${p} % verzinst. Wie viele Zinsen gibt es?`, `${K * p / 100} €`]; }
+  const t = r(1, 3);
+  if (t === 1) return ["Ein Würfel wird einmal geworfen. Wie groß ist die Wahrscheinlichkeit für eine gerade Zahl?", "1/2 (50 %)"];
+  if (t === 2) { const g = r(2, 6); return [`In einer Box liegen ${g} rote und ${10 - g} blaue Kugeln. Wie groß ist die Wahrscheinlichkeit, eine rote zu ziehen?`, `${g}/10 (${g * 10} %)`]; }
+  return ["Eine Münze wird zweimal geworfen. Wie groß ist die Wahrscheinlichkeit für zweimal Kopf?", "1/4 (25 %)"];
 }
 
 /* =====================================================================
@@ -3925,7 +5106,7 @@ function speakOne(text, rate = 0.9) {
     } else browser();
   });
 }
-async function speakSeq(list) { if (TUT) return; stopSpeech(); const my = speakToken; for (const t of list) { if (my !== speakToken) return; await speakOne(t); } }
+async function speakSeq(list) { if (TUT || curArea === "wf") return; stopSpeech(); const my = speakToken; for (const t of list) { if (my !== speakToken) return; await speakOne(t); } }
 function speak(text) { speakSeq([text]); }
 
 /* =====================================================================
@@ -4090,19 +5271,20 @@ function show(node, gameId, grade) {
   $$(".flyclone,.bigx,.boom").forEach(e => e.remove()); // laufende Animationen beim Wechsel entfernen
   $("#score").style.display = "";
   $("#view").replaceChildren(node);
+  document.body.classList.toggle("sek", curArea === "wf"); // weiterführende Schule: ruhigerer Look
   renderTop(gameId, grade);
 }
 function renderTop(gameId, grade) {
   // Dreispaltig (links | Titel | rechts), damit der Titel immer genau in der Mitte steht
   const t = $("#top"); t.replaceChildren();
   const spick = location.hash === "#spickzettel"; // Handy-Spickzettel: keine Modus-Knöpfe
-  const areaBtn = h("button", { class: "btn small topmode area", title: "Bereich wechseln (alleine / Grundschule / weiterführende Schule)", onclick: () => { store.set("qb_area", null); home(); } }, "⇄", h("span", { class: "tml" }, " Bereich"));
+  const areaBtn = h("button", { class: "btn small topmode area", title: "Bereich wechseln (alleine / Grundschule / weiterführende Schule)", onclick: () => { sekUnlocked = false; store.set("qb_area", null); home(); } }, "⇄", h("span", { class: "tml" }, " Bereich"));
   const left = h("div", { class: "tside" }, gameId ? h("button", { class: "btn small", onclick: () => home() }, "🏠 Start")
-    : spick || !curArea ? null : curArea !== "gs" ? areaBtn : [areaBtn, h("button", { class: "btn small topmode duel", title: "Duell-Modus: Das Glücksrad wählt die Spiele", onclick: () => { ac(); duelSetup(); } }, "⚔️", h("span", { class: "tml" }, " Duell-Modus")),
-       h("button", { class: "btn small topmode split", title: "Kinder zufällig auf die Teams verteilen", onclick: () => { ac(); teamSplit(); } }, "👥", h("span", { class: "tml" }, " Teams einteilen")),
+    : spick || !curArea ? null : curArea === "solo" || (curArea === "wf" && !sekUnlocked) ? areaBtn : [areaBtn, h("button", { class: "btn small topmode duel", title: "Duell-Modus: Das Glücksrad wählt die Spiele", onclick: () => { ac(); duelSetup(); } }, "⚔️", h("span", { class: "tml" }, " Duell-Modus")),
+       h("button", { class: "btn small topmode split", title: sekWords("Kinder zufällig auf die Teams verteilen"), onclick: () => { ac(); teamSplit(); } }, "👥", h("span", { class: "tml" }, " Teams einteilen")),
        h("button", { class: "btn small topmode buzz", title: "Großer Buzzer in Teamfarbe", onclick: () => { ac(); buzzer(); } }, buzzIcon(), h("span", { class: "tml" }, " Buzzer"))]);
   const right = h("div", { class: "tside right" });
-  if (grade) right.append(h("span", { class: "badge" }, (DUEL ? `⚔️ ${DUEL.i + 1}/${DUEL.list.length} · ` : "") + grade + ". Klasse"));
+  if (grade) right.append(h("span", { class: "badge" }, (DUEL ? `⚔️ ${DUEL.i + 1}/${DUEL.list.length} · ` : "") + gradeLabel(grade)));
   right.append(h("button", { class: "btn round ghost", title: "Ton an/aus", onclick: e => { S.muted = !S.muted; saveS(); e.currentTarget.textContent = S.muted ? "🔇" : "🔊"; if (!S.muted) sfx.tick(); else stopClip(); } }, S.muted ? "🔇" : "🔊"));
   right.append(h("button", { class: "btn round ghost", title: "Vollbild", onclick: toggleFS }, "⛶"));
   right.append(h("button", { class: "btn round ghost", title: "Spielmenü", onclick: () => settingsMenu() }, "⚙️"));
@@ -4185,28 +5367,36 @@ function topicSel(id, k) {
   return sel.length >= Math.min(g.topics.min, all.length) ? sel : all;
 }
 function topicsDialog(g) {
-  let k = curGrade || 1;
+  let k = okGrade(curGrade);
   const wrap = h("div", { class: "set topics" });
-  const draft = {}; [1, 2, 3, 4].forEach(x => draft[x] = new Set(topicSel(g.id, x)));
+  const draft = {}; gradeList().forEach(x => draft[x] = new Set(topicSel(g.id, x)));
   function draw() {
     const list = g.topics.list(k), set = draft[k], min = Math.min(g.topics.min, list.length), ok = set.size >= min;
     wrap.replaceChildren(
       h("div", { class: "sethead" }, h("h3", null, "🏷️ Themen: " + g.t), h("button", { class: "rx", "aria-label": "Schließen", onclick: closeOverlay }, "✕")),
-      h("div", { class: "kpills" }, [1, 2, 3, 4].map(x => h("button", { class: "kp" + (x === k ? " on" : ""), onclick: () => { k = x; draw(); } }, x + ". Klasse"))),
+      h("div", { class: "kpills" }, gradeList().map(x => h("button", { class: "kp" + (x === k ? " on" : ""), onclick: () => { k = x; draw(); } }, gradeLabel(x)))),
       h("div", { class: "need" + (ok ? "" : " bad") }, `Für dieses Spiel brauchst du mindestens ${min} ${min === 1 ? "Thema" : "Themen"}.`, h("b", null, ` Ausgewählt: ${set.size} von ${list.length}`)),
       h("div", { class: "tchecks" }, list.map((name, i) => h("label", { class: "tcheck" + (set.has(i) ? " on" : "") },
         h("input", { type: "checkbox", id: `topic-${g.id}-${k}-${i}`, checked: set.has(i), onchange: e => { e.target.checked ? set.add(i) : set.delete(i); draw(); } }), h("span", null, name)))),
       h("div", { class: "row" },
         h("button", { class: "btn ghost small", onclick: () => { list.forEach((_, i) => set.add(i)); draw(); } }, "Alle"),
         h("button", { class: "btn ghost small", onclick: () => { set.clear(); draw(); } }, "Keine"),
-        h("button", { class: "btn green", disabled: [1, 2, 3, 4].some(x => draft[x].size < Math.min(g.topics.min, g.topics.list(x).length)), onclick: () => {
-          const all = store.get("qb_topics", {}); all[g.id] = {}; [1, 2, 3, 4].forEach(x => all[g.id][x] = [...draft[x]].sort((a, b) => a - b));
+        h("button", { class: "btn green", disabled: gradeList().some(x => draft[x].size < Math.min(g.topics.min, g.topics.list(x).length)), onclick: () => {
+          // nur die Stufen dieses Bereichs speichern – die Auswahl des anderen Bereichs bleibt erhalten
+          const all = store.get("qb_topics", {}); all[g.id] = all[g.id] || {}; gradeList().forEach(x => all[g.id][x] = [...draft[x]].sort((a, b) => a - b));
           store.set("qb_topics", all); closeOverlay(); sfx.soft(520);
         } }, "✓ Speichern")));
   }
   draw(); openOverlay(wrap, closeOverlay);
 }
 
+/* Klassenstufen: Grundschule 1–4, weiterführende Schule als Doppelstufen 5/6, 7/8, 9/10 (intern 5, 7, 9) */
+const gradeList = () => curArea === "wf" ? [5, 7, 9] : [1, 2, 3, 4];
+const gradeLabel = k => k >= 5 ? `Klasse ${k}/${k + 1}` : `${k}. Klasse`;
+const okGrade = k => gradeList().includes(k) ? k : gradeList()[0];
+/* Im Bereich 5–10 nicht von „Kindern“ sprechen */
+const sekWords = s => curArea !== "wf" ? s : String(s).replace(/\bJedes Kind\b/g, "Jede Person").replace(/\bjedes Kind\b/g, "jede Person").replace(/\bein Kind\b/g, "eine Person")
+  .replace(/\bKindern\b/g, "Spielern").replace(/\bKinder\b/g, "Spieler").replace(/\bKind\b/g, "Person");
 function startGame(g, k) {
   ac();
   curGrade = k;
@@ -4244,16 +5434,59 @@ function landing() {
     legalFooter());
   show(view, "", 0); hideScore();
 }
+/* ---------- Weiterführende Schule (Klasse 5–10): hinter einer PIN, solange der Bereich im Aufbau ist ----------
+   Kein echter Schutz (die Seite ist öffentlich), hält aber Neugierige fern. Die PIN wird bei jedem Öffnen abgefragt. */
+let sekUnlocked = false;
+const SEK_PIN = "4c425d5b"; // vkey("qb-sek:" + PIN)
+const SEK_IDS = ["jeopardy", "abc", "wf", "hoehe", "mauer", "reihe", "zuordnen", "duell", "reaktion", "bombe"];
+const SEK_LOOK = { jeopardy: ["#2563eb", "#1e3a8a"], abc: ["#d97706", "#92400e"], wf: ["#059669", "#065f46"], hoehe: ["#0284c7", "#0c4a6e"], mauer: ["#16a34a", "#14532d"],
+  reihe: ["#7c3aed", "#3b0764"], zuordnen: ["#0d9488", "#134e4a"], duell: ["#dc2626", "#7f1d1d"], reaktion: ["#db2777", "#701a75"], bombe: ["#475569", "#0f172a"] };
+const SEK_RULE1 = { reaktion: "Zwei Spieler stehen nebeneinander an der Tafel – jeder hat seine eigene Hälfte." }; // ersetzt die erste Regel
+const SEK_DESC = { reaktion: "Zwei Spieler, ein geteiltes Board – wer tippt zuerst richtig?", wf: "Stimmt die Aussage? Links wahr, rechts falsch.", hoehe: "Mehr oder weniger? Baut die längste Kette!" };
 function wfHome() {
   curArea = "wf";
-  const note = h("div", { class: "wfnote" });
-  const view = h("div", { class: "home wfpage" }, makeLogo("Weiterführende Schule"),
-    h("div", { class: "wfcard" }, h("div", { class: "wfico" }, "🚧"), h("h2", null, "Wird gerade gebaut"),
-      h("p", null, "Für die Klassen 5 bis 10 entstehen gerade eigene Spiele und Fragen. Schau bald wieder vorbei!"),
-      h("div", { class: "kpills" }, [5, 6, 7, 8, 9, 10].map(k => h("button", { class: "kp", onclick: () => {
-        note.textContent = `Klasse ${k}: kommt bald! 🛠️`; note.classList.remove("pop"); void note.offsetWidth; note.classList.add("pop"); sfx.soft(); } }, k + ". Klasse"))),
-      note,
-      h("button", { class: "btn ghost", onclick: () => { store.set("qb_area", null); home(); } }, "⇄ Anderen Bereich wählen")),
+  if (!sekUnlocked) return sekPin();
+  const wrap = h("div", { class: "home sekhome" }, makeLogo("Klasse 5–10 · Such dir ein Spiel aus"));
+  const cards = ids => h("div", { class: "games" }, ids.map(id => {
+    const g = GAMES.find(x => x.id === id), [c1, c2] = SEK_LOOK[id];
+    const card = h("div", { class: "game", style: `--c1:${c1};--c2:${c2}` },
+      h("div", { class: "cbtns" },
+        g.topics ? h("button", { class: "qbtn", title: "Themen auswählen", "aria-label": "Themen auswählen", onclick: e => { e.stopPropagation(); topicsDialog(g); } }, "🏷️") : null,
+        h("button", { class: "qbtn", title: "Spielregeln", "aria-label": "Spielregeln", onclick: e => { e.stopPropagation(); showRules(Object.assign({}, g, { c1, c2, rules: (SEK_RULE1[id] ? [SEK_RULE1[id], ...g.rules.slice(1)] : g.rules).map(sekWords) }), card); } }, "?")),
+      h("div", { class: "ico" }, g.ico), h("h2", null, g.t), h("p", null, SEK_DESC[id] || g.d),
+      h("div", { class: "klassen sekk" }, [5, 7, 9].map(k => h("button", { onclick: () => startGame(g, k) }, `${k}/${k + 1}`))));
+    return card;
+  }));
+  const sec = (title, sub) => h("div", { class: "sec" }, title, h("small", null, sub));
+  wrap.append(sec("📋 Am Board", "Alle spielen mit – vorne am Board oder per Zuruf."), cards(["jeopardy", "abc", "wf", "hoehe", "mauer", "reihe", "zuordnen"]),
+    h("div", { class: "sekrow" },
+      h("div", null, sec("🎤 Du moderierst", "Team gegen Team."), cards(["duell"])),
+      h("div", null, sec("⚔️ 1 gegen 1", "Zwei treten gegeneinander an."), cards(["reaktion", "bombe"]))),
+    legalFooter());
+  show(wrap, "", 0);
+}
+function sekPin() {
+  let code = "";
+  const dots = h("div", { class: "pindots" });
+  const msg = h("div", { class: "pinmsg" }, "Dieser Bereich ist noch im Aufbau.");
+  const draw = () => dots.replaceChildren(...[0, 1, 2, 3].map(i => h("span", { class: i < code.length ? "on" : "" })));
+  const press = d => {
+    if (code.length >= 4) return;
+    code += d; sfx.tick(); draw();
+    if (code.length === 4) setTimeout(() => {
+      if (vkey("qb-sek:" + code) === SEK_PIN) { sekUnlocked = true; sfx.ok(); removeEventListener("keydown", onKey); wfHome(); return; }
+      sfx.bad(); msg.textContent = "Falsche PIN – bitte noch einmal."; dots.classList.remove("shake"); void dots.offsetWidth; dots.classList.add("shake"); code = ""; draw();
+    }, 180);
+  };
+  const back = () => { if (code) { code = code.slice(0, -1); draw(); } };
+  const onKey = e => { if (!document.querySelector(".pinpad")) return removeEventListener("keydown", onKey); if (/^[0-9]$/.test(e.key)) press(e.key); else if (e.key === "Backspace") back(); };
+  addEventListener("keydown", onKey);
+  draw();
+  const view = h("div", { class: "home wfpage" }, makeLogo("Weiterführende Schule · Klasse 5–10"),
+    h("div", { class: "wfcard pincard" }, h("div", { class: "wfico" }, "🔒"), h("h2", null, "PIN eingeben"), msg, dots,
+      h("div", { class: "pinpad" }, ["1", "2", "3", "4", "5", "6", "7", "8", "9", "⌫", "0", ""].map(d => d === "" ? h("span") :
+        h("button", { class: "pinkey", "aria-label": d === "⌫" ? "Löschen" : d, onclick: () => d === "⌫" ? back() : press(d) }, d))),
+      h("button", { class: "btn ghost", onclick: () => { removeEventListener("keydown", onKey); store.set("qb_area", null); home(); } }, "⇄ Anderen Bereich wählen")),
     legalFooter());
   show(view, "", 0); hideScore();
 }
@@ -4383,8 +5616,8 @@ function bigCountdown(sec = 10) {
    Duell-Modus: Einstellungen → Glücksrad → Spiel (Kurzrunde) → Glücksrad …
    ===================================================================== */
 function duelSetup() {
-  const elig = GAMES.filter(g => g.duel);
-  let k = curGrade || 1, mode = store.get("qb_duel_mode", "rand"), n = store.get("qb_duel_n", 5);
+  const elig = GAMES.filter(g => g.duel && (curArea !== "wf" || SEK_IDS.includes(g.id)));
+  let k = okGrade(curGrade), mode = store.get("qb_duel_mode", "rand"), n = store.get("qb_duel_n", 5);
   const pick = new Set(store.get("qb_duel_pick", elig.map(g => g.id)).filter(id => elig.some(g => g.id === id)));
   const view = h("div", { class: "lwrap duelset" });
   function start() {
@@ -4398,7 +5631,7 @@ function duelSetup() {
   }
   function draw() {
     view.replaceChildren(
-      h("div", { class: "kpills" }, [1, 2, 3, 4].map(x => h("button", { class: "kp" + (x === k ? " on" : ""), onclick: () => { k = x; draw(); } }, x + ". Klasse"))),
+      h("div", { class: "kpills" }, gradeList().map(x => h("button", { class: "kp" + (x === k ? " on" : ""), onclick: () => { k = x; draw(); } }, gradeLabel(x)))),
       h("div", { class: "modes" },
         h("button", { class: "mode" + (mode === "rand" ? " on" : ""), onclick: () => { mode = "rand"; draw(); } }, h("b", null, "🎲 Zufall"), h("small", null, "Das Glücksrad zieht die Spiele.")),
         h("button", { class: "mode" + (mode === "pick" ? " on" : ""), onclick: () => { mode = "pick"; draw(); } }, h("b", null, "✋ Selbst auswählen"), h("small", null, "Deine Spiele – in zufälliger Reihenfolge."))),
@@ -4427,10 +5660,10 @@ function teamSplit() {
       h("div", { class: "hintline" }, "Diese Teams werden aufgefüllt:"),
       h("div", { class: "splitteams" }, teams.map((t, i) => h("span", { class: "splitchip", style: "--c:" + COLORS[i] }, t.name))),
       h("button", { class: "btn ghost small", onclick: () => settingsMenu(() => setup()) }, "⚙️ Teams ändern"),
-      h("div", { class: "stepper" }, h("span", null, "Wie viele Kinder?"),
+      h("div", { class: "stepper" }, h("span", null, sekWords("Wie viele Kinder?")),
         h("button", { class: "btn ghost round", onclick: () => step(-1) }, "−"), inp,
         h("button", { class: "btn ghost round", onclick: () => step(1) }, "+")),
-      h("div", { class: "hintline" }, "Jedes Kind kommt nach vorne und tippt einmal auf die Tafel. Die Teams werden gleich groß."),
+      h("div", { class: "hintline" }, sekWords("Jedes Kind kommt nach vorne und tippt einmal auf die Tafel. Die Teams werden gleich groß.")),
       h("button", { class: "btn green big", onclick: () => { n = Math.max(teams.length, Math.min(60, parseInt(inp.value, 10) || n)); store.set("qb_split_n", n); play(); } }, "▶ Los geht’s"));
   }
   function play() {
@@ -4448,7 +5681,7 @@ function teamSplit() {
     const tally = h("div", { class: "splittally" });
     const undo = h("button", { class: "btn ghost small", onclick: () => { if (busy || !done.length) return; bag.unshift(done.pop()); sfx.soft(330); idle(); paint(); } }, "↶ Rückgängig");
     function paint() {
-      count.textContent = done.length < n ? `Kind ${done.length + 1} von ${n}` : `Alle ${n} Kinder eingeteilt`;
+      count.textContent = sekWords(done.length < n ? `Kind ${done.length + 1} von ${n}` : `Alle ${n} Kinder eingeteilt`);
       undo.disabled = !done.length;
       tally.replaceChildren(...names.map((nm, i) => {
         const k = done.filter(x => x === i).length;
@@ -8101,7 +9334,7 @@ function jeopardy(g) {
       h("button", { class: "qx", title: "Schließen (Frage bleibt offen)", "aria-label": "Schließen", onclick: closeOverlay }, "✕"),
       h("div", { class: "meta" }, data[ci].cat + "  •  " + pts + (pts === 1 ? " Punkt" : " Punkte") + (nr ? "  •  Nr. " + nr : "  •  🎲 Zufallsaufgabe")),
       h("div", { class: "big" }, q),
-      h("div", { class: "row" }, h("button", { class: "btn ghost", onclick: () => speak(q) }, "🔊 Vorlesen"), showBtn),
+      h("div", { class: "row" }, h("button", { class: "btn ghost readbtn", onclick: () => speak(q) }, "🔊 Vorlesen"), showBtn),
       ansBox, award);
     sfx.tick(); openOverlay(box);
     if (S.autoRead) setTimeout(() => speak(q), 300);
@@ -8217,7 +9450,7 @@ function lauf(g, kind) {
     function setCtrl(phase) {
       ctrl.replaceChildren();
       if (phase === "q") ctrl.append(
-        h("button", { class: "btn ghost", onclick: () => speakSeq(abc ? [q, ...opts.flatMap((o, i) => [NUMWORDS[i], o])] : [q]) }, "🔊 Vorlesen"),
+        h("button", { class: "btn ghost readbtn", onclick: () => speakSeq(abc ? [q, ...opts.flatMap((o, i) => [NUMWORDS[i], o])] : [q]) }, "🔊 Vorlesen"),
         h("button", { class: "btn ghost", onclick: () => setSecs(-5) }, "⏱ −5"), h("button", { class: "btn ghost", onclick: () => setSecs(5) }, "⏱ +5"),
         h("button", { class: "btn green", onclick: start }, "▶ Los geht’s!"));
       if (phase === "run") ctrl.append(h("button", { class: "btn pink", onclick: halt }, "⏹ Jetzt stoppen"));
@@ -8612,7 +9845,7 @@ function duell(g) {
       award.replaceChildren(h("div", { class: "hintline" }, "Tipp: Nennt das Klau-Team eine richtige Antwort, tippe zuerst ihr Feld an."));
     }
     upd();
-    ctrl.append(h("button", { class: "btn pink", onclick: strike }, "✗ Falsch"), h("button", { class: "btn ghost", onclick: () => speak(q) }, "🔊 Vorlesen"));
+    ctrl.append(h("button", { class: "btn pink", onclick: strike }, "✗ Falsch"), h("button", { class: "btn ghost readbtn", onclick: () => speak(q) }, "🔊 Vorlesen"));
     award.append(h("button", { class: "btn tbtn", style: "--c:" + COLORS[A], onclick: () => give(A) }, "💰 Topf → " + teams[A].name));
     view.replaceChildren(
       h("div", { class: "vinfo" }, h("span", { class: "pill" }, "Frage " + (idx + 1) + " / " + pool.length), nrPill(nr), turnEl, potEl, strikeEl),
@@ -8623,14 +9856,16 @@ function duell(g) {
 /* ---------- Reaktions-Duell (geteiltes Board) ---------- */
 function makeTask(g) {
   const n = g <= 2 ? 6 : 9, r = (a, b) => a + rnd(b - a + 1);
-  const types = g === 1 ? ["num", "emoji", "letter", "math"] : g === 2 ? ["num", "emoji", "math", "max", "letter"] : ["num", "emoji", "math", "max"];
+  const types = g === 1 ? ["num", "emoji", "letter", "math"] : g === 2 ? ["num", "emoji", "math", "max", "letter"] : g >= 5 ? ["num", "math", "max", "math"] : ["num", "emoji", "math", "max"];
+  /* Zahlenbereich: Grundschule bis 10/20/100/1000, weiterführende Schule größere und (ab 7/8) negative Zahlen */
+  const lo = g === 7 ? -99 : g === 9 ? -999 : 1, top = g <= 4 ? [10, 20, 100, 1000][g - 1] : g === 5 ? 9999 : g === 7 ? 99 : 999;
   const t = types[rnd(types.length)];
   const fill = (first, gen) => { const s = new Set([first]); let guard = 0; while (s.size < n && guard++ < 500) s.add(gen()); return [...s]; };
-  if (t === "num") { const top = [10, 20, 100, 1000][g - 1], x = String(r(1, top)); return { prompt: "Tippe auf die Zahl " + x + "!", opts: fill(x, () => String(r(1, top))), correct: x }; }
+  if (t === "num") { const x = String(g >= 5 ? r(g === 5 ? 1000 : 10000, g === 5 ? 9999 : 99999) : r(1, top)); return { prompt: "Tippe auf die Zahl " + x + "!", opts: fill(x, () => String(g >= 5 ? (x.slice(0, -2) + String(r(0, 99)).padStart(2, "0")) : r(1, top))), correct: x }; }
   if (t === "emoji") { const e = shuffle(WIMMEL).slice(0, n); return { prompt: "Tippe auf:", big: e[0], opts: e, correct: e[0] }; }
   if (t === "letter") { const L = "ABDEFGHIKLMNOPRSTUWZ", x = L[rnd(L.length)]; return { prompt: "Tippe auf den Buchstaben " + x + "!", opts: fill(x, () => L[rnd(L.length)]), correct: x }; }
-  if (t === "max") { const top = [10, 20, 100, 1000][g - 1]; const o = fill(String(r(1, top)), () => String(r(1, top))); const m = String(Math.max(...o.map(Number))); return { prompt: "Tippe auf die größte Zahl!", opts: o, correct: m }; }
-  const [q, a] = blitzMath(g); return { prompt: "Rechne: " + q.replace(" = ?", ""), opts: fill(a, () => String(Math.max(0, +a + r(-9, 9)))), correct: a };
+  if (t === "max") { const o = fill(String(r(lo, top)), () => String(r(lo, top))); const m = String(Math.max(...o.map(Number))); return { prompt: "Tippe auf die größte Zahl!", opts: o, correct: m }; }
+  const [q, a] = blitzMath(g); return { prompt: "Rechne: " + q.replace(" = ?", ""), opts: fill(a, () => String(g >= 5 ? +a + r(-9, 9) : Math.max(0, +a + r(-9, 9)))), correct: a };
 }
 function reaktion(g, opts = {}) {
   if (teams.length < 2) { needTwo(); return; }
@@ -8645,7 +9880,7 @@ function reaktion(g, opts = {}) {
   view.replaceChildren(
     h("div", { class: "rtally" }, h("span", { style: "color:" + COLORS[P[0]] }, teams[P[0]].name), h("b", null, "gegen"), h("span", { style: "color:" + COLORS[P[1]] }, teams[P[1]].name),
       h("small", null, (tb ? "⚔️ Stechen · " : "") + "Wer zuerst " + target + " Runden gewinnt")),
-    h("div", { class: "rprompt" }, "Bereit? Je ein Kind pro Seite an die Tafel!"),
+    h("div", { class: "rprompt" }, curArea === "wf" ? "Bereit? Je eine Person pro Seite an die Tafel!" : "Bereit? Je ein Kind pro Seite an die Tafel!"),
     h("div", { class: "rsides" }, P.map((ti, s) => [s ? h("div", { class: "rmid" }, "⚡") : null,
       h("div", { class: "rside", style: "--c:" + COLORS[ti] }, h("div", { class: "rname" }, teams[ti].name), h("div", { class: "rready" }, s ? "👉" : "👈"))])),
     h("div", { class: "row" }, h("button", { class: "btn green big rstart", onclick: () => { sfx.tada(); next(); } }, "▶ Start")));
@@ -8815,7 +10050,7 @@ function maske(g) {
         award.replaceChildren(awardRow(p, () => { nextTeam(); award.replaceChildren(h("button", { class: "btn green", onclick: next }, idx + 1 >= pool.length ? "🏁 Fertig" : "➡ Nächste Maske")); }));
       }, 1800));
     }
-    ctrl.append(moreBtn, h("button", { class: "btn ghost", onclick: () => { const last = list.lastElementChild; if (last) speak(last.lastChild.textContent); } }, "🔊 Vorlesen"), h("button", { class: "btn gold", onclick: unmask }, "🎭 Demaskieren!"));
+    ctrl.append(moreBtn, h("button", { class: "btn ghost readbtn", onclick: () => { const last = list.lastElementChild; if (last) speak(last.lastChild.textContent); } }, "🔊 Vorlesen"), h("button", { class: "btn gold", onclick: unmask }, "🎭 Demaskieren!"));
     view.replaceChildren(
       h("div", { class: "vinfo" }, h("span", { class: "pill" }, "Maske " + (idx + 1) + " / " + pool.length), nrPill(nr), star),
       h("div", { class: "mrow" }, stage, list), nameBox, ctrl, award);
