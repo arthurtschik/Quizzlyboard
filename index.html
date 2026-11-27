@@ -5454,7 +5454,8 @@ function wfHome() {
         g.topics ? h("button", { class: "qbtn", title: "Themen auswählen", "aria-label": "Themen auswählen", onclick: e => { e.stopPropagation(); topicsDialog(g); } }, "🏷️") : null,
         h("button", { class: "qbtn", title: "Spielregeln", "aria-label": "Spielregeln", onclick: e => { e.stopPropagation(); showRules(Object.assign({}, g, { c1, c2, rules: (SEK_RULE1[id] ? [SEK_RULE1[id], ...g.rules.slice(1)] : g.rules).map(sekWords) }), card); } }, "?")),
       h("div", { class: "ico" }, g.ico), h("h2", null, g.t), h("p", null, SEK_DESC[id] || g.d),
-      h("div", { class: "klassen sekk" }, [5, 7, 9].map(k => h("button", { onclick: () => startGame(g, k) }, `${k}/${k + 1}`))));
+      h("div", { class: "klassen sekk" }, [5, 7, 9].map(k => h("button", { onclick: () => startGame(g, k) }, `${k}/${k + 1}`))),
+      TUTS[id] ? h("button", { class: "tutbtn", onclick: () => tutorial(Object.assign({}, g, { c1, c2 })) }, "🎬 Tutorial") : null);
     return card;
   }));
   const sec = (title, sub) => h("div", { class: "sec" }, title, h("small", null, sub));
@@ -6090,6 +6091,13 @@ function swapLetters(a, b) {
      { el: Selektor oder Funktion → Element, say: Text, act: Aktion (z. B. tippen), wait: ms }
    ===================================================================== */
 const sleep = ms => new Promise(r => setTimeout(r, ms));
+/* Bereich Klasse 5–10: Tutorial mit Stufe 5/6, ohne Vorlesen, mit angepassten Texten */
+const tutGrade = () => curArea === "wf" ? 5 : 1;
+const SEK_SAY = {
+  "Die Frage erscheint groß. Mit dem Lautsprecher-Knopf wird sie vorgelesen.": "Die Frage erscheint groß. Lest sie gemeinsam.",
+  "Zwei Kinder stehen an der Tafel. Jedes hat seine eigene Hälfte.": "Zwei Spieler stehen an der Tafel. Jeder hat seine eigene Hälfte."
+};
+const tutSay = t => t == null || curArea !== "wf" ? t : sekWords(SEK_SAY[t] || t);
 function until(fn, ms = 6000) {
   return new Promise(res => {
     const t0 = Date.now();
@@ -6142,7 +6150,8 @@ function sayAsync(text) {
         safety = setTimeout(fin, 6000 + text.length * 120); // falls „onend“ ausbleibt (bekannter Browser-Fehler)
       } catch (e) { safety = setTimeout(fin, 1800 + text.length * 60); }
     };
-    if (S.muted) { safety = setTimeout(fin, 1800 + text.length * 55); return; }
+    // stumm oder Bereich 5–10 (kein Vorlesen): so lange stehen lassen, wie man zum Lesen braucht
+    if (S.muted || curArea === "wf") { safety = setTimeout(fin, (curArea === "wf" ? 2200 : 1800) + text.length * 55); return; }
     stopNarration();
     if (!hasVoice(text)) return browserVoice();
     // Livia-Aufnahme: Das Sicherheitsnetz startet erst, wenn die Aufnahme wirklich läuft –
@@ -6289,7 +6298,7 @@ async function tutorial(g) {
     if (newTarget) { const t0 = Date.now(); while (placedFor !== target && Date.now() - t0 < 900 && !TUT.stop) await sleep(40); }
     else await sleep(250);
     setCapPos(newTarget && cap.dataset.want ? cap.dataset.want : "atbottom");
-    if (text != null) { txt.textContent = text; if (count != null) cnt.textContent = count; }
+    if (text != null) { txt.textContent = tutSay(text); if (count != null) cnt.textContent = count; }
     cap.classList.remove("fade");
   }
   async function moveFinger(el) {
@@ -6304,7 +6313,7 @@ async function tutorial(g) {
   TUT.debug = () => ({ target, placedFor, covered, spec, fresh: spec ? pick(spec) : null }); // für automatische Tests
   try {
     preloadNarration(script.steps[0].say);
-    (script.start || (() => startGame(g, 1)))();
+    (script.start || (() => startGame(g, tutGrade())))();
     await sleep(500);
     const steps = script.steps;
     for (let i = 0; i < steps.length && !TUT.stop; i++) {
@@ -6442,7 +6451,7 @@ const TUTS = {
     { el: ".sheet.steal", say: "Dann bekommt das andere Team eine Klau-Chance. Es darf sich kurz beraten und genau eine Antwort nennen.", act: () => byText(".sheet.steal .btn", "Verstanden").click(), wait: 400 },
     { el: () => byText(".lwrap .btn", "Nicht geklaut"), say: "Stimmt die Antwort, gehört ihm der ganze Topf. Sonst bekommt das erste Team den Topf.", act: tap, wait: 900 },
     { el: "#score", say: "Bei der nächsten Frage ist automatisch das nächste Team dran." }] },
-  reaktion: { start: () => reaktion(1, { pair: [0, 1] }), steps: [
+  reaktion: { start: () => reaktion(tutGrade(), { pair: [0, 1] }), steps: [
     { el: ".rsides", say: "Zwei Kinder stehen an der Tafel. Jedes hat seine eigene Hälfte." },
     { el: ".rstart", say: "Sind beide bereit, geht es mit Start los.", act: tap, wait: 400 },
     { el: ".rprompt", say: "Oben erscheint die Aufgabe." },
@@ -6450,7 +6459,7 @@ const TUTS = {
     { el: ".rxwrap .pill.turn", say: "Der Punkt geht automatisch an das schnellere Team." },
     { el: ".rnext", say: "Stehen die nächsten zwei Kinder bereit, geht es mit Nächste Runde weiter." },
     { el: ".rtally", say: "Wer zuerst drei Runden gewinnt, hat das Duell gewonnen." }] },
-  bombe: { start: () => bombe(1, { pair: [0, 1] }), steps: [
+  bombe: { start: () => bombe(tutGrade(), { pair: [0, 1] }), steps: [
     { el: ".timerow", say: "Zuerst stellst du ein, wie viel Zeit jedes Team hat." },
     { el: () => byText(".sheet .btn", "Münze werfen"), say: "Dann entscheidet eine Münze, wer anfängt.", act: tap, wait: 2600 },
     { el: () => byText(".sheet .btn", "Uhr starten"), say: "Und los geht's!", act: tap, wait: 300 },
