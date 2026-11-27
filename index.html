@@ -925,18 +925,18 @@ body.sek .game h2{font-weight:900}
 .sekrow{display:grid;grid-template-columns:1fr 2fr;gap:0 14px;max-width:1400px;margin:0 auto;width:100%}
 .sekrow .games{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
 @media (max-width:860px){.sekrow{grid-template-columns:1fr}}
-/* PIN */
-.pincard{max-width:420px}
-.pinmsg{opacity:.85;text-align:center;min-height:1.4em}
-.pindots{display:flex;gap:16px;justify-content:center;margin:6px 0}
-.pindots span{width:18px;height:18px;border-radius:50%;border:2px solid #cbd5e1;transition:background .15s}
-.pindots span.on{background:#38bdf8;border-color:#38bdf8}
-.pinpad{display:grid;grid-template-columns:repeat(3,72px);gap:12px;justify-content:center}
-.pinkey{height:64px;border-radius:16px;background:rgba(255,255,255,.12);font-family:var(--display);font-weight:800;font-size:28px;box-shadow:0 4px 0 rgba(0,0,0,.3)}
-.pinkey:active{transform:translateY(3px);box-shadow:none}
 body.sek .readbtn{display:none}
 /* Wortsalat Klasse 5–10: Text-Hinweis statt Bild */
 .wspic .pictxt{display:block;font-family:var(--display);font-size:clamp(20px,3.8vmin,40px);font-weight:800;line-height:1.25;max-width:min(900px,94vw);margin:0 auto;padding:10px 22px;background:rgba(255,255,255,.08);border:2px solid rgba(255,255,255,.18);border-radius:16px;text-align:center}
+/* Spickzettel: zwei Reihen Klassenstufen (Grundschule / Klasse 5–10) */
+.spk{display:flex;flex-direction:column;gap:6px;align-items:center}
+.spk .kpills{flex-wrap:wrap;justify-content:center;align-items:center}
+.spklab{font-weight:800;opacity:.7;margin-right:4px;min-width:6.5em;text-align:right}
+.spk .kpills{margin:0}
+@media (max-width:520px){.spklab{min-width:0;width:100%;text-align:center;margin:0}.spk .kpills{gap:5px}.spk .kp{padding:6px 10px;font-size:14px}}
+.mctrl{display:flex;flex-direction:column;gap:10px;align-items:center}
+.mctrl .row{flex-wrap:nowrap}
+@media (max-width:520px){.mctrl .row{flex-wrap:wrap}}
 
 </style>
 </head>
@@ -3735,7 +3735,7 @@ const sekWF = (k, t) => { WF[k] = sekLines(t).map(([w, q, e]) => [q, w === "W", 
 const sekBlitz = (k, t) => { BLITZ[k] = sekLines(t).map(([q, a]) => [q, a]); };                       // Frage | Antwort
 const sekDuell = (k, t) => { DUELL[k] = sekLines(t).map(([q, a]) => [q, a.split(";").map(x => { const m = x.trim().match(/^(.*?)\s+(\d+)$/); return [m[1], +m[2]]; })]); }; // Frage | Antwort 30; Antwort 25 …
 const sekReih = (k, t) => { REIH[k] = sekLines(t).map(([q, a]) => [q, a.split(">").map(x => x.trim())]); };   // Titel | erstes > zweites > …
-const sekZuord = (k, t) => { ZUORD[k] = sekLines(t).map(([q, g, it]) => [q, g.split("/").map(x => x.trim()), it.split(";").map(x => { const [n, i] = x.split("="); return [n.trim(), +i - 1]; })]); }; // Titel | Gruppe 1 / Gruppe 2 | Begriff=1; Begriff=2 …
+const sekZuord = (k, t) => { ZUORD[k] = sekLines(t).map(([q, g, it]) => [q, g.split("/").map(x => x.trim()), it.split(";").map(x => { const p = x.lastIndexOf("="); return [x.slice(0, p).trim(), +x.slice(p + 1) - 1]; })]); }; // Titel | Gruppe 1 / Gruppe 2 | Begriff=1; Begriff=2 …
 
 /* ---------------- Klasse 5/6 ---------------- */
 sekQuiz(5, [
@@ -5078,6 +5078,2282 @@ HYPOTENUSE | Längste Seite im rechtwinkligen Dreieck
 `);
 
 /* =====================================================================
+   AUSBAU (27.11.): mehr Inhalte, damit 5–10 ungefähr so viele Fragen hat wie die Grundschule.
+   Alles wird HINTEN angehängt – bestehende Nummern bleiben gleich.
+   ===================================================================== */
+/* Wissens-Quiz: weitere Fragen „Stufe | Frage | Antwort“ für eine Kategorie (Schlüssel ohne Emoji, z. B. "Deutsch") */
+function sekQuizMore(k, key, text) {
+  const lv = QUIZ_MORE[k][key]; if (!lv) throw new Error("Kategorie fehlt: " + k + " " + key);
+  sekLines(text).forEach(([p, q, a]) => lv[+p - 1].push([q, a]));
+}
+const sekAdd = (obj, k, list) => { obj[k].push(...list); };
+const sekABCMore = (k, t) => sekAdd(ABC, k, sekLines(t).map(([q, ...o]) => [q, o]));
+const sekWFMore = (k, t) => sekAdd(WF, k, sekLines(t).map(([w, q, e]) => [q, w === "W", e]));
+const sekBlitzMore = (k, t) => sekAdd(BLITZ, k, sekLines(t).map(([q, a]) => [q, a]));
+const sekVerdMore = (k, t) => sekAdd(VERD, k, sekLines(t).map(([q, a]) => [q, a]));
+const sekWorteMore = (k, t) => sekAdd(WORTE, k, sekLines(t).map(([w, hint]) => [w.toUpperCase(), "txt:" + hint]));
+const sekDuellMore = (k, t) => sekAdd(DUELL, k, sekLines(t).map(([q, a]) => [q, a.split(";").map(x => { const m = x.trim().match(/^(.*?)\s+(\d+)$/); return [m[1], +m[2]]; })]));
+const sekReihMore = (k, t) => sekAdd(REIH, k, sekLines(t).map(([q, a]) => [q, a.split(">").map(x => x.trim())]));
+const sekZuordMore = (k, t) => sekAdd(ZUORD, k, sekLines(t).map(([q, g, it]) => [q, g.split("/").map(x => x.trim()), it.split(";").map(x => { const p = x.lastIndexOf("="); return [x.slice(0, p).trim(), +x.slice(p + 1) - 1]; })]));
+
+/* ---------------- Ausbau Klasse 5/6: Wissens-Quiz ---------------- */
+sekQuizMore(5, "Deutsch", `
+1 | Welche Wortart ist „Freundschaft“? | Nomen
+1 | Wie heißt die Mehrzahl von „Lexikon“? | Lexika (auch: Lexiken)
+1 | Was ist das Gegenteil von „mutig“? | ängstlich / feige
+1 | Welcher Artikel gehört zu „Mädchen“? | das
+1 | Schreibt man Verben groß oder klein? | Klein (außer am Satzanfang oder nominalisiert)
+2 | Wie heißt „ich sehe“ im Präteritum? | ich sah
+2 | Wie heißt „du läufst“ im Perfekt? | du bist gelaufen
+2 | Welcher Fall antwortet auf die Frage „Wessen?“ | Genitiv
+2 | Was ist ein Prädikat? | Das Verb im Satz (Satzaussage)
+2 | Was ist eine Wortfamilie? | Wörter mit demselben Wortstamm (z. B. fahren, Fahrer, Fahrt)
+3 | Was ist ein Märchen? Nenne ein typisches Merkmal! | Erfundene Geschichte, z. B. „Es war einmal“, Zauberei, Gut gegen Böse
+3 | Wie nennt man die Wörter „ich, du, er, sie, es“? | Personalpronomen
+3 | In welchem Fall steht „den Ball“ im Satz „Ich werfe den Ball“? | Im Akkusativ
+3 | Was ist eine Sage? | Eine Erzählung mit wahrem Kern, z. B. über Orte oder Helden
+3 | Wie steigert man „viel“? | viel – mehr – am meisten
+4 | Was ist eine Zeitangabe im Satz? | Ein Adverbial der Zeit (z. B. „morgen“)
+4 | Was ist ein Possessivpronomen? Beispiel! | Besitzanzeigendes Fürwort, z. B. „mein“, „dein“
+4 | Wie nennt man ein Gedicht mit Strophen und Reimen über Natur oder Gefühle? | Lyrik / Gedicht
+4 | Wer schrieb „Die Konferenz der Tiere“? | Erich Kästner
+4 | Was ist der Unterschied zwischen wörtlicher und indirekter Rede? | Wörtlich steht in Anführungszeichen, indirekt wird berichtet
+5 | Was ist ein Satzgefüge? | Hauptsatz und Nebensatz zusammen
+5 | Was ist eine Satzreihe? | Zwei oder mehr Hauptsätze verbunden
+5 | Welches Stilmittel ist „Der Wind flüstert“? | Personifikation
+5 | Was ist ein Steckbrief? | Kurze Beschreibung einer Person mit wichtigen Merkmalen
+5 | Wie heißt der Text, der Vorgänge Schritt für Schritt erklärt? | Vorgangsbeschreibung
+`);
+sekQuizMore(5, "Englisch", `
+1 | Was heißt „Katze“ auf Englisch? | cat
+1 | Was bedeutet „sister“? | Schwester
+1 | Was heißt „blau“ auf Englisch? | blue
+1 | Wie sagt man „Danke“ auf Englisch? | Thank you
+1 | Welcher Tag ist „Sunday“? | Sonntag
+2 | Was heißt „Hausaufgaben“ auf Englisch? | homework
+2 | Was heißt „Ich mag Pizza“? | I like pizza.
+2 | Welche Zahl ist „thirty“? | 30
+2 | Wie heißt die Mehrzahl von „box“? | boxes
+2 | Was bedeutet „kitchen“? | Küche
+3 | Ergänze: „Where ___ you from?“ | are
+3 | Wie heißt die Mehrzahl von „tooth“? | teeth
+3 | Was bedeutet „always“? | immer
+3 | Ergänze: „He ___ to school every day.“ (go) | goes
+3 | Was heißt „Wie spät ist es?“ | What time is it?
+4 | Wie heißt die Vergangenheit von „have“? | had
+4 | Wie heißt die Vergangenheit von „eat“? | ate
+4 | Ergänze: „Yesterday we ___ a film.“ (watch) | watched
+4 | Was ist das Gegenteil von „old“ bei Dingen? | new
+4 | Was bedeutet „sometimes“? | manchmal
+5 | Wie heißt die Vergangenheit von „make“? | made
+5 | Bilde eine Frage im simple past: „She played tennis.“ | Did she play tennis?
+5 | Ergänze: „There ___ two cats in the garden.“ | are
+5 | Was ist „the biggest“ für eine Steigerungsform? | Superlativ von „big“
+5 | Wie heißt „Ich gehe gerade zur Schule.“ auf Englisch? | I am going to school.
+`);
+sekQuizMore(5, "Biologie", `
+1 | Welche Tierklasse legt Eier mit harter Schale und hat Federn? | Vögel
+1 | Wie heißt der Teil der Pflanze, der Wasser aus dem Boden holt? | Wurzel
+1 | Wie heißt das Säugetier, das fliegen kann? | Fledermaus
+1 | Was atmen wir ein, was brauchen wir zum Leben? | Sauerstoff
+1 | Wie nennt man Tiere, die nur Pflanzen fressen? | Pflanzenfresser
+2 | Wie heißt das Gebiss eines Pflanzenfressers wie der Kuh? | Pflanzenfressergebiss (mit breiten Mahlzähnen)
+2 | Wie nennt man den Winterschlaf-ähnlichen Zustand von Eichhörnchen? | Winterruhe
+2 | Wie heißen die Atmungsorgane von Insekten? | Tracheen
+2 | Wie nennt man Tiere ohne Wirbelsäule? | Wirbellose
+2 | Was ist ein Haustier, das vom Wolf abstammt? | Der Hund
+3 | Welche Aufgabe hat das Skelett? | Stützen, schützen, Bewegung ermöglichen
+3 | Wie heißt die Verbindung zwischen zwei Knochen? | Gelenk
+3 | Wie nennt man die männlichen Teile der Blüte? | Staubblätter
+3 | Wie nennt man den weiblichen Teil der Blüte? | Stempel
+3 | Was transportieren die Adern? | Blut
+4 | Wie viele Halswirbel hat eine Giraffe? | Sieben (wie der Mensch)
+4 | Wie nennt man die Gruppe aus Insekten, Spinnen und Krebsen? | Gliederfüßer
+4 | Was ist Keimung? | Ein Samen beginnt zu wachsen
+4 | Wie heißen die Kriechtiere mit Fachwort? | Reptilien
+4 | Welche Aufgabe hat das Zwerchfell? | Es hilft beim Atmen
+5 | Was ist der Unterschied zwischen Bestäubung und Befruchtung? | Bestäubung: Pollen auf Narbe; Befruchtung: Verschmelzen von Ei- und Samenzelle
+5 | Wie nennt man die Verbreitung von Samen durch Tiere? | Tierverbreitung (Zoochorie)
+5 | Was ist ein Nahrungsnetz? | Mehrere verbundene Nahrungsketten
+5 | Was bedeutet „Angepasstheit“ bei Tieren? | Körperbau oder Verhalten passt zum Lebensraum
+5 | Welche Nährstoffe liefern vor allem Energie? | Kohlenhydrate und Fette
+`);
+sekQuizMore(5, "Erdkunde", `
+1 | Wie heißt die Hauptstadt von Österreich? | Wien
+1 | Auf welchem Kontinent liegt Brasilien? | Südamerika
+1 | Welche Himmelsrichtung liegt gegenüber von Norden? | Süden
+1 | Wie heißt der größte Kontinent? | Asien
+1 | Welches Meer liegt zwischen Europa und Afrika? | Das Mittelmeer
+2 | Wie heißt die Hauptstadt von Baden-Württemberg? | Stuttgart
+2 | Welcher Fluss fließt durch Berlin? | Die Spree
+2 | Wie nennt man eine Landfläche, die rundum von Wasser umgeben ist? | Insel
+2 | Wie heißt die größte Insel Deutschlands? | Rügen
+2 | Wie heißt die Hauptstadt von Hessen? | Wiesbaden
+3 | In welchem Gebirge liegt die Zugspitze? | In den Alpen (Wettersteingebirge)
+3 | Wie nennt man ein Gebiet, in dem Braunkohle abgebaut wird? | Tagebau
+3 | Welcher Fluss mündet bei Hamburg in die Nordsee? | Die Elbe
+3 | Wie heißt die Hauptstadt von Niedersachsen? | Hannover
+3 | Was ist ein Kompass? | Ein Gerät zum Bestimmen der Himmelsrichtung
+4 | Was zeigen die Höhenlinien auf einer Karte? | Punkte gleicher Höhe
+4 | Wie viele Nachbarländer hat Deutschland? | Neun
+4 | Welches Nachbarland Deutschlands ist am größten? | Frankreich
+4 | Was ist eine Legende auf einer Karte? | Die Zeichenerklärung
+4 | Wie heißt der Mittelgebirgszug im Südwesten Deutschlands mit Kuckucksuhren? | Schwarzwald
+5 | Wie nennt man die Gebiete mit vielen Städten und Industrie an Rhein und Ruhr? | Ballungsraum (Ruhrgebiet)
+5 | Warum gibt es Tag und Nacht? | Weil sich die Erde um sich selbst dreht
+5 | Warum gibt es Jahreszeiten? | Weil die Erdachse schräg steht, während die Erde um die Sonne kreist
+5 | Was ist der Unterschied zwischen Wetter und Klima? | Wetter: kurzfristig; Klima: Durchschnitt über viele Jahre
+5 | Wie heißt der Fluss mit dem Loreleyfelsen? | Der Rhein
+`);
+sekQuizMore(5, "Geschichte", `
+1 | Wie nennt man Forscher, die alte Funde ausgraben? | Archäologen
+1 | Wie hieß die Göttin der Weisheit bei den Griechen? | Athene
+1 | Wie nannten die Römer ihre Herrscher ab Augustus? | Kaiser
+1 | Wie heißt die berühmte, über 5000 Jahre alte Gletschermumie aus den Alpen? | Ötzi
+1 | Woraus bauten Steinzeitmenschen ihre Werkzeuge? | Aus Stein (Feuerstein), Knochen und Holz
+2 | Welche Stadt war das Zentrum der griechischen Demokratie? | Athen
+2 | Wie hieß der erste römische Kaiser? | Augustus
+2 | Wie nennt man die Bilder, die Steinzeitmenschen an Höhlenwände malten? | Höhlenmalereien
+2 | Welches Volk baute die Stadt Karthago? | Die Phönizier (Punier)
+2 | Wie hießen die Kämpfer, die in der Arena kämpften? | Gladiatoren
+3 | Wie hieß das Gericht der Totengötter in Ägypten, bei dem das Herz gewogen wurde? | Totengericht (Herz gegen Feder der Maat)
+3 | Wie nannte man im antiken Griechenland einen Stadtstaat? | Polis
+3 | Wer war Alexander der Große? | Makedonischer König, der ein Weltreich eroberte
+3 | Was war ein Aquädukt? | Eine Wasserleitung der Römer
+3 | Wann ging das Weströmische Reich unter? | 476 n. Chr.
+4 | Wie nennt man die Zeit der großen Völkerwanderung? | Völkerwanderung (ca. 375–568)
+4 | Wie hieß die Pfalz, in der Karl der Große oft lebte? | Aachen
+4 | Wie heißt die Schrift auf dem Stein von Rosette? | Hieroglyphen, Demotisch und Griechisch
+4 | Wie hießen die drei Stände im Mittelalter? | Geistliche, Adel, Bauern
+4 | Was war ein Lehen? | Land, das ein Herr gegen Treue und Dienste verlieh
+5 | Wer entzifferte die Hieroglyphen? | Jean-François Champollion
+5 | Wie nennt man die Handwerkervereinigungen im Mittelalter? | Zünfte
+5 | Was war die „Pest“ im Mittelalter? | Eine Seuche, die Millionen Menschen tötete
+5 | Wie nennt man die Orte, an denen ein mittelalterlicher König auf Reisen durchs Reich wohnte? | Pfalzen (Königspfalzen)
+5 | Wer war Hildegard von Bingen? | Äbtissin, Heilkundige und Gelehrte im Mittelalter
+`);
+sekQuizMore(5, "Naturwissenschaften", `
+1 | Was ist ein Thermometer? | Ein Messgerät für die Temperatur
+1 | Was braucht man, um einen Stromkreis zu schließen? | Stromquelle, Kabel und Verbraucher (z. B. Lampe)
+1 | Wie nennt man Wasser in fester Form? | Eis
+1 | Woraus besteht ein Schatten? | Aus einem Bereich, in den kein Licht fällt
+1 | Was macht ein Schalter im Stromkreis? | Er öffnet oder schließt den Stromkreis
+2 | Was ist eine Lupe? | Eine Sammellinse, die vergrößert
+2 | Welche Farbe entsteht, wenn alle Farben des Lichts zusammenkommen? | Weiß
+2 | Wie entsteht ein Echo? | Schall wird zurückgeworfen (reflektiert)
+2 | Was ist Kondenswasser? | Wasser, das sich aus Wasserdampf an kalten Flächen bildet
+2 | Warum fallen Dinge nach unten? | Wegen der Schwerkraft (Erdanziehung)
+3 | Was ist ein Gemisch? | Mehrere Stoffe, die vermischt, aber nicht verbunden sind
+3 | Wie kann man Sand und Wasser trennen? | Durch Filtrieren oder Absetzen lassen (Dekantieren)
+3 | Was ist Reibung? | Eine Kraft, die Bewegung bremst
+3 | Was ist eine Lichtquelle? Nenne zwei! | Etwas, das selbst leuchtet, z. B. Sonne, Lampe, Kerze
+3 | Wie breitet sich Licht aus? | Geradlinig
+4 | Was misst man mit einem Kraftmesser? | Kräfte in Newton
+4 | Warum ist ein Löffel nach dem Umrühren im heißen Tee warm? | Metall leitet Wärme gut
+4 | Was ist ein Elektromagnet? | Eine Spule mit Strom, die wie ein Magnet wirkt
+4 | Wie nennt man Stoffe, die Wärme schlecht leiten? | Wärmedämmstoffe (Isolatoren)
+4 | Was passiert mit den meisten Stoffen beim Erwärmen? | Sie dehnen sich aus
+5 | Warum sieht man den Blitz vor dem Donner? | Licht ist viel schneller als Schall
+5 | Was ist ein Kurzschluss? | Strom fließt ohne Verbraucher – gefährlich
+5 | Wie nennt man das Trennverfahren, bei dem gelöste Stoffe zurückbleiben, wenn Wasser verdunstet? | Eindampfen
+5 | Was ist der Unterschied zwischen Masse und Gewichtskraft? | Masse in kg ist überall gleich; Gewichtskraft (N) hängt von der Anziehung ab
+5 | Wie heißt die Einheit für die Energie? | Joule
+`);
+sekQuizMore(5, "Allgemeinwissen", `
+1 | Wie viele Tage hat der Februar in einem normalen Jahr? | 28
+1 | Welche Farbe hat die Flagge Japans in der Mitte? | Rot (roter Kreis auf Weiß)
+1 | Wie heißt die Hauptstadt von Italien? | Rom
+1 | Wie viele Sekunden hat eine Stunde? | 3600
+1 | Welches Instrument hat 88 Tasten? | Das Klavier
+2 | Wer schrieb „Pippi Langstrumpf“? | Astrid Lindgren
+2 | Wie heißt der größte Ozean? | Der Pazifik
+2 | Wie viele Spieler hat ein Basketballteam auf dem Feld? | Fünf
+2 | In welchem Land liegen die Pyramiden von Gizeh? | Ägypten
+2 | Wie heißt das schnellste Landtier? | Der Gepard
+3 | Wer erfand die Glühbirne (bekannt gemacht)? | Thomas Edison
+3 | Wie heißt die Hauptstadt von Spanien? | Madrid
+3 | Wie viele Saiten hat eine Gitarre normalerweise? | Sechs
+3 | Was ist ein Palindrom? Beispiel! | Ein Wort, das vorwärts und rückwärts gleich ist, z. B. „Anna“
+3 | Welches Land hat die Form eines Stiefels? | Italien
+4 | Wer malte die „Sonnenblumen“? | Vincent van Gogh
+4 | Wie heißt die Hauptstadt von Griechenland? | Athen
+4 | Wie viele Sterne hat die Flagge der USA? | 50
+4 | Welcher Vogel ist das Wappentier Deutschlands? | Der Adler
+4 | Wie heißt der Erfinder des Automobils (1886)? | Carl Benz
+5 | Welche Sprache spricht man in Brasilien? | Portugiesisch
+5 | Wie viele Zähne hat ein Milchgebiss? | 20
+5 | Wie heißt der Fluss, der durch Paris fließt? | Die Seine
+5 | Welches ist das kleinste Bundesland Deutschlands? | Bremen
+5 | Wer komponierte „Für Elise“? | Ludwig van Beethoven
+`);
+
+/* ---------------- Ausbau Klasse 5/6: übrige Spiele ---------------- */
+sekABCMore(5, `
+Wie heißt die Hauptstadt von Hessen? | Wiesbaden | Frankfurt | Kassel
+Welches Tier ist ein Säugetier? | Delfin | Hai | Pinguin
+Wie viele Grad hat ein gestreckter Winkel? | 180° | 90° | 360°
+Welches Wort ist ein Verb? | rennen | Rennen | rennend
+Was heißt „always“? | immer | manchmal | nie
+Welche Zahl ist durch 3 teilbar? | 57 | 52 | 64
+Wer war der erste römische Kaiser? | Augustus | Caesar | Nero
+Wie nennt man Wasser als Gas? | Wasserdampf | Nebel | Tau
+Wo liegt die Insel Rügen? | In der Ostsee | In der Nordsee | Im Bodensee
+Wer schrieb „Emil und die Detektive“? | Erich Kästner | Michael Ende | Otfried Preußler
+`);
+sekWFMore(5, `
+W | Die Giraffe hat sieben Halswirbel. | Genauso viele wie der Mensch.
+F | Pinguine leben am Nordpol. | Pinguine leben auf der Südhalbkugel.
+W | Insekten atmen durch Tracheen. | Feine Röhren durchziehen ihren Körper.
+F | Der Rhein mündet in die Ostsee. | Der Rhein mündet in die Nordsee.
+W | Wiesbaden ist die Hauptstadt von Hessen. | Frankfurt ist größer, aber nicht Hauptstadt.
+F | Deutschland hat sieben Nachbarländer. | Es sind neun.
+W | Augustus war der erste römische Kaiser. | Er regierte ab 27 v. Chr.
+F | Die Ritter lebten in der Steinzeit. | Ritter gab es im Mittelalter.
+W | Licht breitet sich geradlinig aus. | Deshalb entstehen scharfe Schatten.
+F | Schall ist schneller als Licht. | Licht ist viel schneller.
+W | Metalle leiten Wärme gut. | Deshalb wird ein Metalllöffel im Tee heiß.
+F | Ein Würfel hat sechs Ecken. | Ein Würfel hat acht Ecken und sechs Flächen.
+W | 0,25 ist dasselbe wie ein Viertel. | 1 : 4 = 0,25
+F | Jede gerade Zahl ist durch 4 teilbar. | z. B. 6 ist gerade, aber nicht durch 4 teilbar.
+W | „teeth“ ist die Mehrzahl von „tooth“. | Ein unregelmäßiger Plural.
+F | „Wednesday“ heißt Donnerstag. | „Wednesday“ heißt Mittwoch.
+W | Eine Fabel endet oft mit einer Lehre. | Die „Moral von der Geschicht’“.
+F | Das Präteritum von „sehen“ ist „sehte“. | Richtig ist „sah“.
+W | Astrid Lindgren schrieb „Pippi Langstrumpf“. | Die Autorin kam aus Schweden.
+F | Die Seine fließt durch London. | Die Seine fließt durch Paris, durch London fließt die Themse.
+`);
+sekVerdMore(5, `
+Wie heißt die Hauptstadt von Österreich? | Wien
+Welcher Kontinent liegt südlich von Europa? | Afrika
+Wie viele Beine haben Spinnen? | Acht
+Welche Farbe bekommen Blätter durch das Chlorophyll? | Grün
+Wie heißt das größte Säugetier der Welt? | Blauwal
+Welches Tier baut Burgen aus Holz im Fluss? | Der Biber
+Wie nennt man Tiere, die nachts aktiv sind? | Nachtaktiv
+Welches Organ pumpt das Blut durch den Körper? | Das Herz
+Wie heißen die Atmungsorgane der Fische? | Kiemen
+Welcher Vogel kann rückwärts fliegen? | Kolibri
+Wie nennt man ein Wort, das ein Nomen begleitet? | Artikel
+Wie heißt der Plural von Globus? | Globen
+Welches Satzzeichen steht vor einem Nebensatz mit weil? | Komma
+Wie nennt man Wörter wie und, oder, aber? | Konjunktionen
+Wie heißt die Grundform eines Verbs? | Infinitiv
+Welcher Fall antwortet auf die Frage wem? | Dativ
+Welcher Fall antwortet auf die Frage wen oder was? | Akkusativ
+Wie nennt man die Lehre, die am Ende einer Fabel steht? | Moral
+Wie heißt der Erzähler, der alles weiß? | Allwissender Erzähler
+Wer schrieb das Buch Momo? | Michael Ende
+Wie heißt Katze auf Englisch? | cat
+Was bedeutet das englische Wort always? | immer
+Wie heißt die Mehrzahl von mouse? | mice
+Welcher englische Monat folgt auf March? | April
+Wie sagt man auf Englisch: Ich bin elf Jahre alt? | I am eleven years old
+Wie heißt die Vergangenheit von see auf Englisch? | saw
+Was bedeutet das englische Wort Thursday? | Donnerstag
+Wie heißt Küche auf Englisch? | kitchen
+Wie heißt die Hauptstadt von England? | London
+Welches Land liegt westlich von Deutschland? | Frankreich
+Wie heißt der längste Fluss Europas? | Wolga
+Welches Meer trennt Europa und Afrika? | Mittelmeer
+Wie heißt die Hauptstadt von Sachsen? | Dresden
+Wie viele Nachbarländer hat Deutschland? | Neun
+Welche Insel ist die größte Deutschlands? | Rügen
+Wie heißt das Gebirge mit dem Brocken? | Harz
+Welcher Fluss fließt durch Köln? | Der Rhein
+Wie heißt die Zeichenerklärung einer Karte? | Legende
+Welches Instrument zeigt immer nach Norden? | Kompass
+Wie nennt man die Linien gleicher Höhe auf Karten? | Höhenlinien
+Wie hieß der erste römische Kaiser? | Augustus
+Welche Stadt wurde vom Vesuv verschüttet? | Pompeji
+Wie hießen die Wettkämpfe im alten Olympia? | Olympische Spiele
+Wie nennt man die Herrschaft weniger Reicher? | Oligarchie
+Wer eroberte ein Weltreich bis nach Indien? | Alexander der Große
+Wie nannte man den griechischen Stadtstaat? | Polis
+Wie hieß die römische Wasserleitung über Täler? | Aquädukt
+In welchem Jahr endete das Weströmische Reich? | 476
+Wie hieß die Seuche, die im Mittelalter wütete? | Pest
+Wie nannte man die Vereinigungen der Handwerker? | Zünfte
+Wer lebte im Mittelalter auf einer Burg? | Ritter und Burgherren
+Wie nannte man unfreie Bauern im Mittelalter? | Leibeigene
+Wie heißt die Gletschermumie aus den Ötztaler Alpen? | Ötzi
+Welche Stadt war die Lieblingspfalz Karls des Großen? | Aachen
+Wie viele Ecken hat ein Sechseck? | Sechs
+Wie viel Grad hat ein voller Kreis? | 360
+Wie heißt ein Viereck mit vier rechten Winkeln? | Rechteck
+Wie nennt man das Ergebnis einer Multiplikation? | Produkt
+Wie nennt man das Ergebnis einer Division? | Quotient
+Was ist das kleinste gemeinsame Vielfache von drei und vier? | Zwölf
+Wie viele Zentimeter hat ein Meter? | Hundert
+Wie viele Gramm hat ein halbes Kilogramm? | Fünfhundert
+Wie heißt ein Dreieck mit drei gleich langen Seiten? | Gleichseitiges Dreieck
+Wie heißt die Zahl über dem Bruchstrich? | Zähler
+Wie heißt die Zahl unter dem Bruchstrich? | Nenner
+Welche Zahl ist eine Primzahl: neun oder sieben? | Sieben
+Wie nennt man Linien, die sich nie schneiden? | Parallelen
+Wie viel ist ein Viertel von hundert? | Fünfundzwanzig
+Bei wie viel Grad kocht Wasser? | Hundert Grad
+Wie heißt der Übergang von fest zu flüssig? | Schmelzen
+Welche Metalle werden von Magneten angezogen? | Eisen, Nickel, Kobalt
+Wie heißt die Einheit der Kraft? | Newton
+Was ist schneller: Licht oder Schall? | Licht
+Wie nennt man Stoffe, die keinen Strom leiten? | Isolatoren
+Wie nennt man eine Linse, die vergrößert? | Lupe
+Wie heißt die Kraft, die Dinge nach unten zieht? | Schwerkraft
+Welches Gas brauchen Menschen zum Atmen? | Sauerstoff
+Welches Gas nehmen Pflanzen aus der Luft auf? | Kohlenstoffdioxid
+Wie nennt man ein Gemisch aus Salz und Wasser? | Salzlösung
+Wie heißt der zurückgeworfene Schall? | Echo
+Wie viele Planeten hat unser Sonnensystem? | Acht
+Welcher Planet heißt auch der rote Planet? | Mars
+Wie heißt der natürliche Begleiter der Erde? | Mond
+Wie lange dauert ein Umlauf der Erde um die Sonne? | Ein Jahr
+Wie heißt unsere Galaxie? | Milchstraße
+Welches Tier ist das Wappentier Deutschlands? | Adler
+Wie viele Spieler hat eine Handballmannschaft auf dem Feld? | Sieben
+Wie heißt die Hauptstadt von Spanien? | Madrid
+Welcher Komponist schrieb die Zauberflöte? | Mozart
+Wie heißt das größte Land Südamerikas? | Brasilien
+Welche Sprache spricht man in Brasilien? | Portugiesisch
+Wer schrieb Pippi Langstrumpf? | Astrid Lindgren
+Wie viele Sterne hat die Flagge der Europäischen Union? | Zwölf
+Wie heißt das Fest am einunddreißigsten Dezember? | Silvester
+Wie heißen die vier Jahreszeiten? | Frühling, Sommer, Herbst, Winter
+Wie heißt der kleinste Planet unseres Sonnensystems? | Merkur
+Wie heißen die Zähne von Kindern? | Milchzähne
+Wie viele Knochen hat ein Erwachsener ungefähr? | Zweihundertsechs
+Welches Organ steuert unseren Körper? | Das Gehirn
+Wie heißen die Röhren, die Blut zum Herzen führen? | Venen
+Wie heißt die Hülle aus Luft um die Erde? | Atmosphäre
+Welcher Vogel baut sein Nest auf Kirchtürmen? | Storch
+Wie heißt das Junge eines Pferdes? | Fohlen
+Welches Insekt macht Honig? | Biene
+Wie nennt man den Schlaf des Igels im Winter? | Winterschlaf
+Wie heißt der Saft, den Bienen aus Blüten saugen? | Nektar
+Welches Tier ist ein Beuteltier aus Australien? | Känguru
+Wie nennt man Tiere, die Fleisch und Pflanzen fressen? | Allesfresser
+Wie heißt der Teil der Blüte mit dem Fruchtknoten? | Stempel
+Welcher Baum trägt Eicheln? | Eiche
+`);
+sekWorteMore(5, `
+NOMEN | Wortart für Namen, Dinge und Gefühle
+VERB | Wortart für Tätigkeiten
+ARTIKEL | Der, die oder das
+PRONOMEN | Steht für ein Nomen, z. B. „er“
+SUBJEKT | Wer oder was tut etwas im Satz?
+PRÄDIKAT | Satzaussage – meist das Verb
+KOMMA | Trennt Haupt- und Nebensatz
+ANTONYM | Wort mit gegenteiliger Bedeutung
+MÄRCHEN | Beginnt oft mit „Es war einmal“
+SAGE | Erzählung mit wahrem Kern
+GEDICHT | Text in Versen und Strophen
+STROPHE | Abschnitt eines Gedichts
+REIM | Gleicher Klang am Versende
+ERZÄHLER | Wer die Geschichte erzählt
+WÖRTERBUCH | Hier schlägt man die Rechtschreibung nach
+VOKABEL | Fremdsprachiges Wort zum Lernen
+DICTIONARY | Englisch: Wörterbuch
+HOMEWORK | Englisch: Hausaufgaben
+BIRTHDAY | Englisch: Geburtstag
+TEACHER | Englisch: Lehrerin oder Lehrer
+FRIEND | Englisch: Freund oder Freundin
+WEATHER | Englisch: Wetter
+CHILDREN | Englische Mehrzahl von „child“
+BREAKFAST | Englisch: Frühstück
+SCHOOLBAG | Englisch: Schultasche
+WEDNESDAY | Englischer Wochentag in der Mitte
+WIRBELTIER | Tier mit Wirbelsäule
+WIRBELLOSE | Tiere ohne Wirbelsäule
+INSEKT | Tier mit sechs Beinen
+SPINNENTIER | Tier mit acht Beinen
+SKELETT | Gerüst aus Knochen
+GELENK | Verbindung zwischen Knochen
+MUSKEL | Zieht sich zusammen und bewegt uns
+LUNGE | Hier atmen wir
+KIEMEN | Atmungsorgane der Fische
+TRACHEEN | Atmungsröhren der Insekten
+BLÜTE | Bunter Teil der Pflanze mit Staubblättern
+STAUBBLATT | Männlicher Teil der Blüte
+STEMPEL | Weiblicher Teil der Blüte
+BESTÄUBUNG | Pollen gelangt auf die Narbe
+KEIMUNG | Ein Samen beginnt zu wachsen
+WINTERRUHE | So überwintern Eichhörnchen
+WINTERSCHLAF | So überwintern Igel
+NAHRUNGSNETZ | Viele verbundene Nahrungsketten
+CHLOROPHYLL | Grüner Farbstoff der Pflanzen
+WECHSELWARM | Körpertemperatur passt sich der Umgebung an
+GLEICHWARM | Körpertemperatur bleibt immer gleich
+HAUPTSTADT | Sitz der Regierung eines Landes
+BUNDESLAND | Deutschland hat sechzehn davon
+HIMMELSRICHTUNG | Norden, Süden, Osten oder Westen
+LEGENDE | Zeichenerklärung einer Karte
+HÖHENLINIE | Verbindet Punkte gleicher Höhe
+LÄNGENGRAD | Linie von Pol zu Pol
+BREITENGRAD | Linie parallel zum Äquator
+NULLMERIDIAN | Längengrad durch Greenwich
+GEZEITEN | Ebbe und Flut
+WATTENMEER | Küste, die bei Ebbe trockenfällt
+MITTELGEBIRGE | Harz, Schwarzwald oder Eifel
+TIEFLAND | Flache Landschaft im Norden Deutschlands
+ALPENVORLAND | Liegt zwischen Donau und Alpen
+ERDACHSE | Um sie dreht sich die Erde
+JAHRESZEITEN | Entstehen durch die schräge Erdachse
+STEINZEIT | Älteste Epoche der Menschheit
+ARCHÄOLOGE | Erforscht alte Funde
+ANTIKE | Zeit der Griechen und Römer
+OLYMPIA | Ort der ersten Olympischen Spiele
+POLIS | Griechischer Stadtstaat
+AQUÄDUKT | Römische Wasserleitung
+KOLOSSEUM | Arena in Rom
+LEGIONÄR | Römischer Soldat
+KAISER | Herrscher des Römischen Reiches
+VÖLKERWANDERUNG | Viele Völker zogen um 400 durch Europa
+LEHNSWESEN | Land gegen Treue und Dienste
+LEIBEIGENE | Unfreie Bauern im Mittelalter
+STÄNDE | Geistliche, Adel und Bauern
+ZUNFT | Vereinigung der Handwerker
+HANSE | Bund von Handelsstädten
+KREUZZUG | Kriegszug ins Heilige Land
+BURGGRABEN | Wassergraben um eine Burg
+KILOGRAMM | Tausend Gramm
+SCHMELZEN | Von fest zu flüssig
+ERSTARREN | Von flüssig zu fest
+KONDENSIEREN | Von gasförmig zu flüssig
+FILTRIEREN | Trennen mit einem Filter
+EINDAMPFEN | Wasser verdunstet, Salz bleibt zurück
+LÖSUNG | Zum Beispiel Salz in Wasser gelöst
+MAGNETFELD | Bereich, in dem ein Magnet wirkt
+ISOLATOR | Leitet keinen Strom
+LEITER | Leitet Strom gut
+SCHALTER | Öffnet oder schließt den Stromkreis
+BATTERIE | Speichert elektrische Energie
+SCHWERKRAFT | Zieht alles nach unten
+REIBUNG | Bremst jede Bewegung
+SCHATTEN | Entsteht hinter einem Gegenstand im Licht
+SPIEGEL | Wirft das Licht zurück
+PRIMZAHL | Nur durch eins und sich selbst teilbar
+TEILER | Teilt eine Zahl ohne Rest
+VIELFACHES | Zum Beispiel 12 zu 4
+ZÄHLER | Zahl über dem Bruchstrich
+NENNER | Zahl unter dem Bruchstrich
+KOMMAZAHL | Anderes Wort für Dezimalzahl
+SUMME | Ergebnis einer Addition
+DIFFERENZ | Ergebnis einer Subtraktion
+PRODUKT | Ergebnis einer Multiplikation
+QUOTIENT | Ergebnis einer Division
+RECHTECK | Viereck mit vier rechten Winkeln
+DREIECK | Figur mit drei Ecken
+GEODREIECK | Hilfsmittel zum Messen von Winkeln
+SPIEGELACHSE | An ihr wird eine Figur gespiegelt
+WÜRFEL | Körper mit sechs gleichen Quadraten
+`);
+sekBlitzMore(5, `
+Plural von „Globus“? | Globen
+Plural von „Lexikon“? | Lexika
+Präteritum von „sehen“? | sah
+Präteritum von „laufen“? | lief
+Präteritum von „denken“? | dachte
+Wortart von „unter“? | Präposition
+Wortart von „und“? | Konjunktion
+Fall bei der Frage „Wem?“ | Dativ
+Fall bei der Frage „Wessen?“ | Genitiv
+Gegenteil von „mutig“? | ängstlich
+Gegenteil von „ehrlich“? | unehrlich
+Synonym für „schnell“? | flink
+Reimform abab? | Kreuzreim
+Reimform aabb? | Paarreim
+Wer schrieb „Momo“? | Michael Ende
+Wer schrieb „Das doppelte Lottchen“? | Erich Kästner
+Englisch für „Katze“? | cat
+Englisch für „Küche“? | kitchen
+Englisch für „Geburtstag“? | birthday
+Englisch für „Hausaufgaben“? | homework
+Englisch für „immer“? | always
+Englisch für „manchmal“? | sometimes
+Englische Mehrzahl von „mouse“? | mice
+Englische Mehrzahl von „foot“? | feet
+Englische Vergangenheit von „see“? | saw
+Englische Vergangenheit von „eat“? | ate
+Englische Vergangenheit von „have“? | had
+Englische Zahl „thirteen“? | 13
+Was heißt „Thursday“? | Donnerstag
+Was heißt „sister“? | Schwester
+Tierklasse des Wals? | Säugetiere
+Tierklasse der Eidechse? | Reptilien
+Tierklasse des Salamanders? | Amphibien
+Atmungsorgane der Insekten? | Tracheen
+Wie viele Beine hat ein Käfer? | 6
+Fliegendes Säugetier? | Fledermaus
+Männlicher Teil der Blüte? | Staubblatt
+Weiblicher Teil der Blüte? | Stempel
+Verbindung zwischen Knochen? | Gelenk
+Halswirbel der Giraffe? | 7
+Gas, das Pflanzen abgeben? | Sauerstoff
+Gas, das wir ausatmen? | Kohlenstoffdioxid
+So überwintert der Igel? | Winterschlaf
+So überwintert das Eichhörnchen? | Winterruhe
+Hauptstadt von Österreich? | Wien
+Hauptstadt von Spanien? | Madrid
+Hauptstadt der Niederlande? | Amsterdam
+Hauptstadt von Hessen? | Wiesbaden
+Hauptstadt von Sachsen? | Dresden
+Hauptstadt von Baden-Württemberg? | Stuttgart
+Hauptstadt von Niedersachsen? | Hannover
+Größte deutsche Insel? | Rügen
+Fluss durch Berlin? | Spree
+Fluss durch Dresden? | Elbe
+Gebirge mit dem Brocken? | Harz
+Nachbarländer Deutschlands? | 9
+Größter Kontinent? | Asien
+Meer zwischen Europa und Afrika? | Mittelmeer
+Gezeiten an der Nordsee? | Ebbe und Flut
+Zeichenerklärung einer Karte? | Legende
+Erster römischer Kaiser? | Augustus
+Untergang Westroms (Jahr)? | 476
+Kaiserkrönung Karls des Großen (Jahr)? | 800
+Griechische Göttin der Weisheit? | Athene
+Römische Wasserleitung? | Aquädukt
+Griechischer Stadtstaat? | Polis
+Mumie aus dem Gletscher? | Ötzi
+Vereinigung der Handwerker? | Zunft
+Bund der Handelsstädte? | Hanse
+Kampfplatz der Gladiatoren in Rom? | Kolosseum
+Unfreie Bauern im Mittelalter? | Leibeigene
+Wer entzifferte die Hieroglyphen? | Champollion
+Einheit der Kraft? | Newton
+Einheit der Energie? | Joule
+Übergang von fest zu flüssig? | Schmelzen
+Übergang von gasförmig zu flüssig? | Kondensieren
+Wird ein Kupferdraht vom Magneten angezogen? | nein
+Was entsteht, wenn Schall zurückkommt? | Echo
+Licht oder Schall – was ist schneller? | Licht
+Hauptbestandteil der Luft? | Stickstoff
+Vergrößernde Linse? | Lupe
+Lampen hintereinander geschaltet? | Reihenschaltung
+Lampen nebeneinander geschaltet? | Parallelschaltung
+Grad im rechten Winkel? | 90
+Grad im gestreckten Winkel? | 180
+Ecken eines Würfels? | 8
+Kanten eines Würfels? | 12
+Flächen eines Würfels? | 6
+kgV von 6 und 8? | 24
+ggT von 12 und 18? | 6
+Kleinste Primzahl? | 2
+Ist 51 eine Primzahl? | nein (3 · 17)
+Ein Drittel von 90? | 30
+Drei Viertel von 40? | 30
+0,5 als Bruch? | 1/2
+3/4 als Dezimalzahl? | 0,75
+1/5 als Dezimalzahl? | 0,2
+25 % als Bruch? | 1/4
+Millimeter in einem Zentimeter? | 10
+Meter in einem Kilometer? | 1000
+Quadratzentimeter in einem Quadratdezimeter? | 100
+Planet mit Ringen? | Saturn
+Unsere Galaxie? | Milchstraße
+Wer malte die Sonnenblumen? | van Gogh
+Wer schrieb „Pippi Langstrumpf“? | Astrid Lindgren
+Spieler eines Basketballteams auf dem Feld? | 5
+Sprache in Brasilien? | Portugiesisch
+Sterne auf der US-Flagge? | 50
+Zähne im Milchgebiss? | 20
+Wer komponierte „Für Elise“? | Beethoven
+`);
+sekDuellMore(5, `
+Nenne ein Tier, das Winterschlaf hält! | Igel 30; Bär 22; Murmeltier 18; Fledermaus 14; Siebenschläfer 10; Hamster 6
+Nenne etwas, das man in der Pause macht! | Essen 28; Mit Freunden reden 24; Fußball spielen 18; Handy schauen 14; Toilette 10; Hausaufgaben abschreiben 6
+Nenne ein Fach, das man in der Schule hat! | Mathe 34; Deutsch 22; Englisch 16; Sport 12; Biologie 10; Kunst 6
+Nenne ein Haustier, das in einem Käfig lebt! | Hamster 30; Kaninchen 22; Meerschweinchen 18; Wellensittich 14; Ratte 10; Maus 6
+Nenne etwas, das man im Winter anzieht! | Mütze 28; Handschuhe 24; Schal 18; Winterjacke 14; Stiefel 10; Pullover 6
+Nenne ein Spiel, das man auf dem Schulhof spielt! | Fangen 30; Fußball 22; Verstecken 18; Seilspringen 14; Tischtennis 10; Gummitwist 6
+Nenne einen Planeten! | Mars 26; Erde 22; Jupiter 18; Saturn 16; Venus 10; Merkur 8
+Nenne ein Tier, das in Australien lebt! | Känguru 34; Koala 22; Krokodil 16; Emu 12; Schnabeltier 10; Wombat 6
+Nenne etwas, das man in einer Federmappe findet! | Bleistift 30; Radiergummi 22; Füller 18; Buntstifte 14; Lineal 10; Anspitzer 6
+Nenne eine Farbe, die eine Flagge oft hat! | Rot 30; Weiß 22; Blau 18; Grün 14; Gelb 10; Schwarz 6
+Nenne einen Wochentag, an dem man gern frei hätte! | Montag 32; Freitag 24; Mittwoch 16; Dienstag 12; Donnerstag 10; Samstag 6
+Nenne etwas, das man am Strand macht! | Schwimmen 28; Sandburg bauen 24; Sonnen 18; Eis essen 14; Volleyball 10; Muscheln sammeln 6
+Nenne ein Obst, das rot ist! | Erdbeere 30; Apfel 22; Kirsche 18; Himbeere 14; Johannisbeere 10; Granatapfel 6
+Nenne ein Tier, das im Wald lebt! | Reh 26; Fuchs 22; Wildschwein 18; Eichhörnchen 16; Hirsch 10; Specht 8
+Nenne eine Sportart im Wasser! | Schwimmen 34; Tauchen 22; Surfen 16; Rudern 12; Wasserball 10; Kanu fahren 6
+Nenne etwas, das man zum Frühstück isst! | Brötchen 30; Müsli 22; Toast 18; Ei 14; Obst 10; Joghurt 6
+Nenne ein Gemüse, das grün ist! | Gurke 28; Brokkoli 24; Salat 18; Erbsen 14; Zucchini 10; Spinat 6
+Nenne ein Märchen der Brüder Grimm! | Rotkäppchen 30; Hänsel und Gretel 22; Schneewittchen 18; Dornröschen 14; Aschenputtel 10; Rapunzel 6
+Nenne ein Land, das an Deutschland grenzt! | Frankreich 26; Österreich 22; Polen 18; Schweiz 16; Niederlande 10; Dänemark 8
+Nenne etwas, das man im Kino macht! | Film schauen 34; Popcorn essen 22; Cola trinken 16; Lachen 12; Handy ausschalten 10; Werbung gucken 6
+Nenne ein Tier mit Streifen! | Zebra 32; Tiger 24; Biene 16; Waschbär 12; Wespe 10; Streifenhörnchen 6
+Nenne etwas, das man an Weihnachten macht! | Geschenke auspacken 30; Baum schmücken 22; Essen 18; Singen 14; Plätzchen backen 10; Kirche 6
+Nenne ein Tier mit einem Panzer! | Schildkröte 36; Gürteltier 20; Krebs 16; Käfer 12; Hummer 10; Schnecke 6
+Nenne ein Werkzeug! | Hammer 30; Schraubenzieher 22; Säge 18; Zange 14; Bohrmaschine 10; Schraubenschlüssel 6
+Nenne etwas, das Strom braucht! | Handy 28; Fernseher 24; Lampe 18; Computer 14; Kühlschrank 10; Waschmaschine 6
+Nenne einen Beruf in einem Krankenhaus! | Arzt / Ärztin 34; Krankenpfleger/-in 22; Chirurg/-in 16; Hebamme 12; Sanitäter/-in 10; Putzkraft 6
+Nenne einen bekannten Fluss in Deutschland! | Rhein 30; Elbe 22; Donau 18; Main 14; Weser 10; Mosel 6
+Nenne ein Tier, das fliegen kann, aber kein Vogel ist! | Fledermaus 34; Biene 22; Schmetterling 16; Fliege 12; Libelle 10; Marienkäfer 6
+Nenne etwas Rundes! | Ball 30; Kreis 22; Teller 18; Uhr 14; Rad 10; Münze 6
+Nenne ein Musikinstrument mit Saiten! | Gitarre 32; Geige 24; Harfe 16; Cello 12; Bass 10; Ukulele 6
+Nenne etwas, das man im Zoo füttern darf! | Ziegen 30; Fische 22; Enten 18; Schafe 14; Esel 10; Kaninchen 6
+Nenne ein Getränk! | Wasser 30; Saft 22; Cola 18; Milch 14; Tee 10; Kakao 6
+Nenne eine Süßigkeit! | Schokolade 30; Gummibärchen 24; Bonbons 16; Lutscher 12; Kekse 10; Lakritz 8
+Nenne etwas, das man im Sportunterricht macht! | Laufen 28; Ballspiele 24; Turnen 18; Schwimmen 14; Springen 10; Dehnen 6
+Nenne ein Tier, das Eier legt! | Huhn 34; Vogel 22; Schlange 14; Schildkröte 12; Krokodil 10; Fisch 8
+Nenne eine Großstadt in Europa! | Paris 28; London 24; Rom 18; Berlin 14; Madrid 10; Wien 6
+Nenne etwas, das man mit dem Fahrrad braucht! | Helm 30; Licht 22; Klingel 18; Schloss 14; Luftpumpe 10; Reflektoren 6
+Nenne etwas, das man im Frühling sieht! | Blumen 34; Vögel 18; Grüne Blätter 16; Schmetterlinge 12; Osterhasen 10; Regen 10
+Nenne ein Tier, das im Meer lebt und kein Fisch ist! | Wal 30; Delfin 24; Qualle 16; Seestern 12; Krake 10; Robbe 8
+Nenne etwas Gelbes! | Banane 30; Sonne 24; Zitrone 18; Küken 12; Postkasten 10; Taxi 6
+Nenne etwas, das man vor der Schule macht! | Frühstücken 30; Zähne putzen 22; Anziehen 18; Waschen 14; Tasche packen 10; Bus fahren 6
+Nenne einen Gegenstand im Klassenzimmer! | Tafel 32; Tisch 22; Stuhl 18; Uhr 12; Schrank 10; Beamer 6
+Nenne eine Brettspiel-Figur oder ein Brettspiel! | Mensch ärgere dich nicht 30; Monopoly 24; Schach 18; Mühle 12; Dame 10; Siedler von Catan 6
+Nenne etwas, das man im Schwimmbad braucht! | Badehose / Badeanzug 32; Handtuch 24; Schwimmbrille 16; Duschgel 12; Badeschuhe 10; Eintrittskarte 6
+Nenne ein Tier mit langem Schwanz! | Affe 28; Katze 22; Maus 18; Krokodil 14; Pferd 10; Eichhörnchen 8
+Nenne etwas, das in einen Kühlschrank gehört! | Milch 30; Käse 22; Butter 18; Joghurt 14; Wurst 10; Gemüse 6
+Nenne einen Superhelden oder eine Superheldin! | Spider-Man 32; Batman 24; Superman 18; Iron Man 12; Wonder Woman 8; Hulk 6
+Nenne eine Sportart mit einem Schläger! | Tennis 34; Tischtennis 22; Badminton 16; Hockey 12; Golf 10; Baseball 6
+Nenne etwas, das man mit Freunden unternimmt! | Spielen 30; Kino 22; Schwimmen 18; Shoppen 12; Radfahren 10; Übernachten 8
+Nenne einen Körperteil, den man zweimal hat! | Auge 30; Ohr 22; Arm 18; Bein 14; Hand 10; Fuß 6
+Nenne ein Tier, das man auf dem Bauernhof findet! | Kuh 30; Schwein 22; Huhn 18; Pferd 14; Schaf 10; Ziege 6
+Nenne eine Farbe, die man durch Mischen bekommt! | Grün 30; Orange 24; Lila 18; Braun 12; Rosa 10; Grau 6
+Nenne etwas, das man beim Camping braucht! | Zelt 34; Schlafsack 22; Taschenlampe 16; Isomatte 12; Gaskocher 10; Mückenspray 6
+Nenne ein Wort, das mit „Schul-“ beginnt! | Schultasche 30; Schulhof 22; Schulbus 18; Schulbuch 14; Schulfest 10; Schulranzen 6
+Nenne etwas Kaltes! | Eis 34; Schnee 22; Kühlschrank 16; Eiswürfel 12; Winter 10; Wasser 6
+Nenne ein Fahrzeug mit Blaulicht! | Polizeiauto 32; Krankenwagen 26; Feuerwehrauto 24; Notarztwagen 8; Rettungshubschrauber 6; Motorrad der Polizei 4
+Nenne einen Vogel! | Amsel 26; Spatz 22; Adler 18; Taube 16; Meise 10; Eule 8
+Nenne etwas, das man in der Bibliothek macht! | Bücher ausleihen 34; Lesen 24; Lernen 16; Leise sein 12; Recherchieren 8; Hausaufgaben 6
+Nenne einen Grund, warum man zum Arzt geht! | Erkältung 30; Fieber 22; Bauchschmerzen 18; Verletzung 14; Impfung 10; Untersuchung 6
+Nenne ein Wassertier, das man essen kann! | Fisch 30; Lachs 22; Thunfisch 18; Garnelen 14; Muscheln 10; Tintenfisch 6
+Nenne etwas, das man auf einem Geburtstag macht! | Kuchen essen 30; Geschenke auspacken 26; Spiele spielen 16; Singen 12; Kerzen auspusten 10; Tanzen 6
+Nenne einen Gegenstand aus Holz! | Tisch 30; Stuhl 22; Bleistift 18; Schrank 14; Tür 10; Löffel 6
+Nenne etwas, das man im Herbst sieht! | Bunte Blätter 34; Drachen 18; Kastanien 16; Nebel 12; Pilze 10; Regen 10
+Nenne ein Tier, das schnell rennen kann! | Gepard 34; Pferd 22; Hase 16; Strauß 12; Hund 10; Antilope 6
+Nenne einen Beruf, bei dem man draußen arbeitet! | Gärtner/-in 28; Bauer/Bäuerin 24; Förster/-in 18; Bauarbeiter/-in 14; Postbote/-botin 10; Dachdecker/-in 6
+Nenne eine Pizzasorte oder einen Pizzabelag! | Salami 34; Margherita 24; Thunfisch 14; Schinken 12; Hawaii 10; Pilze 6
+Nenne etwas, das man an Ostern macht! | Eier suchen 36; Eier bemalen 22; Schokolade essen 16; Familie besuchen 12; Osterfeuer 8; Kirche 6
+Nenne etwas, das klebt! | Kleber 32; Klebeband 24; Honig 16; Kaugummi 12; Pflaster 10; Sticker 6
+Nenne etwas, das man am Himmel sehen kann! | Sonne 30; Wolken 24; Mond 18; Sterne 12; Flugzeug 10; Vögel 6
+Nenne ein Tier, das nachts aktiv ist! | Eule 32; Fledermaus 26; Igel 14; Fuchs 12; Katze 10; Glühwürmchen 6
+Nenne etwas, das in einem Rucksack für den Wandertag ist! | Trinkflasche 32; Brot / Snacks 26; Regenjacke 16; Handy 12; Pflaster 8; Sonnencreme 6
+Nenne etwas, das man auf dem Jahrmarkt macht! | Karussell fahren 30; Zuckerwatte essen 22; Achterbahn fahren 18; Losbude 14; Autoscooter 10; Riesenrad 6
+Nenne ein Wort, das sich auf „Haus“ reimt! | Maus 36; Laus 20; raus 16; Klaus 12; Schmaus 10; Strauß 6
+Nenne ein Lieblingsessen von Kindern! | Pizza 30; Nudeln 26; Pommes 18; Burger 12; Pfannkuchen 8; Fischstäbchen 6
+Nenne etwas, das man im Garten findet! | Blumen 28; Rasen 22; Baum 18; Gartenhaus 14; Schaukel 10; Gemüsebeet 8
+Nenne einen Gegenstand, der Licht macht! | Lampe 32; Taschenlampe 22; Kerze 18; Handy 12; Laterne 10; Sonne 6
+Nenne ein Tier, das im Dschungel lebt! | Affe 30; Tiger 22; Papagei 18; Schlange 14; Gorilla 10; Jaguar 6
+Nenne einen Grund, warum man sich freut! | Ferien 30; Geschenke 22; Gute Note 18; Freunde treffen 14; Geburtstag 10; Schnee 6
+Nenne eine Tätigkeit im Haushalt! | Staubsaugen 28; Abwaschen 24; Aufräumen 18; Wäsche waschen 14; Kochen 10; Müll rausbringen 6
+Nenne ein Kleidungsstück für den Sommer! | T-Shirt 30; Kurze Hose 24; Sandalen 16; Kappe 12; Kleid 10; Sonnenbrille 8
+Nenne etwas, das Lärm macht! | Baustelle 28; Auto 22; Flugzeug 18; Trommel 14; Hund 10; Wecker 8
+Nenne ein Wort, das man oft in Chats benutzt! | lol 34; ok 22; hdl 14; xD 12; Emojis 10; jaa 8
+Nenne etwas, das man mit Papier machen kann! | Malen 30; Schreiben 24; Falten 16; Basteln 14; Ausschneiden 10; Papierflieger 6
+Nenne ein Tier, das gefährlich sein kann! | Löwe 26; Hai 24; Schlange 18; Krokodil 14; Bär 12; Spinne 6
+Nenne etwas, das man bei Regen braucht! | Regenschirm 38; Regenjacke 24; Gummistiefel 18; Kapuze 10; Auto 6; Regenhose 4
+Nenne eine Schulsache, die man oft vergisst! | Hausaufgaben 34; Sportzeug 22; Hefte 16; Federmappe 12; Brotdose 10; Unterschrift 6
+Nenne ein Spielzeug! | Lego 30; Ball 22; Puppe 18; Kuscheltier 14; Spielzeugauto 10; Puzzle 6
+Nenne etwas, das man in einem Freizeitpark findet! | Achterbahn 36; Wildwasserbahn 18; Karussell 16; Riesenrad 12; Geisterbahn 12; Kettenkarussell 6
+Nenne einen Teil eines Fahrrads! | Lenker 26; Sattel 22; Reifen 18; Pedale 16; Kette 10; Klingel 8
+Nenne etwas, das man an Halloween macht! | Verkleiden 34; Süßes sammeln 26; Kürbis schnitzen 16; Gruselfilm schauen 10; Party 8; Erschrecken 6
+Nenne etwas, das man mit dem Handy fotografiert! | Freunde 28; Essen 22; Tiere 18; Landschaft 14; Selfies 12; Hausaufgaben 6
+Nenne ein Land, in dem man Urlaub machen kann! | Spanien 28; Italien 24; Türkei 18; Griechenland 14; Österreich 10; Kroatien 6
+Nenne etwas, das man beim Basteln braucht! | Schere 32; Kleber 26; Papier 18; Stifte 12; Farbe 8; Glitzer 4
+Nenne eine Berufsgruppe, die Uniform trägt! | Polizei 34; Feuerwehr 24; Piloten 14; Soldaten 12; Ärzte 10; Köche 6
+Nenne einen Ort, an dem man leise sein muss! | Bibliothek 34; Kirche 22; Krankenhaus 16; Klassenarbeit 12; Kino 10; Museum 6
+Nenne ein Tier, das man reiten kann! | Pferd 46; Esel 16; Kamel 14; Pony 12; Elefant 8; Strauß 4
+Nenne etwas, das man an einem Regentag drinnen macht! | Spielen 26; Fernsehen 24; Lesen 18; Zocken 16; Basteln 10; Backen 6
+Nenne eine Frucht, die in Bäumen wächst! | Apfel 34; Birne 22; Kirsche 16; Pflaume 12; Orange 10; Kokosnuss 6
+Nenne etwas, das in der Wüste vorkommt! | Sand 34; Kamel 24; Kaktus 16; Hitze 12; Oase 8; Schlange 6
+Nenne eine Tätigkeit, bei der man schwitzt! | Sport 34; Laufen 22; Sauna 16; Fußball 12; Tanzen 10; Treppensteigen 6
+Nenne ein Wort mit „Eis“! | Eiscreme 26; Eiswürfel 22; Eisbär 18; Eishockey 14; Eisberg 12; Eisdiele 8
+Nenne ein Tier, das man im Aquarium sieht! | Goldfisch 30; Clownfisch 22; Hai 16; Seepferdchen 14; Schildkröte 10; Qualle 8
+Nenne etwas, das in der Stadt viel Platz braucht! | Straßen 28; Parkplätze 24; Häuser 18; Bahnhof 12; Einkaufszentrum 10; Park 8
+Nenne etwas, das man im Matheunterricht braucht! | Taschenrechner 30; Geodreieck 24; Zirkel 16; Lineal 14; Heft 10; Bleistift 6
+Nenne ein Wort, das man in einem Brief schreibt! | Liebe/r 30; Hallo 22; Grüße 18; Datum 14; Unterschrift 10; Danke 6
+Nenne etwas, das man nachts sieht! | Mond 34; Sterne 30; Laternen 12; Fledermäuse 10; Sternschnuppe 8; Flugzeuglichter 6
+Nenne einen Grund, warum man spät ins Bett geht! | Film schauen 28; Zocken 24; Handy 18; Party 14; Lesen 10; Hausaufgaben 6
+Nenne ein Tier mit Fell! | Hund 28; Katze 26; Bär 16; Kaninchen 12; Fuchs 10; Schaf 8
+Nenne ein Fest oder einen Feiertag! | Weihnachten 32; Ostern 22; Geburtstag 18; Silvester 14; Halloween 8; Karneval 6
+Nenne etwas, das man an einem heißen Tag macht! | Eis essen 32; Schwimmen 28; Im Schatten liegen 14; Viel trinken 12; Ventilator anmachen 8; Wasserschlacht 6
+`);
+sekReihMore(5, `
+Ägypten: vom Tod zum Grab | Einbalsamieren > Einwickeln in Leinen > Sarkophag > Grabkammer
+Vom Samen zur Frucht | Bestäubung > Befruchtung > Fruchtknoten wächst > Frucht
+Atmung: der Weg der Luft | Nase > Luftröhre > Bronchien > Lungenbläschen
+Zahlen von klein nach groß | 1/10 > 0,25 > 1/2 > 0,8
+Brüche von klein nach groß | 1/8 > 1/4 > 3/8 > 1/2
+Zahlen von klein nach groß | 0,09 > 0,1 > 0,19 > 0,9
+Planeten von der Sonne aus | Merkur > Venus > Erde > Mars
+Äußere Planeten von der Sonne aus | Jupiter > Saturn > Uranus > Neptun
+Wörter nach dem Alphabet | Abend > Abenteuer > Abfahrt > Abgas
+Wörter nach dem Alphabet | Schule > Schulter > Schuppe > Schuster
+Wörter nach dem Alphabet | Rad > Radar > Radio > Radius
+Englische Monate in Reihenfolge | January > February > March > April
+Englische Monate in Reihenfolge | September > October > November > December
+Englische Wochentage in Reihenfolge | Monday > Tuesday > Wednesday > Thursday
+Englische Zahlen von klein nach groß | eleven > fifteen > twenty > fifty
+Steigerung von „viel“ | viel > mehr > am meisten
+Zeitformen von „spielen“ – von alt nach neu | ich hatte gespielt > ich spielte > ich spiele > ich werde spielen
+Märchenaufbau | Es war einmal > Aufgabe oder Problem > Lösung durch Zauber > Glückliches Ende
+Die Stände im Mittelalter – von oben nach unten | König > Adel und Geistliche > Bürger > Bauern
+Vom Pagen zum Ritter | Page > Knappe > Ritterschlag (Schwertleite) > Ritter
+Griechische Geschichte | Gründung der Polis > Erste Olympische Spiele (776 v. Chr.) > Demokratie in Athen > Alexander der Große
+Römische Geschichte | Gründung Roms (753 v. Chr.) > Caesar > Kaiser Augustus > Untergang Westroms (476)
+Frühgeschichte | Altsteinzeit > Jungsteinzeit > Bronzezeit > Eisenzeit
+Mittelalter | Karl der Große wird Kaiser (800) > Otto der Große wird Kaiser (962) > Erster Kreuzzug (1096) > Die Pest in Europa (1347)
+Flüsse nach Länge (in Deutschland) – vom längsten | Rhein > Elbe > Donau > Main
+Berge nach Höhe – vom höchsten | Zugspitze > Feldberg > Brocken > Wasserkuppe
+Bundesländer von Nord nach Süd | Schleswig-Holstein > Niedersachsen > Hessen > Bayern
+Städte von West nach Ost | Köln > Hannover > Berlin > Frankfurt (Oder)
+Längeneinheiten von klein nach groß | Millimeter > Zentimeter > Dezimeter > Meter
+Gewichte von leicht nach schwer | Milligramm > Gramm > Kilogramm > Tonne
+Flächeneinheiten von klein nach groß | Quadratzentimeter > Quadratdezimeter > Quadratmeter > Hektar
+Zeiteinheiten von kurz nach lang | Sekunde > Minute > Stunde > Tag
+Winkel von klein nach groß | spitzer Winkel > rechter Winkel > stumpfer Winkel > gestreckter Winkel
+Vom Ei zum Huhn | Ei > Küken schlüpft > Junghenne > Huhn
+Wasserkreislauf | Verdunstung > Wolkenbildung > Niederschlag > Abfluss ins Meer
+Vom Getreide zum Brötchen | Ernte > Mehl mahlen > Teig kneten > Backen
+Eis wird erwärmt | Eis > Schmelzwasser > warmes Wasser > Wasserdampf
+Tiere nach Größe – vom kleinsten | Ameise > Maus > Fuchs > Elefant
+Schulalltag | Ankommen > Unterricht > Große Pause > Nachhause gehen
+Englischer Satzbau (Aussagesatz) | Subjekt > Verb > Objekt > Ort/Zeit
+Eine Erzählung schreiben | Ideen sammeln > Gliederung > Text schreiben > Überarbeiten
+Ablauf eines Versuchs | Frage > Vermutung > Durchführung > Auswertung
+Vom Rohstoff zum Papier | Holz > Zellstoff > Papierbrei > Papier
+Vom Kraftwerk zur Lampe | Kraftwerk > Hochspannungsleitung > Steckdose > Lampe
+Sonnensystem von innen nach außen | Sonne > Erde > Jupiter > Neptun
+`);
+sekZuordMore(5, `
+Antike oder Steinzeit? | Steinzeit / Antike | Faustkeil=1; Höhlenmalerei=1; Mammutjagd=1; Ötzi=1; Kolosseum=2; Olympische Spiele=2; Demokratie in Athen=2; Aquädukt=2
+Ägypten oder Griechenland? | Ägypten / Griechenland | Pharao=1; Nil=1; Pyramide=1; Hieroglyphen=1; Zeus=2; Athen=2; Polis=2; Olympia=2
+Burg oder Kloster? | Burg / Kloster | Ritter=1; Burggraben=1; Bergfried=1; Turnier=1; Mönch=2; Äbtissin=2; Gebet=2; Kreuzgang=2
+Englisch: Wochentag oder Monat? | Wochentag / Monat | Monday=1; Friday=1; Sunday=1; Tuesday=1; March=2; June=2; October=2; August=2
+Englisch: Familie oder Schule? | Familie / Schule | mother=1; brother=1; grandma=1; uncle=1; teacher=2; classroom=2; homework=2; break=2
+Nomen oder Adjektiv? | Nomen / Adjektiv | Mut=1; Freude=1; Schönheit=1; Wahrheit=1; mutig=2; fröhlich=2; schön=2; wahr=2
+Singular oder Plural? | Einzahl / Mehrzahl | Museum=1; Atlas=1; Lexikon=1; Globus=1; Museen=2; Atlanten=2; Lexika=2; Globen=2
+Säugetier oder Vogel? | Säugetier / Vogel | Fledermaus=1; Wal=1; Maulwurf=1; Igel=1; Pinguin=2; Strauß=2; Kiwi=2; Eule=2
+Insekt oder Spinnentier? | Insekt (6 Beine) / Spinnentier (8 Beine) | Biene=1; Ameise=1; Käfer=1; Libelle=1; Zecke=2; Kreuzspinne=2; Milbe=2; Skorpion=2
+Pflanzenfresser oder Fleischfresser? | Pflanzenfresser / Fleischfresser | Kuh=1; Reh=1; Hase=1; Giraffe=1; Löwe=2; Wolf=2; Hai=2; Adler=2
+Wirbeltier oder wirbellos? | Wirbeltier / Wirbellos | Frosch=1; Hai=1; Taube=1; Schlange=1; Regenwurm=2; Qualle=2; Schnecke=2; Krake=2
+Teil der Blüte oder des Stängels? | Blüte / Stängel und Blatt | Staubblatt=1; Narbe=1; Kronblatt=1; Fruchtknoten=1; Leitbündel=2; Blattader=2; Spaltöffnung=2; Knoten=2
+Fluss oder Gebirge? | Fluss / Gebirge | Rhein=1; Elbe=1; Weser=1; Mosel=1; Harz=2; Eifel=2; Erzgebirge=2; Alpen=2
+Landeshauptstadt oder nicht? | Landeshauptstadt / Keine Landeshauptstadt | Stuttgart=1; Kiel=1; Dresden=1; Wiesbaden=1; Frankfurt=2; Köln=2; Leipzig=2; Nürnberg=2
+Europa oder Afrika? | Europa / Afrika | Portugal=1; Norwegen=1; Ungarn=1; Griechenland=1; Ägypten=2; Kenia=2; Marokko=2; Nigeria=2
+Nordhalbkugel oder Südhalbkugel? | Nordhalbkugel / Südhalbkugel | Deutschland=1; Kanada=1; Japan=1; Ägypten=1; Australien=2; Argentinien=2; Südafrika=2; Neuseeland=2
+Fest oder gasförmig? (bei Zimmertemperatur) | Fest / Gasförmig | Eisen=1; Zucker=1; Holz=1; Salz=1; Sauerstoff=2; Stickstoff=2; Helium=2; Kohlenstoffdioxid=2
+Lichtquelle oder beleuchteter Körper? | Leuchtet selbst / Wird angeleuchtet | Sonne=1; Kerze=1; Glühbirne=1; Glühwürmchen=1; Mond=2; Spiegel=2; Buch=2; Wolke=2
+Gemisch oder Reinstoff? | Gemisch / Reinstoff | Salzwasser=1; Luft=1; Müsli=1; Limonade=1; destilliertes Wasser=2; Gold=2; Zucker=2; Sauerstoff=2
+Kraft oder Länge? | Einheit der Kraft / Einheit der Länge | Newton=1; Kilonewton=1; Meganewton=1; Millinewton=1; Meter=2; Kilometer=2; Zentimeter=2; Millimeter=2
+Primzahl oder nicht? | Primzahl / Keine Primzahl | 2=1; 7=1; 13=1; 29=1; 1=2; 9=2; 15=2; 27=2
+Gerade oder ungerade? | Gerade / Ungerade | 128=1; 1.000=1; 46=1; 302=1; 77=2; 1.001=2; 135=2; 59=2
+Spitzer oder stumpfer Winkel? | Spitz (unter 90°) / Stumpf (über 90°) | 30°=1; 45°=1; 60°=1; 89°=1; 100°=2; 120°=2; 135°=2; 170°=2
+Bruch größer oder kleiner als ½? | Kleiner als ½ / Größer als ½ | 1/3=1; 2/5=1; 1/4=1; 3/10=1; 2/3=2; 3/4=2; 5/8=2; 7/10=2
+Märchen oder Sage? | Märchen / Sage | Rotkäppchen=1; Hänsel und Gretel=1; Froschkönig=1; Rumpelstilzchen=1; Loreley=2; Rattenfänger von Hameln=2; Nibelungen=2; Odysseus=2
+Gedicht oder Erzählung? | Gedicht / Erzählung | Vers=1; Strophe=1; Reim=1; Kreuzreim=1; Einleitung=2; Hauptteil=2; Höhepunkt=2; Schluss=2
+Wortfamilie „fahren“ oder „laufen“? | fahren / laufen | Fahrer=1; Fahrt=1; Fahrrad=1; Gefährt=1; Läufer=2; Lauf=2; Auslauf=2; Laufschuh=2
+Englisch: Vergangenheit regelmäßig oder unregelmäßig? | Regelmäßig (-ed) / Unregelmäßig | played=1; watched=1; walked=1; cleaned=1; went=2; saw=2; ate=2; had=2
+Organ und Aufgabe | Atmung / Verdauung | Lunge=1; Luftröhre=1; Bronchien=1; Zwerchfell=1; Magen=2; Darm=2; Speiseröhre=2; Bauchspeicheldrüse=2
+Sinnesorgan | Sehen / Hören | Pupille=1; Netzhaut=1; Linse=1; Iris=1; Trommelfell=2; Ohrmuschel=2; Gehörknöchelchen=2; Schnecke im Ohr=2
+`);
+
+/* ---------------- Ausbau Klasse 7/8: Wissens-Quiz ---------------- */
+sekQuizMore(7, "Deutsch", `
+1 | Wie heißt „wir lesen“ im Futur I? | wir werden lesen
+1 | Welche Wortart ist „sehr“? | Adverb
+1 | Was ist ein Hauptsatz? | Ein Satz, der allein stehen kann
+1 | Wie heißt die Mehrzahl von „Praxis“? | Praxen
+1 | Was ist ein Interview? | Ein Gespräch mit Fragen und Antworten
+2 | Was ist ein Vergleich als Stilmittel? | Ein bildlicher Vergleich mit „wie“ oder „als ob“
+2 | Wie heißt das Partizip II von „bringen“? | gebracht
+2 | Was ist ein Bericht? | Sachliche Darstellung eines Ereignisses (W-Fragen)
+2 | In welcher Zeitform schreibt man einen Bericht meist? | Im Präteritum
+2 | Was ist eine Glosse? | Ein kurzer, spöttischer Meinungstext
+3 | Bilde das Passiv im Präteritum: „Man baute die Brücke.“ | Die Brücke wurde gebaut.
+3 | Was ist eine Konjunktion, die einen Nebensatz einleitet? Beispiel! | Subjunktion, z. B. „weil“, „dass“, „obwohl“
+3 | Wer schrieb den „Schimmelreiter“? | Theodor Storm
+3 | Was ist eine Hyperbel? | Eine starke Übertreibung („Ich hab dir das tausendmal gesagt“)
+3 | Was ist eine Charakterisierung? | Beschreibung einer Figur mit Aussehen, Verhalten und Eigenschaften
+4 | Was ist eine Lautmalerei (Onomatopoesie)? | Wörter, die Geräusche nachahmen („zischen“, „miau“)
+4 | Was ist der Unterschied zwischen Erzählzeit und erzählter Zeit? | Erzählzeit: Lesedauer; erzählte Zeit: Dauer der Handlung
+4 | Was ist ein Appell als Textfunktion? | Der Text will zu etwas auffordern
+4 | Was ist eine Parenthese? | Ein Einschub in einen Satz – wie dieser hier
+4 | Was ist eine These in einer Argumentation? | Eine Behauptung, die begründet wird
+5 | Was ist ein personaler Erzähler? | Er erzählt aus der Sicht einer Figur
+5 | Was ist ein Trochäus? | Versmaß: betont – unbetont
+5 | Was ist der Konjunktiv II von „haben“? | hätte
+5 | Was ist eine Satire? | Ein Text, der Missstände übertreibt und verspottet
+5 | Welche Ballade von Fontane handelt von einem Birnbaum? | Herr von Ribbeck auf Ribbeck im Havelland
+`);
+sekQuizMore(7, "Englisch", `
+1 | Was bedeutet „to remember“? | sich erinnern
+1 | Wie heißt die 3. Form von „be“? | been
+1 | Was bedeutet „neighbour“? | Nachbar/Nachbarin
+1 | Was ist das Gegenteil von „early“? | late
+1 | Was heißt „gefährlich“ auf Englisch? | dangerous
+2 | Wie heißt die 3. Form von „write“? | written
+2 | Ergänze: „I’ve known her ___ ten years.“ | for
+2 | Was bedeutet „to prefer“? | bevorzugen / lieber mögen
+2 | Bilde das Adverb von „easy“! | easily
+2 | Was bedeutet „probably“? | wahrscheinlich
+3 | Ergänze: „She is the girl ___ won the prize.“ | who
+3 | Was ist das Gegenteil von „to win“? | to lose
+3 | Ergänze: „We ___ already finished.“ (have) | have
+3 | Was bedeutet „to be allowed to“? | dürfen
+3 | Wie heißt das Passiv von „They speak English here.“? | English is spoken here.
+4 | Ergänze: „If he ___ (study), he would pass.“ | studied
+4 | Was bedeutet „to complain“? | sich beschweren
+4 | Wie heißt die Hauptstadt von Irland? | Dublin
+4 | Was bedeutet „while“ in „while I was reading“? | während
+4 | Wie heißt das „past progressive“ von „I read“? | I was reading
+5 | Bilde die indirekte Rede: He said: „I like it.“ | He said (that) he liked it.
+5 | Was ist ein „phrasal verb“? Beispiel! | Verb + Partikel mit neuer Bedeutung, z. B. „give up“ (aufgeben)
+5 | Was bedeutet „to look forward to“? | sich freuen auf
+5 | Ergänze: „You ___ wear a helmet – it’s the law!“ | must
+5 | Was ist der Unterschied zwischen „must not“ und „don’t have to“? | „must not“ = darf nicht; „don’t have to“ = muss nicht
+`);
+sekQuizMore(7, "Biologie", `
+1 | Wie heißt die Hülle um eine Tierzelle? | Zellmembran
+1 | Was haben Pflanzenzellen, aber Tierzellen nicht? | Zellwand, Chloroplasten, große Vakuole
+1 | Welches Organ produziert Insulin? | Bauchspeicheldrüse
+1 | Wie heißt der größte Muskel beim Atmen? | Zwerchfell
+1 | Wie nennt man ansteckende Krankheiten, die von Viren ausgelöst werden? | Viruserkrankungen (Virusinfektionen)
+2 | Was macht der Dickdarm? | Er entzieht dem Nahrungsbrei Wasser
+2 | Was sind Antikörper? | Eiweiße, die Krankheitserreger markieren und bekämpfen
+2 | Wie heißt die Phase, wenn ein Erreger im Körper ist, man aber noch nicht krank ist? | Inkubationszeit
+2 | Was sind Konsumenten in einem Ökosystem? | Lebewesen, die andere fressen (Tiere)
+2 | Was ist ein Biotop? | Ein bestimmter Lebensraum
+3 | Wie heißt die Erbkrankheit, bei der das Blut schlecht gerinnt? | Bluterkrankheit (Hämophilie)
+3 | Was ist eine Population? | Alle Individuen einer Art in einem Gebiet
+3 | Was macht das Kleinhirn? | Es steuert Gleichgewicht und Bewegung
+3 | Was ist der Unterschied zwischen Arterien und Venen? | Arterien führen vom Herzen weg, Venen zum Herzen hin
+3 | Wie heißt der Vorgang, bei dem Zucker ohne Sauerstoff abgebaut wird (z. B. Hefe)? | Gärung
+4 | Was sind Hormone der Schilddrüse wichtig für? | Stoffwechsel und Wachstum
+4 | Was ist Osmose? | Wasser wandert durch eine Membran zur höheren Konzentration
+4 | Wie heißt der Botenstoff für Stress? | Adrenalin
+4 | Was sind Neophyten? | Eingewanderte, gebietsfremde Pflanzen
+4 | Was ist eine Allergie? | Überreaktion des Immunsystems auf harmlose Stoffe
+5 | Was ist der Unterschied zwischen aktiver und passiver Immunisierung? | Aktiv: Körper bildet Antikörper selbst (Impfung); passiv: Antikörper werden gegeben
+5 | Was ist ein Fossil, das Merkmale zweier Gruppen zeigt? | Brückentier, z. B. Archaeopteryx
+5 | Was ist ein Ökologischer Fußabdruck? | Fläche, die für den Lebensstil eines Menschen nötig ist
+5 | Was ist Eutrophierung? | Überdüngung von Gewässern mit Algenwachstum
+5 | Welches Organ entgiftet den Körper und speichert Zucker als Glykogen? | Die Leber
+`);
+sekQuizMore(7, "Erdkunde", `
+1 | Auf welchem Kontinent liegt Indien? | Asien
+1 | Wie heißt die Hauptstadt von China? | Peking
+1 | Welcher Fluss fließt durch Ägypten? | Der Nil
+1 | Wie heißt der höchste Berg Afrikas? | Kilimandscharo
+1 | Was ist ein Regenwald? | Ein feuchter, warmer Wald in den Tropen
+2 | Wie nennt man eine Trockengrenze, an der Ackerbau gerade noch möglich ist? | Agronomische Trockengrenze
+2 | Wie heißen die großen Grasländer in Afrika? | Savannen
+2 | Wie heißt die Hauptstadt von Russland? | Moskau
+2 | Welcher Ozean liegt zwischen Afrika und Australien? | Der Indische Ozean
+2 | Was ist eine Oase? | Ein Ort mit Wasser in der Wüste
+3 | Welches Land hat die meisten aktiven Vulkane? | Indonesien
+3 | Wie heißt das Gebirge zwischen Indien und China? | Himalaya
+3 | Was ist ein Hurrikan? | Ein tropischer Wirbelsturm über dem Atlantik
+3 | Wie nennt man die Gebiete am Rande einer Wüste, z. B. südlich der Sahara? | Sahelzone
+3 | Was ist Bewässerungsfeldbau? | Ackerbau mit künstlicher Bewässerung
+4 | Was ist der Unterschied zwischen Taifun und Hurrikan? | Gleiches Phänomen, Taifun im Westpazifik, Hurrikan im Atlantik
+4 | Wie nennt man die Zone, in der Erdbeben häufig sind, rund um den Pazifik? | Pazifischer Feuerring
+4 | Was ist eine Plantage? | Großer Betrieb mit nur einer Nutzpflanze (z. B. Kaffee)
+4 | Welcher Fluss führt das meiste Wasser der Welt? | Der Amazonas
+4 | Was sind Hot Spots in der Geologie? | Stellen, an denen Magma aus dem Erdmantel aufsteigt (z. B. Hawaii)
+5 | Was bedeutet „Tageszeitenklima“ im Gegensatz zu „Jahreszeitenklima“? | Temperaturunterschiede zwischen Tag und Nacht größer als zwischen den Jahreszeiten
+5 | Wie heißt die Wüste in Chile, eine der trockensten der Welt? | Atacama
+5 | Was ist der Treibhauseffekt natürlich gut für? | Ohne ihn wäre die Erde etwa −18 °C kalt
+5 | Wie nennt man die Abholzung von Wald im großen Stil? | Rodung / Entwaldung
+5 | Was ist ein Mittelozeanischer Rücken? | Unterwassergebirge, an dem neue Erdkruste entsteht
+`);
+sekQuizMore(7, "Geschichte", `
+1 | Wer segelte 1492 nach Amerika? | Christoph Kolumbus
+1 | Wie heißt die Kirche, die durch Luther entstand? | Evangelische (lutherische) Kirche
+1 | Was erfand Gutenberg? | Den Buchdruck mit beweglichen Lettern
+1 | Wer war Napoleon? | Französischer Feldherr und Kaiser
+1 | Wie nennt man die Zeit der Erfindungen und Fabriken? | Industrialisierung
+2 | Welches Gefängnis stürmten die Pariser am 14. Juli 1789? | Die Bastille
+2 | Wie hieß das Schloss Ludwigs XIV.? | Versailles
+2 | Was war die Erklärung der Menschen- und Bürgerrechte? | Grundrechte für alle Menschen (1789, Frankreich)
+2 | Wer war Kaiser Wilhelm II.? | Letzter deutscher Kaiser (bis 1918)
+2 | Wann endete der Erste Weltkrieg? | 1918
+3 | Wer war Leonardo da Vinci? | Künstler und Erfinder der Renaissance
+3 | Was war der Westfälische Frieden? | Friedensschluss 1648 nach dem Dreißigjährigen Krieg
+3 | Wer erfand die verbesserte Dampfmaschine? | James Watt
+3 | Was war die Märzrevolution? | Revolution 1848 in Deutschland für Einheit und Freiheit
+3 | Was ist Merkantilismus? | Wirtschaftspolitik im Absolutismus: viel exportieren, wenig importieren
+4 | Was forderte Karl Marx? | Eine klassenlose Gesellschaft, Arbeiter sollen die Macht übernehmen
+4 | Wie hieß die Partei der Arbeiter, die 1863/1875 entstand? | SPD (Sozialdemokraten)
+4 | Was war die Kinderarbeit in der Industrialisierung? | Kinder arbeiteten in Fabriken und Bergwerken unter harten Bedingungen
+4 | Welche Länder bildeten die Mittelmächte im Ersten Weltkrieg? | Deutschland, Österreich-Ungarn (mit Osmanischem Reich, Bulgarien)
+4 | Was war der Stellungskrieg? | Krieg in Schützengräben, kaum Geländegewinne
+5 | Welche Stadt war Schauplatz einer verlustreichen Schlacht 1916? | Verdun
+5 | Wann wurde in Deutschland das Frauenwahlrecht eingeführt? | 1918 (erste Wahl 1919)
+5 | Wer rief 1918 die Republik aus? | Philipp Scheidemann (und Karl Liebknecht)
+5 | Was war die Inflation von 1923? | Das Geld verlor fast völlig seinen Wert
+5 | Wer war der erste Reichspräsident der Weimarer Republik? | Friedrich Ebert
+`);
+sekQuizMore(7, "Physik & Chemie", `
+1 | Wie heißt das chemische Symbol für Wasserstoff? | H
+1 | Wie heißt das chemische Symbol für Eisen? | Fe
+1 | In welcher Einheit misst man die Masse? | Kilogramm
+1 | Was ist eine Kraft? | Ursache für Bewegungsänderung oder Verformung
+1 | Was sind Metalle? Nenne drei! | Z. B. Eisen, Kupfer, Aluminium
+2 | Was ist die Formel für die Dichte? | ρ = m : V
+2 | Wie heißt das chemische Symbol für Kohlenstoff? | C
+2 | Was ist ein Molekül? | Verbindung aus mindestens zwei Atomen
+2 | Was zeigt ein Amperemeter an? | Die Stromstärke
+2 | Was ist Kohlenstoffdioxid als Gas wichtig für? | Pflanzen zur Fotosynthese
+3 | Was passiert beim Erhitzen von Kupfer an der Luft? | Es bildet sich schwarzes Kupferoxid
+3 | Was ist ein Hebelgesetz? | Kraft · Kraftarm = Last · Lastarm
+3 | Was ist eine Lauge? | Eine basische Lösung (pH über 7)
+3 | Woran erkennt man eine chemische Reaktion? | Neue Stoffe entstehen, oft mit Energieumsatz
+3 | Was zeigt der Indikator Rotkohlsaft an? | Ob eine Lösung sauer, neutral oder basisch ist
+4 | Was ist Schmelztemperatur? | Die Temperatur, bei der ein Stoff schmilzt
+4 | Was ist die Einheit der Arbeit und Energie? | Joule
+4 | Was besagt das Gesetz von der Erhaltung der Masse? | Bei chemischen Reaktionen bleibt die Gesamtmasse gleich
+4 | Was ist Reduktion? | Abgabe von Sauerstoff (Gegenteil der Oxidation)
+4 | Warum ist der Himmel blau? | Blaues Licht wird in der Luft am stärksten gestreut
+5 | Wie lautet die Formel für den Druck? | p = F : A
+5 | Was ist ein Elementarteilchen mit positiver Ladung im Kern? | Proton
+5 | Was ist die Formel von Ammoniak? | NH₃
+5 | Was beschreibt das erste newtonsche Gesetz? | Trägheit: Ein Körper bleibt in Ruhe oder Bewegung, wenn keine Kraft wirkt
+5 | Welche Gase sind Hauptbestandteile der Luft? | Stickstoff (78 %) und Sauerstoff (21 %)
+`);
+sekQuizMore(7, "Allgemeinwissen", `
+1 | Wie heißt der aktuelle Sitz der Bundesregierung? | Berlin
+1 | Wie heißt die Hauptstadt von Polen? | Warschau
+1 | Wer schrieb „Faust“? | Johann Wolfgang von Goethe
+1 | Was ist ein Emoji? | Ein Bildzeichen in digitalen Nachrichten
+1 | Wie viele Bundesländer hat Österreich? | Neun
+2 | Wie heißt das höchste Gebäude der Welt (Dubai)? | Burj Khalifa
+2 | Wer malte das Bild „Der Schrei“? | Edvard Munch
+2 | Wie heißt die Währung Großbritanniens? | Pfund Sterling
+2 | In welcher Stadt steht die Freiheitsstatue? | New York
+2 | Wie viele deutsche Bundesländer sind Stadtstaaten? | Drei (Berlin, Hamburg, Bremen)
+3 | Was ist ein Vorurteil? | Eine Meinung über Menschen ohne genaue Kenntnis
+3 | Was ist Cybermobbing? | Beleidigen oder Bloßstellen über das Internet
+3 | Was bedeutet „Datenschutz“? | Schutz persönlicher Daten vor Missbrauch
+3 | Wie heißt das Fest der Muslime am Ende des Ramadan? | Fest des Fastenbrechens (Zuckerfest)
+3 | Welche Religion hat die Thora als heilige Schrift? | Judentum
+4 | Was ist ein Passwort-Manager? | Programm, das Passwörter sicher speichert
+4 | Wer war Albert Schweitzer? | Arzt und Theologe, Friedensnobelpreis 1952
+4 | Was ist eine Monarchie? | Staatsform mit König oder Königin an der Spitze
+4 | Wie heißt die Hauptstadt der Schweiz? | Bern
+4 | Was ist ein Influencer? | Person, die in sozialen Medien viele Menschen beeinflusst
+5 | Wer war Mahatma Gandhi? | Anführer des gewaltlosen Widerstands in Indien
+5 | Was ist die UNESCO? | UN-Organisation für Bildung, Wissenschaft und Kultur (Welterbe)
+5 | Was bedeutet „Fake“ bei einem Foto? | Gefälscht oder manipuliert
+5 | Was ist der Unterschied zwischen Brutto und Netto beim Lohn? | Brutto: vor Abzügen; Netto: was ausgezahlt wird
+5 | Wie viele Einwohner hat Deutschland etwa? | Rund 84 Millionen
+`);
+
+/* ---------------- Ausbau Klasse 7/8: übrige Spiele ---------------- */
+sekABCMore(7, `
+Welches Gefängnis wurde am 14. Juli 1789 gestürmt? | Bastille | Tower | Louvre
+Wer verbesserte die Dampfmaschine entscheidend? | James Watt | Thomas Edison | Carl Benz
+Welches chemische Symbol hat Eisen? | Fe | Ei | Ir
+Was ist die Formel für die Dichte? | m : V | m · V | V : m
+Welcher Botenstoff wird bei Stress ausgeschüttet? | Adrenalin | Insulin | Melatonin
+Welches Organ bildet Insulin? | Bauchspeicheldrüse | Leber | Niere
+Welches Land hat die meisten aktiven Vulkane? | Indonesien | Italien | Island
+Wie heißt die Hauptstadt von Irland? | Dublin | Belfast | Cork
+Was bedeutet „to complain“? | sich beschweren | vervollständigen | erklären
+Wer schrieb den „Schimmelreiter“? | Theodor Storm | Theodor Fontane | Thomas Mann
+`);
+sekWFMore(7, `
+W | Pflanzenzellen haben eine Zellwand. | Tierzellen haben nur eine Zellmembran.
+F | Venen führen Blut vom Herzen weg. | Das machen Arterien; Venen führen zum Herzen.
+W | Adrenalin ist ein Stresshormon. | Es macht den Körper schnell leistungsbereit.
+F | Hefe gewinnt Energie nur mit Sauerstoff. | Hefe kann auch Gärung betreiben.
+W | Die Sahelzone liegt südlich der Sahara. | Ein Übergangsgebiet zur Savanne.
+F | Der Himalaya liegt in Südamerika. | Er liegt in Asien.
+W | Der Amazonas führt das meiste Wasser aller Flüsse. | Er ist wasserreicher als der Nil.
+F | Ein Taifun ist etwas anderes als ein Hurrikan. | Es ist dasselbe Phänomen, nur in einer anderen Region.
+W | Die Bastille wurde 1789 gestürmt. | Der 14. Juli ist Frankreichs Nationalfeiertag.
+F | Der Westfälische Frieden beendete den Ersten Weltkrieg. | Er beendete 1648 den Dreißigjährigen Krieg.
+W | Friedrich Ebert war der erste Reichspräsident. | Er amtierte von 1919 bis 1925.
+F | Frauen durften in Deutschland erst nach 1945 wählen. | Das Frauenwahlrecht kam 1918.
+W | Bei chemischen Reaktionen bleibt die Masse erhalten. | Atome gehen nicht verloren.
+F | Laugen haben einen pH-Wert unter 7. | Laugen sind basisch, pH über 7.
+W | Das chemische Symbol für Eisen ist Fe. | Von lateinisch „ferrum“.
+F | Ein Proton ist negativ geladen. | Protonen sind positiv geladen.
+W | „to look forward to“ heißt „sich freuen auf“. | z. B. „I look forward to the holidays.“
+F | „must not“ bedeutet „muss nicht“. | „must not“ = darf nicht; „don’t have to“ = muss nicht.
+W | Eine Hyperbel ist eine Übertreibung. | z. B. „Ich habe tausend Hausaufgaben.“
+F | Eine Satire lobt Missstände. | Sie verspottet sie.
+`);
+sekVerdMore(7, `
+Wie heißt das Schloss des französischen Sonnenkönigs? | Versailles
+Welches Gefängnis wurde am Beginn der Französischen Revolution gestürmt? | Bastille
+Wer verbesserte die Dampfmaschine entscheidend? | James Watt
+In welchem Jahr endete der Dreißigjährige Krieg? | Sechzehnhundertachtundvierzig
+Wie hieß der Friedensvertrag nach dem Dreißigjährigen Krieg? | Westfälischer Frieden
+Welcher Seefahrer umrundete als Erster die Südspitze Afrikas nach Indien? | Vasco da Gama
+Wie nennt man die Epoche der Wiedergeburt von Kunst und Wissen? | Renaissance
+Welcher Künstler malte die Mona Lisa? | Leonardo da Vinci
+Wie hieß der letzte deutsche Kaiser? | Wilhelm der Zweite
+Wann wurde das Deutsche Kaiserreich gegründet? | Achtzehnhunderteinundsiebzig
+Wie nannte man die Not der Arbeiter in den Fabriken? | Soziale Frage
+Welcher Philosoph schrieb das Kommunistische Manifest mit Engels? | Karl Marx
+In welcher Kirche tagte achtzehnhundertachtundvierzig das erste deutsche Parlament? | Paulskirche
+Welche Schlacht bei Verdun dauerte fast ein ganzes Jahr? | Schlacht um Verdun
+Wer war der erste Reichspräsident der Weimarer Republik? | Friedrich Ebert
+In welchem Jahr durften Frauen in Deutschland erstmals wählen? | Neunzehnhundertneunzehn
+Welcher Vertrag beendete den Ersten Weltkrieg für Deutschland? | Versailler Vertrag
+Wie nannte man die Wirtschaftspolitik des Absolutismus? | Merkantilismus
+Wer schlug fünfzehnhundertsiebzehn Thesen an die Kirchentür? | Martin Luther
+Welcher Erfinder ermöglichte den Buchdruck mit beweglichen Lettern? | Johannes Gutenberg
+Wie nennt man die Hülle einer tierischen Zelle? | Zellmembran
+Welche Zellbestandteile haben nur Pflanzenzellen? | Zellwand und Chloroplasten
+Welches Organ bildet das Hormon Insulin? | Bauchspeicheldrüse
+Wie heißt der Botenstoff, der bei Stress ausgeschüttet wird? | Adrenalin
+Wie nennt man die Zeit zwischen Ansteckung und Ausbruch einer Krankheit? | Inkubationszeit
+Welche Eiweiße markieren Krankheitserreger im Blut? | Antikörper
+Wie nennt man alle Lebewesen einer Art in einem Gebiet? | Population
+Welcher Teil des Gehirns steuert das Gleichgewicht? | Kleinhirn
+Wie nennt man den Zuckerabbau ohne Sauerstoff? | Gärung
+Wie nennt man eingewanderte gebietsfremde Pflanzen? | Neophyten
+Wie heißt die Überdüngung von Gewässern? | Eutrophierung
+Welches Brückentier verbindet Reptilien und Vögel? | Archaeopteryx
+Wie nennt man die Überreaktion des Immunsystems auf Pollen? | Allergie
+Welche Blutgefäße führen Blut zum Herzen hin? | Venen
+Wie heißt der Vorgang, bei dem Wasser durch eine Membran wandert? | Osmose
+Wie heißt die Hauptstadt der Volksrepublik China? | Peking
+Welcher Fluss durchquert die ganze Wüste Ägyptens? | Nil
+Wie heißt der höchste Berg Afrikas? | Kilimandscharo
+Wie nennt man die tropischen Grasländer Afrikas? | Savannen
+Welcher Ozean liegt zwischen Afrika und Australien? | Indischer Ozean
+Welches Land hat die meisten aktiven Vulkane der Welt? | Indonesien
+Wie heißt das höchste Gebirge der Erde? | Himalaya
+Wie nennt man den Gürtel aus Vulkanen rund um den Pazifik? | Pazifischer Feuerring
+Welcher Fluss führt weltweit das meiste Wasser? | Amazonas
+Wie heißt eine der trockensten Wüsten der Welt in Chile? | Atacama
+Wie nennt man den Übergangsraum südlich der Sahara? | Sahelzone
+Wie heißt ein tropischer Wirbelsturm über dem Atlantik? | Hurrikan
+Welche Inselgruppe im Pazifik entstand über einem Hot Spot? | Hawaii
+Wie nennt man große Betriebe mit nur einer Nutzpflanze? | Plantagen
+Wie heißt die Hauptstadt von Brasilien? | Brasília
+Wie lautet das chemische Symbol für Eisen? | Fe
+Wie lautet das chemische Symbol für Kohlenstoff? | C
+Wie lautet die Formel für die Dichte eines Stoffes? | Masse durch Volumen
+Welches Messgerät misst die elektrische Stromstärke? | Amperemeter
+Was entsteht, wenn Kupfer an der Luft erhitzt wird? | Kupferoxid
+Wie nennt man eine basische Lösung? | Lauge
+Was zeigt ein Indikator wie Rotkohlsaft an? | Ob etwas sauer oder basisch ist
+In welcher Einheit misst man Arbeit und Energie? | Joule
+Wie nennt man die Abgabe von Sauerstoff bei einer Reaktion? | Reduktion
+Welches Teilchen im Atomkern ist positiv geladen? | Proton
+Welches Teilchen im Atomkern ist ungeladen? | Neutron
+Wie lautet die Formel für Ammoniak? | NH drei
+Welches Gesetz beschreibt die Trägheit von Körpern? | Erstes newtonsches Gesetz
+Wie lautet die Formel für den Druck? | Kraft durch Fläche
+Welches Gas macht etwa achtundsiebzig Prozent der Luft aus? | Stickstoff
+Wie nennt man eine Schaltung mit Lampen hintereinander? | Reihenschaltung
+Wie viel Prozent sind ein Fünftel? | Zwanzig Prozent
+Wie viel sind zwanzig Prozent von zweihundert? | Vierzig
+Wie heißt die Winkelsumme in einem Viereck? | Dreihundertsechzig Grad
+Wie nennt man einen Term mit einer Unbekannten und Gleichheitszeichen? | Gleichung
+Wie heißt das Verfahren über die Einheit beim Rechnen? | Dreisatz
+Was ergibt minus fünf mal minus drei? | Plus fünfzehn
+Wie nennt man Zahlen kleiner als null? | Negative Zahlen
+Wie heißt die Fläche eines Kreises mit Radius r? | Pi mal r Quadrat
+Wie heißt die Strecke durch den Mittelpunkt eines Kreises? | Durchmesser
+Wie nennt man ein Dreieck mit einem rechten Winkel? | Rechtwinkliges Dreieck
+Wie heißt das englische Wort für Erfahrung? | experience
+Was bedeutet das englische Wort neighbour? | Nachbar
+Was bedeutet das englische Wort probably? | wahrscheinlich
+Wie heißt die dritte Form von be? | been
+Wie heißt die Hauptstadt von Irland? | Dublin
+Was bedeutet das englische Wort to complain? | sich beschweren
+Was heißt auf Englisch: Ich freue mich auf die Ferien? | I am looking forward to the holidays
+Welches englische Hilfsverb drückt ein Verbot aus? | must not
+Wie heißt das Relativpronomen für Personen im Englischen? | who
+Wie heißt das Präteritum von bringen? | brachte
+Wie heißt das Partizip zwei von bringen? | gebracht
+Wie nennt man eine starke Übertreibung als Stilmittel? | Hyperbel
+Wie nennt man einen Einschub in einen Satz? | Parenthese
+Wer schrieb die Novelle Der Schimmelreiter? | Theodor Storm
+Wer schrieb die Ballade vom Herrn von Ribbeck? | Theodor Fontane
+Wie nennt man Wörter, die Geräusche nachahmen? | Lautmalerei
+Wie nennt man einen Text, der Missstände verspottet? | Satire
+Welches Versmaß folgt dem Muster betont unbetont? | Trochäus
+Wie heißt die Satzart mit der Aufforderung: Komm her? | Aufforderungssatz
+Wie nennt man die Beschreibung einer Romanfigur? | Charakterisierung
+Wie heißt der Erzähler, der aus Sicht einer Figur erzählt? | Personaler Erzähler
+Wie heißt die Hauptstadt der Schweiz? | Bern
+Welches Gebäude in Dubai ist das höchste der Welt? | Burj Khalifa
+Wer malte das berühmte Bild Der Schrei? | Edvard Munch
+In welcher Stadt steht die Freiheitsstatue? | New York
+Wie heißt die Währung des Vereinigten Königreichs? | Pfund Sterling
+Wie heißt die heilige Schrift des Judentums? | Thora
+Welche Organisation verleiht den Titel Weltkulturerbe? | UNESCO
+Wer führte den gewaltlosen Widerstand in Indien an? | Mahatma Gandhi
+Wie nennt man Beleidigungen über das Internet? | Cybermobbing
+Wie heißt der Lohn vor allen Abzügen? | Bruttolohn
+Wie viele Einwohner hat Deutschland ungefähr? | Vierundachtzig Millionen
+Wie heißt der Sitz des Bundesverfassungsgerichts? | Karlsruhe
+Welcher Fluss bildet die Grenze zwischen Deutschland und Polen? | Oder
+`);
+sekWorteMore(7, `
+RENAISSANCE | Wiedergeburt von Kunst und Wissenschaft
+BUCHDRUCK | Erfindung von Johannes Gutenberg
+ENTDECKUNG | Kolumbus erreicht 1492 Amerika
+THESENANSCHLAG | Luther 1517 in Wittenberg
+DREISSIGJÄHRIG | Der lange Krieg von 1618 bis 1648 war …
+VERSAILLES | Schloss des Sonnenkönigs
+MERKANTILISMUS | Wirtschaftspolitik im Absolutismus
+AUFKLÄRER | Denker, die auf Vernunft setzten
+BASTILLE | Gefängnis, gestürmt am 14. Juli 1789
+MENSCHENRECHTE | Rechte, die allen Menschen zustehen
+NAPOLEON | Französischer Kaiser ab 1804
+NATIONALVERSAMMLUNG | Parlament von 1848 in der Paulskirche
+PAULSKIRCHE | Tagungsort des ersten deutschen Parlaments
+FABRIKARBEIT | Arbeit an Maschinen in der Industrie
+KINDERARBEIT | Kinder schufteten in Fabriken und Bergwerken
+GEWERKSCHAFT | Zusammenschluss von Arbeitnehmern
+SOZIALVERSICHERUNG | Bismarcks Schutz für Arbeiter
+KOMMUNISMUS | Idee einer klassenlosen Gesellschaft
+IMPERIALISMUS | Streben nach Weltmacht durch Kolonien
+SCHÜTZENGRABEN | Typisch für den Stellungskrieg
+WAFFENSTILLSTAND | Ende der Kämpfe am 11. November 1918
+REPUBLIK | Staat ohne König oder Kaiser
+FRAUENWAHLRECHT | Seit 1918 in Deutschland
+REICHSPRÄSIDENT | Staatsoberhaupt der Weimarer Republik
+ZELLMEMBRAN | Hülle einer Tierzelle
+ZELLWAND | Feste Hülle der Pflanzenzelle
+VAKUOLE | Großer Saftraum in der Pflanzenzelle
+ZELLKERN | Enthält die Erbinformation
+MIKROSKOP | Gerät zum Betrachten kleiner Dinge
+BAKTERIEN | Einzeller, manche machen krank
+VIREN | Vermehren sich nur in fremden Zellen
+ANTIKÖRPER | Markieren Krankheitserreger
+IMPFUNG | Schützt vor ansteckenden Krankheiten
+INKUBATIONSZEIT | Zeit zwischen Ansteckung und Erkrankung
+ALLERGIE | Überreaktion auf harmlose Stoffe
+ADRENALIN | Stresshormon
+BAUCHSPEICHELDRÜSE | Bildet Insulin
+DÜNNDARM | Hier werden Nährstoffe aufgenommen
+VERDAUUNG | Zerlegung der Nahrung
+KREISLAUF | Weg des Blutes durch den Körper
+ARTERIE | Führt Blut vom Herzen weg
+KLEINHIRN | Steuert Gleichgewicht und Bewegung
+PUBERTÄT | Zeit der körperlichen Veränderungen
+POPULATION | Alle Tiere einer Art in einem Gebiet
+PRODUZENT | Pflanze, die Nährstoffe herstellt
+KONSUMENT | Lebewesen, das andere frisst
+ZERSETZER | Baut tote Stoffe ab
+OSMOSE | Wasser wandert durch eine Membran
+EUTROPHIERUNG | Überdüngung von Gewässern
+NEOPHYT | Eingewanderte Pflanze
+EVOLUTIONSTHEORIE | Charles Darwins wichtigste Idee
+KONTINENTALDRIFT | Die Kontinente wandern
+ERDBEBEN | Die Erde bebt an Plattengrenzen
+VULKANAUSBRUCH | Magma tritt als Lava aus
+FEUERRING | Vulkangürtel rund um den Pazifik
+SAVANNE | Tropisches Grasland
+REGENWALD | Feuchter Wald in den Tropen
+SAHELZONE | Übergangsraum südlich der Sahara
+OASE | Wasserstelle in der Wüste
+PLANTAGE | Großbetrieb mit einer Nutzpflanze
+HURRIKAN | Tropischer Wirbelsturm im Atlantik
+TAIFUN | Tropischer Wirbelsturm im Westpazifik
+MONSUNREGEN | Starker Regen in Südasien im Sommer
+BEWÄSSERUNG | Künstliche Wasserzufuhr für Felder
+ROHSTOFF | Zum Beispiel Erdöl oder Eisenerz
+HIMALAYA | Höchstes Gebirge der Erde
+ATACAMA | Sehr trockene Wüste in Chile
+TREIBHAUSGAS | Zum Beispiel Kohlenstoffdioxid
+ELEMENT | Grundstoff aus nur einer Atomsorte
+MOLEKÜL | Verbindung aus mehreren Atomen
+VERBINDUNG | Stoff aus verschiedenen Elementen
+INDIKATOR | Zeigt sauer oder basisch an
+NEUTRALISATION | Säure und Lauge heben sich auf
+REDUKTION | Abgabe von Sauerstoff
+VERBRENNUNG | Reaktion mit Sauerstoff, oft mit Flamme
+KUPFEROXID | Schwarzer Stoff aus Kupfer und Sauerstoff
+DICHTE | Masse pro Volumen
+DRUCK | Kraft pro Fläche
+TRÄGHEIT | Körper bleiben in Ruhe oder Bewegung
+HEBELGESETZ | Kraft mal Kraftarm gleich Last mal Lastarm
+AMPEREMETER | Misst die Stromstärke
+VOLTMETER | Misst die Spannung
+STROMSTÄRKE | Wird in Ampere gemessen
+LEISTUNG | Wird in Watt gemessen
+PROTON | Positiv geladenes Kernteilchen
+NEUTRON | Ungeladenes Kernteilchen
+TERMUMFORMUNG | Einen Term vereinfachen
+VARIABLE | Platzhalter wie x
+PROPORTIONAL | Doppelt so viel kostet doppelt so viel
+PROZENTSATZ | Zum Beispiel 25 %
+GRUNDWERT | Das Ganze bei der Prozentrechnung
+ZINSEN | Geld für geliehenes Geld
+KREISFLÄCHE | Pi mal Radius zum Quadrat
+DURCHMESSER | Doppelter Radius
+NEGATIVE | Zahlen kleiner als null heißen …
+EXPERIENCE | Englisch: Erfahrung
+NEIGHBOUR | Englisch: Nachbar
+DANGEROUS | Englisch: gefährlich
+PROBABLY | Englisch: wahrscheinlich
+ALTHOUGH | Englisch: obwohl
+ENVIRONMENT | Englisch: Umwelt
+HYPERBEL | Starke Übertreibung
+PARENTHESE | Einschub in einen Satz
+LAUTMALEREI | Wörter wie „zischen“ oder „klirren“
+SATIRE | Verspottet Missstände
+CHARAKTERISIERUNG | Beschreibung einer Romanfigur
+INDIKATIV | Wirklichkeitsform des Verbs
+PLUSQUAMPERFEKT | Vorvergangenheit
+NEBENSATZ | Kann nicht allein stehen
+BERICHT | Sachliche Darstellung eines Ereignisses
+`);
+sekBlitzMore(7, `
+Futur I von „wir lesen“? | wir werden lesen
+Partizip II von „bringen“? | gebracht
+Konjunktiv II von „haben“? | hätte
+Konjunktiv II von „sein“? | wäre
+Wortart von „sehr“? | Adverb
+Wortart von „dass“? | Konjunktion (Subjunktion)
+Stilmittel: „Ich hab’s dir tausendmal gesagt“? | Hyperbel
+Stilmittel: „Die Sonne lacht“? | Personifikation
+Stilmittel: „kalt wie Eis“? | Vergleich
+Versmaß betont – unbetont? | Trochäus
+Versmaß unbetont – betont? | Jambus
+Gedicht mit 14 Versen? | Sonett
+Zeitform einer Inhaltsangabe? | Präsens
+Wer schrieb „Der Schimmelreiter“? | Theodor Storm
+Wer schrieb „Herr von Ribbeck auf Ribbeck“? | Fontane
+Wer schrieb „Der Erlkönig“? | Goethe
+Wer schrieb „Effi Briest“? | Fontane
+3. Form von „be“? | been
+3. Form von „go“? | gone
+3. Form von „see“? | seen
+3. Form von „buy“? | bought
+Englisch für „gefährlich“? | dangerous
+Englisch für „Nachbar“? | neighbour
+Englisch für „wahrscheinlich“? | probably
+Englisch für „sich beschweren“? | to complain
+Englisch für „bevorzugen“? | to prefer
+Englisch für „dürfen“? | to be allowed to
+Englisch für „während“? | while
+Relativpronomen für Personen (Englisch)? | who
+Relativpronomen für Dinge (Englisch)? | which
+Hauptstadt von Irland? | Dublin
+Hauptstadt von Wales? | Cardiff
+Hülle der Tierzelle? | Zellmembran
+Hülle der Pflanzenzelle? | Zellwand
+Ort der Fotosynthese? | Chloroplasten
+Organ, das Galle bildet? | Leber
+Stresshormon? | Adrenalin
+Blutzellen gegen Erreger? | Weiße Blutkörperchen
+Gefäße zum Herzen hin? | Venen
+Gefäße vom Herzen weg? | Arterien
+Medikament gegen Bakterien? | Antibiotikum
+Zeit bis zum Krankheitsausbruch? | Inkubationszeit
+Überdüngung von Gewässern? | Eutrophierung
+Eingewanderte Pflanzen? | Neophyten
+Zuckerabbau ohne Sauerstoff? | Gärung
+Grüner Farbstoff der Pflanzen? | Chlorophyll
+Brückentier zwischen Reptil und Vogel? | Archaeopteryx
+Hauptstadt von China? | Peking
+Hauptstadt von Russland? | Moskau
+Hauptstadt von Brasilien? | Brasília
+Hauptstadt von Japan? | Tokio
+Höchster Berg Afrikas? | Kilimandscharo
+Höchster Berg Europas? | Mont Blanc
+Wasserreichster Fluss? | Amazonas
+Längster Fluss der Welt? | Nil
+Wüste in der Mongolei? | Gobi
+Trockene Wüste in Chile? | Atacama
+Grasland in Afrika? | Savanne
+Wirbelsturm im Atlantik? | Hurrikan
+Wirbelsturm im Westpazifik? | Taifun
+Wind, der die Richtung wechselt? | Monsun
+Vulkangürtel um den Pazifik? | Feuerring
+Land mit den meisten aktiven Vulkanen? | Indonesien
+Gestürmt am 14. Juli 1789? | Bastille
+Schloss Ludwigs XIV.? | Versailles
+Spitzname Ludwigs XIV.? | Sonnenkönig
+Ende des Dreißigjährigen Kriegs? | 1648
+Krönung Napoleons zum Kaiser? | 1804
+Revolution in Deutschland? | 1848
+Ende des Ersten Weltkriegs? | 1918
+Erster Reichspräsident? | Friedrich Ebert
+Schlacht 1916 in Frankreich? | Verdun
+Erfinder der verbesserten Dampfmaschine? | James Watt
+Verfasser des Kommunistischen Manifests? | Marx und Engels
+Erfinder des Buchdrucks? | Gutenberg
+Wer erreichte 1498 Indien auf dem Seeweg? | Vasco da Gama
+Symbol von Eisen? | Fe
+Symbol von Kohlenstoff? | C
+Symbol von Wasserstoff? | H
+Symbol von Sauerstoff? | O
+Symbol von Silber? | Ag
+Formel von Ammoniak? | NH₃
+Formel der Dichte? | m : V
+Formel des Drucks? | F : A
+Formel der Geschwindigkeit? | s : t
+Einheit der Spannung? | Volt
+Einheit der Frequenz? | Hertz
+SI-Einheit der Temperatur? | Kelvin
+Einheit der Leistung? | Watt
+Einheit der Kraft? | Newton
+Einheit des Drucks? | Pascal
+Positives Teilchen im Kern? | Proton
+Ungeladenes Teilchen im Kern? | Neutron
+pH-Wert einer Lauge: über oder unter 7? | über 7
+Edelgas in Leuchtreklamen? | Neon
+(−7) · (−4)? | 28
+(−12) + 5? | −7
+10 % von 350? | 35
+50 % von 84? | 42
+Winkelsumme im Dreieck? | 180°
+Winkelsumme im Viereck? | 360°
+Löse: 2x + 4 = 18 | x = 7
+Löse: 5x = 45 | x = 9
+3 Hefte kosten 6 €, 5 Hefte kosten? | 10 €
+Kreisumfang mit d = 10 cm (π ≈ 3,14)? | 31,4 cm
+Staatsoberhaupt Deutschlands? | Bundespräsident
+Höchstes Gebäude der Welt? | Burj Khalifa
+Maler von „Der Schrei“? | Edvard Munch
+Heilige Schrift des Judentums? | Thora
+Gründer des Roten Kreuzes? | Henry Dunant
+`);
+sekDuellMore(7, `
+Nenne eine App, die fast jeder auf dem Handy hat! | WhatsApp 34; Instagram 22; TikTok 16; YouTube 12; Snapchat 10; Spotify 6
+Nenne etwas, das man für eine Klassenarbeit braucht! | Stift 30; Lernen 24; Spickzettel 16; Taschenrechner 12; Glück 10; Nerven 8
+Nenne ein Videospiel! | Minecraft 30; Fortnite 24; FIFA / EA FC 18; Mario Kart 12; Roblox 10; Pokémon 6
+Nenne etwas, das man in der achten Klasse macht! | Praktikum 26; Klassenfahrt 24; Referate halten 18; Erste Liebe 14; Berufsorientierung 10; Tanzkurs 8
+Nenne eine Sportart, die im Fernsehen läuft! | Fußball 40; Formel 1 18; Tennis 12; Handball 12; Basketball 10; Skispringen 8
+Nenne etwas, das Eltern oft sagen! | Räum dein Zimmer auf 32; Mach deine Hausaufgaben 24; Leg das Handy weg 18; Geh schlafen 12; Iss dein Gemüse 8; Zieh dich warm an 6
+Nenne einen Grund, das Handy zu benutzen! | Chatten 30; Videos schauen 22; Musik hören 18; Spielen 14; Fotografieren 10; Telefonieren 6
+Nenne ein Fastfood-Restaurant! | McDonald’s 40; Burger King 24; KFC 12; Subway 10; Pizza Hut 8; Domino’s 6
+Nenne etwas, das man auf einer Klassenfahrt macht! | Wandern 26; Party machen 24; Museum besuchen 18; Lange wach bleiben 14; Schwimmen 10; Stadtführung 8
+Nenne eine Eigenschaft eines guten Freundes! | Ehrlich 30; Treu 22; Lustig 18; Hilfsbereit 14; Zuverlässig 10; Verschwiegen 6
+Nenne ein Land, in dem man Spanisch spricht! | Spanien 40; Mexiko 22; Argentinien 14; Kolumbien 10; Chile 8; Peru 6
+Nenne einen berühmten Fußballverein! | FC Bayern 36; Real Madrid 20; Borussia Dortmund 16; FC Barcelona 14; Manchester United 8; Juventus Turin 6
+Nenne etwas, das in einem Labor steht! | Mikroskop 30; Reagenzglas 26; Bunsenbrenner 18; Waage 12; Pipette 8; Schutzbrille 6
+Nenne ein Wort, das Jugendliche gerade oft sagen! | Krass 26; Digga 22; Cringe 18; Safe 14; Lost 12; Bro 8
+Nenne einen Grund, warum man streitet! | Missverständnis 26; Eifersucht 22; Lügen 18; Geld 14; Langeweile 10; Ungerechtigkeit 10
+Nenne einen Gegenstand, den man auf eine einsame Insel mitnehmen würde! | Messer 26; Wasser 22; Feuerzeug 18; Handy 14; Zelt 10; Buch 10
+Nenne etwas, das man an einem Wochenende macht! | Ausschlafen 30; Freunde treffen 24; Zocken 16; Sport 14; Familie besuchen 10; Shoppen 6
+Nenne ein Thema im Biologie-Unterricht! | Zelle 26; Körper 22; Pflanzen 18; Tiere 14; Ökologie 12; Genetik 8
+Nenne eine Erfindung, die die Welt verändert hat! | Internet 30; Rad 22; Strom 18; Buchdruck 14; Telefon 10; Auto 6
+Nenne einen Planeten unseres Sonnensystems außer der Erde! | Mars 32; Jupiter 24; Saturn 18; Venus 12; Merkur 8; Neptun 6
+Nenne etwas, das man im Sportverein macht! | Fußball 36; Turnen 16; Schwimmen 14; Handball 14; Tennis 10; Leichtathletik 10
+Nenne ein Tier, das vom Aussterben bedroht ist! | Eisbär 28; Panda 24; Tiger 18; Nashorn 14; Orang-Utan 10; Gorilla 6
+Nenne eine Sehenswürdigkeit in Europa! | Eiffelturm 34; Kolosseum 20; Big Ben 16; Brandenburger Tor 14; Schiefer Turm von Pisa 10; Akropolis 6
+Nenne etwas, das man mit Freunden in der Stadt macht! | Shoppen 30; Essen gehen 24; Kino 18; Eis essen 12; Rumhängen 10; Bowling 6
+Nenne ein Schulfach, das viele schwer finden! | Mathe 42; Physik 18; Chemie 14; Latein 10; Französisch 10; Englisch 6
+Nenne etwas, das man bei Liebeskummer macht! | Weinen 30; Mit Freunden reden 24; Schokolade essen 16; Traurige Musik hören 14; Ablenken 10; Schlafen 6
+Nenne eine Musikrichtung! | Pop 30; Rap / Hip-Hop 26; Rock 16; Techno 12; Klassik 10; Schlager 6
+Nenne etwas, das man gegen Langeweile tut! | Handy 34; Fernsehen 18; Zocken 16; Rausgehen 14; Lesen 10; Schlafen 8
+Nenne einen Beruf, den man im Fernsehen sieht! | Polizist/-in 30; Arzt/Ärztin 24; Moderator/-in 18; Koch/Köchin 12; Anwalt/Anwältin 10; Detektiv/-in 6
+Nenne etwas, das zum Umweltschutz beiträgt! | Müll trennen 30; Fahrrad fahren 22; Weniger Plastik 18; Strom sparen 14; Bäume pflanzen 10; Weniger Fleisch 6
+Nenne etwas, das man beim Zahnarzt erlebt! | Bohren 30; Spritze 22; Kontrolle 18; Zahnreinigung 14; Angst 10; Mund weit auf 6
+Nenne einen Grund für einen Schulverweis! | Prügelei 34; Schwänzen 18; Mobbing 16; Diebstahl 12; Respektlosigkeit 12; Drogen 8
+Nenne ein Lieblingsessen in der Mensa! | Pizza 28; Nudeln 26; Schnitzel 16; Pommes 14; Burger 10; Currywurst 6
+Nenne ein Land in Asien! | China 32; Japan 24; Indien 18; Thailand 12; Südkorea 8; Vietnam 6
+Nenne etwas, das man mit einem Taschenrechner macht! | Rechnen 46; Wurzel ziehen 16; Prozent ausrechnen 12; Wörter tippen 10; Brüche 10; Potenzen 6
+Nenne eine Fremdsprache, die man in der Schule lernen kann! | Englisch 34; Französisch 26; Spanisch 18; Latein 14; Russisch 4; Italienisch 4
+Nenne einen Grund, warum man nicht einschlafen kann! | Handy 30; Stress 22; Lärm 16; Gedanken 14; Hitze 10; Zu viel Cola 8
+Nenne etwas, das in einer Stadt rund um die Uhr geöffnet hat! | Tankstelle 32; Krankenhaus 26; Polizei 16; Fastfood 12; Kiosk 8; Fitnessstudio 6
+Nenne eine bekannte Marke für Sportschuhe! | Nike 40; Adidas 30; Puma 14; New Balance 8; Asics 4; Reebok 4
+Nenne etwas, das man zum Geburtstag geschenkt bekommt! | Geld 30; Gutschein 22; Kleidung 16; Spiele 14; Bücher 10; Kopfhörer 8
+Nenne ein Ereignis, bei dem man feiert! | Geburtstag 30; Hochzeit 22; Silvester 18; Abschluss 14; Weihnachten 10; Sieg im Sport 6
+Nenne einen Gegenstand, den man in der Schule verlieren kann! | Stift 28; Schlüssel 22; Handy 16; Jacke 14; Trinkflasche 12; Hausaufgaben 8
+Nenne ein Tier, das giftig ist! | Schlange 34; Spinne 22; Skorpion 18; Qualle 12; Frosch 8; Wespe 6
+Nenne eine Stadt in den USA! | New York 36; Los Angeles 22; Chicago 14; Miami 12; Las Vegas 10; San Francisco 6
+Nenne etwas, das man beim Kochen braucht! | Topf 28; Herd 24; Messer 18; Pfanne 14; Löffel 10; Zutaten 6
+Nenne ein Gericht aus einem anderen Land! | Pizza 30; Sushi 22; Döner 18; Tacos 14; Paella 10; Curry 6
+Nenne einen Gegenstand, der früher üblich war und heute selten ist! | Kassette 26; Telefonzelle 22; CD 18; Faxgerät 14; Röhrenfernseher 10; Schreibmaschine 10
+Nenne etwas, das Jugendliche sammeln! | Sneaker 26; Karten 22; Followers 18; Münzen 12; Briefmarken 12; Figuren 10
+Nenne eine Tätigkeit im Internet! | Surfen 26; Chatten 24; Streamen 18; Einkaufen 14; Recherchieren 10; Spielen 8
+Nenne einen Weg, Geld zu verdienen, als Jugendlicher! | Babysitten 30; Zeitung austragen 22; Nachhilfe 18; Rasenmähen 12; Ferienjob 12; Hund ausführen 6
+Nenne etwas, das man in Physik misst! | Länge 26; Zeit 22; Temperatur 18; Spannung 14; Masse 12; Geschwindigkeit 8
+Nenne eine Eigenschaft, die ein Lehrer haben sollte! | Gerecht 30; Geduldig 22; Lustig 18; Freundlich 14; Streng 10; Klug 6
+Nenne einen Fluss in Europa! | Rhein 30; Donau 26; Themse 14; Seine 12; Elbe 10; Wolga 8
+Nenne eine Jahreszahl, die man in Geschichte kennen muss! | 1989 30; 1945 26; 1492 16; 1789 14; 1914 8; 1871 6
+Nenne einen Grund, warum Menschen Sport treiben! | Gesundheit 32; Spaß 24; Abnehmen 16; Fitness 14; Freunde 8; Wettkampf 6
+Nenne etwas, das an einer Bushaltestelle ist! | Fahrplan 32; Bank 24; Dach 16; Mülleimer 14; Schild 10; Werbung 4
+Nenne ein Wort, das mit „Schul-“ anfängt und nervt! | Schulaufgabe 26; Schulweg 22; Schulstress 20; Schulranzen 12; Schulpflicht 12; Schulklingel 8
+Nenne etwas, das man an einem Fluss findet! | Brücke 30; Steine 22; Fische 18; Ufer 14; Boot 10; Enten 6
+Nenne ein Tier, das in der Arktis lebt! | Eisbär 40; Robbe 22; Polarfuchs 14; Walross 10; Schneeeule 8; Rentier 6
+Nenne etwas, das man bei einem Referat braucht! | Präsentation 30; Plakat 22; Mut 18; Karteikarten 14; Laptop 10; Beamer 6
+Nenne ein berühmtes Gemälde! | Mona Lisa 44; Der Schrei 18; Sternennacht 14; Das letzte Abendmahl 10; Sonnenblumen 8; Die Geburt der Venus 6
+Nenne etwas, das man auf einem Konzert macht! | Tanzen 30; Mitsingen 26; Filmen 16; Springen 12; Klatschen 10; Getränke kaufen 6
+Nenne eine Eigenschaft einer guten Klassenarbeit (aus Schülersicht)! | Leicht 34; Kurz 22; Angekündigt 16; Gute Note 14; Mit Wahlaufgaben 8; Keine Rechtschreibung 6
+Nenne einen Gegenstand mit Akku! | Handy 34; Laptop 20; Kopfhörer 16; E-Scooter 12; Tablet 10; Elektroauto 8
+Nenne etwas, das man in der Mittagspause macht! | Essen 34; Handy 20; Reden 18; Sport 12; Hausaufgaben 10; Chillen 6
+Nenne ein Gemüse, das viele nicht mögen! | Rosenkohl 34; Brokkoli 20; Spinat 18; Paprika 10; Zwiebeln 10; Pilze 8
+Nenne eine Großstadt in Deutschland! | Berlin 34; Hamburg 22; München 18; Köln 12; Frankfurt 8; Stuttgart 6
+Nenne etwas, das man im Notfall macht! | 112 anrufen 40; Erste Hilfe 22; Ruhe bewahren 14; Hilfe holen 12; Unfallstelle sichern 8; Weglaufen 4
+Nenne ein Getränk mit Koffein! | Kaffee 34; Cola 26; Energydrink 18; Tee 12; Mate 6; Eistee 4
+Nenne eine Situation, in der man rot wird! | Peinlicher Moment 30; Verliebt sein 24; Vor der Klasse reden 18; Lob 12; Lügen 10; Hinfallen 6
+Nenne etwas, das man über einen Promi wissen will! | Alter 26; Freund/Freundin 24; Geld 18; Wohnort 12; Größe 10; Lieblingsessen 10
+Nenne einen Ort, an dem man Pause vom Alltag macht! | Strand 30; Berge 22; Zuhause 18; See 12; Park 10; Wellness 8
+Nenne eine Naturkatastrophe! | Erdbeben 30; Tsunami 22; Hurrikan 18; Überschwemmung 14; Vulkanausbruch 10; Waldbrand 6
+Nenne etwas, das man von seinem Taschengeld kauft! | Süßigkeiten 30; Kleidung 22; Spiele 18; Essen 14; Handyguthaben 10; Kino 6
+Nenne einen Gegenstand in einem Chemieraum! | Bunsenbrenner 30; Reagenzglas 24; Schutzbrille 18; Abzug 12; Periodensystem 10; Erlenmeyerkolben 6
+Nenne etwas, das man bei einer Wanderung sieht! | Bäume 30; Berge 22; Tiere 16; Wasserfall 14; Aussicht 10; Hütte 8
+Nenne eine Mannschaftssportart! | Fußball 36; Handball 18; Basketball 16; Volleyball 14; Eishockey 10; Hockey 6
+Nenne einen Grund für Verspätung beim Unterricht! | Verschlafen 34; Bus verpasst 24; Toilette 14; Lehrer hat überzogen 12; Stau 10; Ausrede 6
+Nenne ein Wort aus der Computerwelt! | Internet 26; Maus 22; Tastatur 18; Bildschirm 14; Software 12; Update 8
+Nenne eine Superkraft, die man gern hätte! | Fliegen 32; Unsichtbar sein 22; Teleportieren 18; Gedanken lesen 14; Zeit anhalten 10; Superstärke 4
+Nenne etwas, das man mit 16 anders machen darf als mit 14! | Bis 24 Uhr ausgehen 30; Rollerführerschein 24; Bier/Wein trinken 18; Ausbildung 12; Wählen (Kommunal) 10; Ohne Eltern verreisen 6
+Nenne einen Grund, ein Haustier zu haben! | Freundschaft 30; Kuscheln 24; Verantwortung 16; Gesellschaft 14; Bewegung 10; Spaß 6
+Nenne eine Insel in Nord- oder Ostsee! | Sylt 30; Rügen 24; Helgoland 16; Usedom 12; Norderney 10; Fehmarn 8
+Nenne etwas, das man beim Joggen trägt! | Laufschuhe 34; Sportkleidung 26; Kopfhörer 18; Uhr 10; Stirnband 6; Trinkflasche 6
+Nenne einen Gegenstand aus Metall! | Löffel 26; Schlüssel 24; Münze 18; Nagel 14; Dose 10; Fahrrad 8
+Nenne eine Situation, in der man lügt! | Ausreden 30; Hausaufgaben vergessen 22; Geschenk gefällt nicht 18; Zu spät gekommen 12; Note verschweigen 10; Überraschung 8
+Nenne etwas, das man an einem Bahnhof macht! | Warten 30; Ticket kaufen 24; Zug fahren 18; Essen kaufen 12; Gleis suchen 10; Abschied nehmen 6
+Nenne etwas, das man auf dem Weg zur Schule sieht! | Autos 30; Bäume 20; Freunde 18; Bus 14; Häuser 10; Hunde 8
+Nenne einen Ort, an dem man Ruhe findet! | Zimmer 30; Natur 24; Bibliothek 16; Kirche 12; Bett 10; Strand 8
+Nenne eine Farbe, die man oft auf Flaggen sieht! | Rot 34; Weiß 22; Blau 18; Grün 12; Gelb 8; Schwarz 6
+Nenne eine Aufgabe, die man im Haushalt erledigen muss! | Zimmer aufräumen 30; Spülmaschine ausräumen 22; Müll rausbringen 18; Staubsaugen 14; Tisch decken 10; Wäsche aufhängen 6
+Nenne etwas, das man am Computer schreibt! | E-Mail 28; Referat 24; Nachricht 18; Hausaufgaben 14; Bewerbung 10; Code 6
+Nenne einen Grund, ins Museum zu gehen! | Klassenausflug 34; Lernen 22; Kunst ansehen 16; Regenwetter 12; Dinosaurier 10; Langeweile 6
+Nenne eine Insel, auf der man Urlaub macht! | Mallorca 34; Sylt 18; Kreta 16; Rügen 12; Teneriffa 12; Bali 8
+Nenne ein Tier, das im Meer gefährlich ist! | Hai 46; Qualle 18; Rochen 12; Krokodil 10; Seeigel 8; Muräne 6
+Nenne etwas, das man vor einem Vorstellungsgespräch macht! | Informieren 30; Gut anziehen 26; Üben 16; Pünktlich losfahren 12; Durchatmen 10; Haare machen 6
+Nenne etwas, das in einer Großstadt nervt! | Verkehr 30; Lärm 24; Müll 16; Menschenmassen 14; Mieten 10; Abgase 6
+Nenne einen Gegenstand, den man zum Zelten braucht! | Zelt 36; Schlafsack 24; Isomatte 14; Taschenlampe 12; Kocher 8; Heringe 6
+Nenne etwas, das sich mit der Pubertät verändert! | Stimme 30; Körper 24; Laune 18; Pickel 14; Haare 8; Interessen 6
+Nenne einen Ort, an dem man nicht telefonieren sollte! | Kino 30; Unterricht 24; Kirche 18; Bibliothek 14; Krankenhaus 8; Flugzeug 6
+Nenne etwas, das in der Zeitung steht! | Nachrichten 32; Wetter 20; Sport 18; Werbung 14; Horoskop 8; Rätsel 8
+Nenne eine Strafe, die Eltern verhängen! | Handyverbot 36; Hausarrest 26; Kein Taschengeld 14; Kein Fernsehen 10; Früher ins Bett 8; Zimmer aufräumen 6
+Nenne einen Grund, warum man umzieht! | Neuer Job 30; Größere Wohnung 24; Familie 18; Schule 12; Trennung 10; Neue Stadt 6
+Nenne einen Gegenstand in einem Badezimmer! | Zahnbürste 28; Dusche 24; Spiegel 18; Handtuch 14; Toilette 10; Seife 6
+Nenne etwas, das man im Winterurlaub macht! | Skifahren 40; Snowboarden 20; Rodeln 14; Schneeballschlacht 12; Schneemann bauen 8; Sauna 6
+Nenne einen Gegenstand, den es in jedem Klassenraum gibt! | Tafel 34; Tische 22; Stühle 18; Uhr 12; Fenster 8; Mülleimer 6
+Nenne eine Ausrede für vergessene Hausaufgaben! | Der Hund hat sie gefressen 34; Vergessen 22; Krank gewesen 16; Zuhause liegen lassen 12; Nicht verstanden 10; Drucker kaputt 6
+Nenne etwas, das man in einem Freibad macht! | Schwimmen 34; Rutschen 22; Springen 18; Sonnen 12; Pommes essen 8; Volleyball 6
+`);
+sekReihMore(7, `
+Entdeckungen und Erfindungen | Buchdruck (um 1450) > Amerika erreicht (1492) > Seeweg nach Indien (1498) > Erste Weltumsegelung (1522)
+Reformation | Thesenanschlag (1517) > Reichstag zu Worms (1521) > Bauernkrieg (1525) > Augsburger Religionsfrieden (1555)
+Absolutismus bis Revolution | Ludwig XIV. wird König > Bau von Versailles > Sturm auf die Bastille > Hinrichtung Ludwigs XVI.
+Napoleon | Konsul (1799) > Kaiser (1804) > Russlandfeldzug (1812) > Waterloo (1815)
+Deutsche Einigung | Wiener Kongress (1815) > Hambacher Fest (1832) > Paulskirche (1848) > Reichsgründung (1871)
+Industrialisierung in Deutschland | Erste Eisenbahn Nürnberg–Fürth (1835) > Gründung der SPD-Vorläufer (1863) > Reichsgründung (1871) > Sozialversicherung (ab 1883)
+Erster Weltkrieg | Attentat von Sarajevo > Kriegsbeginn > Schlacht von Verdun > Waffenstillstand
+Weimarer Republik | Ausrufung der Republik (1918) > Verfassung (1919) > Hyperinflation (1923) > Weltwirtschaftskrise (1929)
+Der Weg des Blutes durch den Körper | Rechte Herzkammer > Lunge > Linke Herzkammer > Körperkreislauf
+Verdauung | Mund > Magen > Dünndarm > Dickdarm
+Ablauf einer Infektion | Ansteckung > Inkubationszeit > Krankheitsausbruch > Genesung
+Immunreaktion | Erreger dringt ein > Fresszellen greifen an > Antikörper werden gebildet > Gedächtniszellen bleiben
+Vom Licht zum Zucker | Licht wird aufgenommen > Wasser wird gespalten > CO₂ wird gebunden > Traubenzucker entsteht
+Nahrungskette im See | Algen > Wasserfloh > Fisch > Reiher
+Ökologische Sukzession (vom kahlen Boden zum Wald) | Flechten und Moose > Gräser > Sträucher > Wald
+Zellebenen – vom kleinsten | Zelle > Gewebe > Organ > Organismus
+Erdschichten von oben nach unten | Kruste > Mantel > äußerer Kern > innerer Kern
+Vulkanausbruch | Magma steigt auf > Druck in der Kammer steigt > Ausbruch > Lava fließt
+Entstehung eines tropischen Wirbelsturms | Warmes Meer > Viel Verdunstung > Wolken drehen sich > Hurrikan
+Höhenstufen im Gebirge – von unten nach oben | Laubwald > Nadelwald > Almwiesen > Schnee und Fels
+Klimazonen von Nord nach Süd (Europa → Afrika) | Kalte Zone > Gemäßigte Zone > Subtropen > Tropen
+Kontinente nach Bevölkerung – vom größten | Asien > Afrika > Europa > Südamerika
+Große Wüsten – von groß nach klein | Sahara > Arabische Wüste > Gobi > Kalahari
+Vom Erdöl zum Kunststoff | Bohren > Raffinieren > Chemische Umwandlung > Plastikflasche
+Stoffumwandlung bei der Verbrennung | Brennstoff > Zündtemperatur > Flamme > Asche und Gase
+Atombau von innen nach außen | Protonen und Neutronen > Atomkern > Elektronen > Atomhülle
+pH-Skala von sauer nach basisch | Salzsäure > Zitronensaft > Wasser > Natronlauge
+Vom Strom zum Licht (Glühlampe) | Steckdose > Kabel > Glühdraht wird heiß > Licht
+Geschwindigkeiten – von langsam nach schnell | Fußgänger > Radfahrer > Auto auf der Autobahn > Flugzeug
+Spannungen – von klein nach groß | Batterie 1,5 V > Autobatterie 12 V > Steckdose 230 V > Hochspannung 380.000 V
+Dichte – von leicht nach schwer | Luft > Holz > Wasser > Eisen
+Lösen einer Gleichung: 2x + 3 = 11 | 2x + 3 = 11 > 2x = 8 > x = 4 > Probe: 2 · 4 + 3 = 11
+Prozentrechnung – von klein nach groß | 5 % > 1/10 > 0,25 > 3/4
+Negative Zahlen – von klein nach groß | −12 > −5 > 0 > 3
+Dreisatz | Gegeben: 3 kg kosten 6 € > Für 1 kg: 2 € > Für 5 kg: 10 € > Antwort formulieren
+Bau einer Argumentation | These > Argument > Beleg > Beispiel
+Inhaltsangabe schreiben | Text lesen > Wichtiges markieren > Einleitung mit Titel und Autor > Hauptteil im Präsens
+Ballade „Der Erlkönig“ | Vater reitet mit Kind > Kind sieht den Erlkönig > Erlkönig lockt > Kind ist tot
+Englische Zeiten – von der Vergangenheit in die Zukunft | I had seen > I saw > I see > I will see
+Englischer Brief | Dear … > Introduction > Main part > Best wishes
+Bewerbungsmappe | Deckblatt > Anschreiben > Lebenslauf > Zeugnisse
+Medien in der Geschichte | Buchdruck > Zeitung > Radio > Internet
+Kommunikation | Brief > Telegramm > Telefon > Smartphone
+Verkehrsmittel – von früh nach spät | Kutsche > Dampflok > Auto > Flugzeug
+Werdegang eines Gesetzes | Entwurf > Bundestag > Bundesrat > Bundespräsident unterschreibt
+`);
+sekZuordMore(7, `
+Renaissance oder Reformation? | Renaissance / Reformation | Leonardo da Vinci=1; Michelangelo=1; Mona Lisa=1; Perspektive in der Malerei=1; Martin Luther=2; 95 Thesen=2; Bibelübersetzung=2; Wittenberg=2
+Absolutismus oder Aufklärung? | Absolutismus / Aufklärung | Ludwig XIV.=1; Gottesgnadentum=1; Versailles=1; Stehendes Heer=1; Vernunft=2; Gewaltenteilung=2; Kant=2; Montesquieu=2
+Revolution 1789 oder 1848? | Frankreich 1789 / Deutschland 1848 | Bastille=1; Ludwig XVI.=1; Jakobiner=1; Marseillaise=1; Paulskirche=2; Schwarz-Rot-Gold=2; Märzforderungen=2; Frankfurter Nationalversammlung=2
+Kaiserreich oder Weimarer Republik? | Kaiserreich (1871–1918) / Weimarer Republik (1919–1933) | Bismarck=1; Wilhelm II.=1; Flottenrüstung=1; Kolonien=1; Friedrich Ebert=2; Inflation 1923=2; Frauenwahlrecht=2; Goldene Zwanziger=2
+Erster Weltkrieg: Mittelmächte oder Entente? | Mittelmächte / Entente | Deutsches Reich=1; Österreich-Ungarn=1; Osmanisches Reich=1; Bulgarien=1; Frankreich=2; Großbritannien=2; Russland=2; Italien (ab 1915)=2
+Pflanzenzelle oder nur Tierzelle? | Nur Pflanzenzelle / Beide Zellen | Zellwand=1; Chloroplast=1; große Vakuole=1; Stärkekörner=1; Zellkern=2; Zellmembran=2; Mitochondrium=2; Zellplasma=2
+Virus oder Bakterium? | Virus / Bakterium | Grippe=1; Masern=1; HIV=1; Windpocken=1; Tuberkulose=2; Scharlach=2; Cholera=2; Lyme-Borreliose=2
+Produzent oder Konsument? | Produzent / Konsument | Gras=1; Alge=1; Eiche=1; Moos=1; Hase=2; Fuchs=2; Reh=2; Adler=2
+Organ und System | Herz-Kreislauf / Nervensystem | Herz=1; Arterie=1; Vene=1; Kapillare=1; Gehirn=2; Rückenmark=2; Nerv=2; Synapse=2
+Hormon und Drüse | Bauchspeicheldrüse / Nebenniere | Insulin=1; Glukagon=1; Blutzucker senken=1; Blutzucker erhöhen=1; Adrenalin=2; Stressreaktion=2; Puls steigt=2; Kampf oder Flucht=2
+Tropen oder Polargebiet? | Tropen / Polargebiet | Regenwald=1; Tageszeitenklima=1; Mangroven=1; Kakao=1; Permafrost=2; Polarnacht=2; Eisbär=2; Tundra=2
+Wüste oder Savanne? | Wüste / Savanne | Oase=1; Sanddünen=1; Wadi=1; Kamel=1; Akazie=2; Regenzeit=2; Grasland=2; Gnu-Herden=2
+Kontinent | Afrika / Asien | Kenia=1; Nigeria=1; Ägypten=1; Ghana=1; Vietnam=2; Indien=2; Japan=2; Mongolei=2
+Plattengrenze | Auseinander (divergent) / Aufeinander (konvergent) | Mittelatlantischer Rücken=1; Island=1; Ostafrikanischer Graben=1; Neue Kruste entsteht=1; Himalaya=2; Anden=2; Tiefseegraben=2; Subduktion=2
+Element oder Verbindung? | Element / Verbindung | Kupfer=1; Stickstoff=1; Schwefel=1; Neon=1; Kochsalz=2; Rost=2; Ammoniak=2; Methan=2
+Metall oder Nichtmetall? | Metall / Nichtmetall | Natrium=1; Aluminium=1; Zink=1; Magnesium=1; Schwefel=2; Kohlenstoff=2; Chlor=2; Sauerstoff=2
+Physikalische Größe und Einheit | Elektrik / Mechanik | Volt=1; Ampere=1; Ohm=1; Watt=1; Newton=2; Pascal=2; Joule=2; Meter pro Sekunde=2
+Säure oder Lauge? | Säure / Lauge | Salzsäure=1; Essigsäure=1; Zitronensäure=1; Kohlensäure=1; Natronlauge=2; Kalilauge=2; Kalkwasser=2; Seifenlauge=2
+Gleichung lösen: x = 3 oder x = 5? | x = 3 / x = 5 | 2x = 6=1; x + 7 = 10=1; 4x − 2 = 10=1; 3x = 9=1; x + 5 = 10=2; 2x − 4 = 6=2; 6x = 30=2; x : 5 = 1=2
+Positiv oder negativ? | Ergebnis positiv / Ergebnis negativ | (−3) · (−4)=1; 7 − 2=1; (−10) : (−2)=1; 5 + (−1)=1; (−6) · 2=2; 3 − 8=2; (−9) + 4=2; 12 : (−3)=2
+Prozent | Weniger als die Hälfte / Mehr als die Hälfte | 25 %=1; 0,3=1; 2/5=1; 40 %=1; 75 %=2; 0,6=2; 3/5=2; 90 %=2
+Stilmittel | Bildlich / Wiederholung | Metapher=1; Vergleich=1; Personifikation=1; Hyperbel=1; Anapher=2; Alliteration=2; Refrain=2; Parallelismus=2
+Textsorte | Sachtext / Literarischer Text | Bericht=1; Lexikonartikel=1; Nachricht=1; Interview=1; Ballade=2; Kurzgeschichte=2; Novelle=2; Fabel=2
+Zeitform | Vergangenheit / Zukunft | er war gegangen=1; er ging=1; er ist gegangen=1; er hatte gesagt=1; er wird gehen=2; er wird gesagt haben=2; sie wird lesen=2; wir werden sehen=2
+Englisch: simple past oder present perfect? | simple past / present perfect | yesterday=1; last week=1; in 2010=1; two days ago=1; already=2; ever=2; never=2; yet=2
+Englisch: some oder any? | some / any | I have ___ apples.=1; Would you like ___ tea?=1; There is ___ milk.=1; She bought ___ bread.=1; Have you got ___ pets?=2; I don’t have ___ money.=2; Is there ___ sugar?=2; We didn’t see ___ birds.=2
+Liegt im Norden oder im Süden Deutschlands? | Norden / Süden | Hamburg=1; Bremen=1; Schleswig-Holstein=1; Mecklenburg-Vorpommern=1; Bayern=2; Baden-Württemberg=2; Bodensee=2; Zugspitze=2
+Erfinder und Erfindung | Mobilität / Kommunikation | Carl Benz (Auto)=1; Brüder Wright (Flugzeug)=1; Drais (Laufrad)=1; Stephenson (Dampflok)=1; Bell (Telefon)=2; Gutenberg (Buchdruck)=2; Marconi (Funk)=2; Berners-Lee (WWW)=2
+Erneuerbar oder fossil? | Erneuerbar / Fossil | Wind=1; Sonne=1; Biogas=1; Wasser=1; Kohle=2; Erdöl=2; Erdgas=2; Torf=2
+Digitale Welt | Sicher / Riskant | Starkes Passwort=1; Zwei-Faktor-Anmeldung=1; Updates installieren=1; Privatsphäre einstellen=1; Passwort teilen=2; Unbekannte Links öffnen=2; Adresse posten=2; Fremden vertrauen=2
+`);
+
+/* ---------------- Ausbau Klasse 9/10: Wissens-Quiz ---------------- */
+sekQuizMore(9, "Deutsch", `
+1 | Wer schrieb „Die Leiden des jungen Werther“? | Goethe
+1 | Was ist ein Monolog? | Eine Figur spricht allein
+1 | Was ist ein Dialog? | Ein Gespräch zwischen Figuren
+1 | Was ist ein Roman? | Eine lange Erzählung in Prosa
+1 | Was ist ein Antagonist? | Der Gegenspieler der Hauptfigur
+2 | Wer schrieb „Effi Briest“? | Theodor Fontane
+2 | Was ist eine Tragödie? | Ein Drama mit unglücklichem Ende für den Helden
+2 | Was ist eine Komödie? | Ein heiteres Drama mit gutem Ende
+2 | Was ist ein Akt im Drama? | Ein größerer Abschnitt der Handlung
+2 | Was ist eine Pointe? | Überraschender Schluss, oft bei Witzen oder Kurzgeschichten
+3 | Was ist eine Erörterung, die beide Seiten abwägt? | Dialektische (Pro-und-Kontra-)Erörterung
+3 | Was ist ein Leitmotiv? | Ein wiederkehrendes Motiv in einem Werk
+3 | Wer schrieb „Die Physiker“? | Friedrich Dürrenmatt
+3 | Wie heißt die Epoche mit Goethe und Schiller in Weimar um 1800? | Weimarer Klassik
+3 | Was ist ein Chiasmus? | Überkreuzstellung („Die Kunst ist lang, kurz ist das Leben“)
+4 | Was ist Exilliteratur? | Werke von Autoren, die vor den Nazis fliehen mussten
+4 | Wer schrieb „Die Blechtrommel“? | Günter Grass
+4 | Was ist ein Erzählerbericht im Gegensatz zur Figurenrede? | Was der Erzähler erzählt, nicht was Figuren sagen
+4 | Was ist Ironie? | Man sagt das Gegenteil von dem, was man meint
+4 | Was ist eine Rezension? | Eine bewertende Besprechung, z. B. eines Buches
+5 | Was ist der Unterschied zwischen offener und geschlossener Dramenform? | Geschlossen: strenger Aufbau, Einheit von Ort/Zeit/Handlung; offen: lockerer, viele Schauplätze
+5 | Was ist Naturalismus in der Literatur? | Epoche, die die Wirklichkeit genau und ungeschönt abbildet (ca. 1880–1900)
+5 | Wer schrieb „Die Weber“? | Gerhart Hauptmann
+5 | Was ist ein Symbol in der Literatur? | Ein Gegenstand, der für etwas Größeres steht
+5 | Was ist eine Inversion? | Umstellung der normalen Wortfolge zur Betonung
+`);
+sekQuizMore(9, "Englisch", `
+1 | Was bedeutet „to improve“? | verbessern
+1 | Was bedeutet „society“? | Gesellschaft
+1 | Was ist „Commonwealth“? | Bund von Staaten, die meist früher zum britischen Empire gehörten
+1 | Was bedeutet „to vote“? | wählen / abstimmen
+1 | Was bedeutet „opportunity“? | Gelegenheit / Chance
+2 | Was bedeutet „to require“? | erfordern / benötigen
+2 | Was ist ein „CV“? | Lebenslauf (curriculum vitae)
+2 | Wie heißt das „present perfect progressive“ von „I wait“? | I have been waiting
+2 | Was bedeutet „immigrant“? | Einwanderer
+2 | Was ist der „melting pot“? | Bild für die USA als Schmelztiegel vieler Kulturen
+3 | Was bedeutet „to discriminate against“? | diskriminieren / benachteiligen
+3 | Was ist ein „participle clause“? | Verkürzter Nebensatz mit Partizip („Walking home, I saw …“)
+3 | Was bedeutet „although“ im Vergleich zu „despite“? | „although“ + Satz, „despite“ + Nomen
+3 | Was war die Sklaverei-Abschaffung in den USA? | 1865 mit dem 13. Verfassungszusatz
+3 | Wer war Rosa Parks? | Bürgerrechtlerin, weigerte sich 1955, im Bus ihren Platz zu räumen
+4 | Was bedeutet „to raise awareness“? | Bewusstsein schaffen
+4 | Was ist eine „mediation“-Aufgabe? | Sinngemäße Übertragung zwischen Sprachen
+4 | Wie heißt das Passiv von „They will finish the project.“? | The project will be finished.
+4 | Was bedeutet „to be responsible for“? | verantwortlich sein für
+4 | Was ist das „House of Commons“? | Das Unterhaus des britischen Parlaments
+5 | Was bedeutet „to make ends meet“? | über die Runden kommen
+5 | Was ist ein „gerund“ nach „enjoy“? Beispiel! | „I enjoy reading.“
+5 | Was ist „Apartheid“? | Rassentrennung in Südafrika (bis 1994)
+5 | Wer war Nelson Mandela? | Kämpfer gegen Apartheid, erster schwarzer Präsident Südafrikas
+5 | Ergänze: „Hardly ___ I arrived when it started to rain.“ | had
+`);
+sekQuizMore(9, "Biologie", `
+1 | Wie viele Chromosomen hat eine menschliche Keimzelle? | 23
+1 | Was ist ein Phänotyp? | Das äußere Erscheinungsbild
+1 | Was ist ein Genotyp? | Die Erbanlagen eines Lebewesens
+1 | Was ist die Aufgabe der Ribosomen? | Proteine herstellen
+1 | Was ist HIV? | Ein Virus, das das Immunsystem schwächt
+2 | Welche Geschlechtschromosomen hat ein Mann? | XY
+2 | Welche Geschlechtschromosomen hat eine Frau? | XX
+2 | Was ist ein Stammbaum in der Genetik? | Darstellung, wie Merkmale in einer Familie vererbt werden
+2 | Was ist Homöostase? | Aufrechterhaltung eines stabilen inneren Zustands
+2 | Was sind T-Helferzellen? | Immunzellen, die die Abwehr koordinieren
+3 | Was ist ein Gentest? | Untersuchung des Erbguts auf bestimmte Merkmale
+3 | Was ist Klonen? | Erzeugen genetisch identischer Lebewesen
+3 | Was ist eine Punktmutation? | Veränderung einer einzelnen Base der DNA
+3 | Was sagt die erste Mendelsche Regel? | Uniformitätsregel: Mischlinge reinerbiger Eltern sind gleich
+3 | Wie heißt die Lücke zwischen zwei Nervenzellen, über die Botenstoffe wandern? | Synaptischer Spalt
+4 | Was ist die Blut-Hirn-Schranke? | Barriere, die das Gehirn vor Stoffen im Blut schützt
+4 | Was ist Resistenz bei Bakterien? | Antibiotika wirken nicht mehr
+4 | Was sind Aminosäuren? | Bausteine der Proteine
+4 | Was ist natürliche Selektion? | Besser angepasste Lebewesen überleben und vermehren sich eher
+4 | Was ist eine Art (Spezies)? | Lebewesen, die sich miteinander fruchtbar fortpflanzen können
+5 | Was ist Epigenetik? | Veränderungen der Genaktivität ohne Änderung der DNA-Sequenz
+5 | Was ist der genetische Code? | Zuordnung von Basentripletts zu Aminosäuren
+5 | Was ist Transkription? | Umschreiben der DNA in mRNA
+5 | Was ist Translation? | Übersetzen der mRNA in ein Protein am Ribosom
+5 | Was sind Gendrift und Isolation in der Evolution? | Zufällige Genveränderungen und Trennung von Populationen – führen zu neuen Arten
+`);
+sekQuizMore(9, "Erdkunde", `
+1 | Was ist ein Industrieland? | Ein Land mit viel Industrie und hohem Einkommen
+1 | Welcher Kontinent hat die meisten Einwohner? | Asien
+1 | Was ist Tourismus? | Reisen in andere Orte zur Erholung
+1 | Was ist eine Pendlerin? | Eine Person, die regelmäßig zwischen Wohn- und Arbeitsort fährt
+1 | Was ist ein Treibhausgas außer CO₂? | Methan
+2 | Was ist Raumplanung? | Ordnen, wo gewohnt, gearbeitet und gebaut wird
+2 | Was ist eine Freihandelszone? | Gebiet ohne Zölle zwischen Ländern
+2 | Was ist die „Agenda 2030“? | 17 UN-Ziele für nachhaltige Entwicklung
+2 | Was ist ein Slum? | Armenviertel am Stadtrand großer Städte
+2 | Was ist der Meeresspiegelanstieg? | Steigen des Meeres durch schmelzendes Eis und Erwärmung
+3 | Was ist das Kyoto-Protokoll? | Erstes Klimaschutzabkommen (1997)
+3 | Was ist ein Global Player? | Ein weltweit tätiges Großunternehmen
+3 | Was ist Massentourismus? | Tourismus mit sehr vielen Menschen an wenigen Orten
+3 | Was ist die Gentrifizierung? | Aufwertung eines Viertels, alteingesessene Bewohner werden verdrängt
+3 | Was sind seltene Erden? | Metalle, die für Elektronik wichtig sind
+4 | Was ist der Unterschied zwischen BIP und BNE? | BIP: im Land erwirtschaftet; BNE: von Inländern erwirtschaftet
+4 | Was ist eine Wertschöpfungskette? | Alle Schritte von Rohstoff bis Endprodukt
+4 | Was ist Landgrabbing? | Großflächiger Landkauf durch Investoren in ärmeren Ländern
+4 | Was ist die Vegetationszone der Nadelwälder im Norden? | Taiga (boreale Nadelwälder)
+4 | Was ist Kreislaufwirtschaft? | Rohstoffe werden möglichst wiederverwendet
+5 | Was ist ein Kipppunkt im Klimasystem? | Schwelle, ab der eine Veränderung nicht mehr umkehrbar ist
+5 | Was ist der Unterschied zwischen Mitigation und Adaptation? | Mitigation: Klimawandel bremsen; Adaptation: sich anpassen
+5 | Was ist die Tertiärisierung? | Wachsende Bedeutung des Dienstleistungssektors
+5 | Was ist der Gini-Koeffizient? | Maß für die Ungleichheit der Einkommensverteilung
+5 | Was ist der IPCC? | Der Weltklimarat
+`);
+sekQuizMore(9, "Geschichte", `
+1 | Wer war Adolf Hitler? | Diktator des nationalsozialistischen Deutschlands (1933–1945)
+1 | Wann wurde die DDR gegründet? | 1949
+1 | Wie hieß die Währung der BRD vor dem Euro? | D-Mark
+1 | Welche Stadt war Hauptstadt der BRD bis 1990? | Bonn
+1 | Wann wurde der Euro als Bargeld eingeführt? | 2002
+2 | Was war die Reichspogromnacht? | Gewalt gegen Juden am 9./10. November 1938
+2 | Was war die Stasi? | Ministerium für Staatssicherheit (Geheimpolizei der DDR)
+2 | Was waren die Nürnberger Prozesse? | Gerichtsverfahren gegen NS-Kriegsverbrecher (1945–1946)
+2 | Was war der Volksaufstand am 17. Juni 1953? | Proteste in der DDR, von sowjetischen Panzern niedergeschlagen
+2 | Wer war Willy Brandt? | Bundeskanzler, Friedensnobelpreis für seine Ostpolitik
+3 | Was war das „Wirtschaftswunder“? | Schneller Aufschwung der BRD in den 1950er-Jahren
+3 | Was war der Kniefall von Warschau? | Willy Brandt kniete 1970 vor dem Ghetto-Denkmal nieder
+3 | Wie hieß das Militärbündnis des Westens? | NATO (1949)
+3 | Was waren die Nürnberger Gesetze (1935)? | Gesetze, die Juden entrechteten
+3 | Was geschah am 1. September 1939? | Deutschland überfiel Polen – Beginn des Zweiten Weltkriegs
+4 | Was war der Holocaust? | Systematischer Mord an rund sechs Millionen europäischen Juden
+4 | Was war die Gleichschaltung? | Ausschaltung aller unabhängigen Organisationen im NS-Staat
+4 | Wer war Erich Honecker? | Staats- und Parteichef der DDR (1971–1989)
+4 | Was war die Berlin-Blockade? | Sowjetische Sperrung der Wege nach West-Berlin 1948/49
+4 | Was war der Mauerbau am 13. August 1961? | Abriegelung West-Berlins durch die DDR
+5 | Was war die Schlacht von Stalingrad? | Wendepunkt im Zweiten Weltkrieg (1942/43)
+5 | Was war die 68er-Bewegung? | Studentenproteste für gesellschaftliche Veränderungen
+5 | Was war die RAF? | Linksterroristische Gruppe in der BRD (1970er-Jahre)
+5 | Was bedeutet „Wende“ in der deutschen Geschichte? | Der Umbruch in der DDR 1989/90
+5 | Wann trat die BRD der NATO bei? | 1955
+`);
+sekQuizMore(9, "Chemie & Physik", `
+1 | Was ist ein Ion? | Ein elektrisch geladenes Atom oder Molekül
+1 | Was ist die Formel von Schwefelsäure? | H₂SO₄
+1 | Was ist ein Kohlenwasserstoff? | Verbindung aus Kohlenstoff und Wasserstoff
+1 | In welcher Einheit misst man die Frequenz? | Hertz
+1 | Was ist Wechselstrom? | Strom, der ständig seine Richtung ändert
+2 | Was ist die Formel von Ethanol? | C₂H₅OH
+2 | Was ist ein Elektromotor? | Gerät, das elektrische in Bewegungsenergie umwandelt
+2 | Was ist ein Generator? | Gerät, das Bewegungsenergie in elektrische Energie umwandelt
+2 | Was ist Alpha-Strahlung? | Heliumkerne aus radioaktivem Zerfall
+2 | Was ist ein Halbleiter? Beispiel! | Stoff, der Strom unter Bedingungen leitet, z. B. Silizium
+3 | Was sind Alkene? | Kohlenwasserstoffe mit Doppelbindung
+3 | Was ist eine Elektrolyse? | Zerlegung eines Stoffes durch elektrischen Strom
+3 | Was ist die Formel für die Leistung? | P = W : t (Arbeit durch Zeit)
+3 | Was ist Wirkungsgrad? | Verhältnis von nutzbarer zu zugeführter Energie
+3 | Was ist eine Kettenreaktion bei der Kernspaltung? | Freigesetzte Neutronen spalten weitere Kerne
+4 | Was ist ein Dipol? | Molekül mit ungleich verteilter Ladung (z. B. Wasser)
+4 | Was ist die Avogadro-Konstante ungefähr? | 6 · 10²³ Teilchen pro Mol
+4 | Was besagt die Lenzsche Regel? | Induzierter Strom wirkt seiner Ursache entgegen
+4 | Was sind Wasserstoffbrücken? | Anziehung zwischen Molekülen über Wasserstoffatome
+4 | Was ist ein Kondensator? | Bauteil, das elektrische Ladung speichert
+5 | Was ist die Lichtgeschwindigkeit im Vakuum? | Etwa 300.000 km/s
+5 | Was ist der Treibhauseffekt chemisch? | Gase wie CO₂ und Methan absorbieren Wärmestrahlung
+5 | Was ist eine Brennstoffzelle? | Erzeugt Strom aus Wasserstoff und Sauerstoff
+5 | Was ist Verseifung? | Herstellung von Seife aus Fett und Lauge
+5 | Was ist der Unterschied zwischen Masse und Stoffmenge? | Masse in g/kg; Stoffmenge in mol (Teilchenzahl)
+`);
+sekQuizMore(9, "Politik & Gesellschaft", `
+1 | Was ist eine Demokratie? | Herrschaft des Volkes
+1 | Was ist eine Diktatur? | Herrschaft einer Person oder Gruppe ohne freie Wahlen
+1 | Wie heißt das Staatsoberhaupt Deutschlands? | Bundespräsident/-in
+1 | Was ist eine Petition? | Eine Bitte oder Beschwerde an Parlament oder Behörden
+1 | Was ist eine Bürgerinitiative? | Zusammenschluss von Bürgern für ein Anliegen
+2 | Was ist die Opposition? | Parteien im Parlament, die nicht regieren
+2 | Was ist die Exekutive? | Die ausführende Gewalt (Regierung, Verwaltung)
+2 | Was sind Grundrechte? | Rechte, die jeder Mensch gegenüber dem Staat hat (Art. 1–19 GG)
+2 | Was ist Wahlgeheimnis? | Niemand darf erfahren, wen man wählt
+2 | Was ist die Erststimme? | Stimme für einen Direktkandidaten im Wahlkreis
+3 | Was ist die Zweitstimme? | Stimme für eine Partei – bestimmt die Sitzverteilung
+3 | Was ist ein Volksentscheid? | Abstimmung der Bürger über ein Gesetz
+3 | Was ist Zivilcourage? | Mut, sich für andere einzusetzen
+3 | Was sind Menschenrechte? | Rechte, die allen Menschen zustehen
+3 | Was ist eine Gewerkschaft? | Interessenvertretung der Arbeitnehmer
+4 | Was ist der Europäische Rat? | Treffen der Staats- und Regierungschefs der EU
+4 | Was ist die Europäische Kommission? | Die „Regierung“ der EU, schlägt Gesetze vor
+4 | Was ist Mindestlohn? | Gesetzlich festgelegter niedrigster Stundenlohn
+4 | Was ist Sozialstaat? | Staat sorgt für soziale Sicherheit und Gerechtigkeit
+4 | Was ist das Asylrecht? | Schutz für politisch Verfolgte (Art. 16a GG)
+5 | Was ist die Bundesversammlung? | Gremium aus Bundestag und Ländervertretern, wählt den Bundespräsidenten
+5 | Was ist ein Untersuchungsausschuss? | Bundestag klärt Missstände auf
+5 | Was ist die „wehrhafte Demokratie“? | Demokratie schützt sich gegen ihre Feinde (z. B. Parteiverbot)
+5 | Was ist der Vermittlungsausschuss? | Gremium von Bundestag und Bundesrat bei Streit über Gesetze
+5 | Was bedeutet „Checks and Balances“? | Gegenseitige Kontrolle der Staatsgewalten
+`);
+
+/* ---------------- Ausbau Klasse 9/10: übrige Spiele ---------------- */
+sekABCMore(9, `
+Wann wurde die DDR gegründet? | 1949 | 1945 | 1961
+Wer war Staats- und Parteichef der DDR bis 1989? | Erich Honecker | Walter Ulbricht | Egon Krenz
+Wer kniete 1970 in Warschau nieder? | Willy Brandt | Helmut Schmidt | Konrad Adenauer
+Wie heißt die Formel von Schwefelsäure? | H₂SO₄ | HCl | H₂CO₃
+Was ist ein Generator? | Wandelt Bewegung in Strom | Wandelt Strom in Bewegung | Speichert Strom
+Was ist der Genotyp? | Die Erbanlagen | Das Aussehen | Das Verhalten
+Wie viele Chromosomen hat eine Keimzelle des Menschen? | 23 | 46 | 12
+Was ist der IPCC? | Der Weltklimarat | Der UN-Sicherheitsrat | Die Welthandelsorganisation
+Was bedeutet „to improve“? | verbessern | beweisen | bewegen
+Wer schrieb „Die Physiker“? | Friedrich Dürrenmatt | Max Frisch | Bertolt Brecht
+`);
+sekWFMore(9, `
+W | Die Bundesrepublik trat 1955 der NATO bei. | Die DDR trat 1956 dem Warschauer Pakt bei.
+F | Bonn war die Hauptstadt der DDR. | Bonn war Hauptstadt der BRD, Ost-Berlin die der DDR.
+W | Der Volksaufstand in der DDR war am 17. Juni 1953. | Er wurde mit sowjetischen Panzern niedergeschlagen.
+F | Willy Brandt war der erste Bundeskanzler. | Der erste war Konrad Adenauer.
+W | Der Euro wurde 2002 als Bargeld eingeführt. | Als Buchgeld gab es ihn schon seit 1999.
+F | Die Stasi war die Polizei der BRD. | Die Stasi war die Geheimpolizei der DDR.
+W | Eine Keimzelle hat 23 Chromosomen. | Bei der Befruchtung entstehen wieder 46.
+F | Männer haben zwei X-Chromosomen. | Männer haben XY, Frauen XX.
+W | Ribosomen stellen Proteine her. | Dort findet die Translation statt.
+F | Antibiotika helfen gegen HIV. | HIV ist ein Virus.
+W | Die Taiga ist ein Nadelwaldgürtel im Norden. | Sie erstreckt sich über Russland, Skandinavien und Kanada.
+F | Das Kyoto-Protokoll ist ein Handelsabkommen. | Es ist ein Klimaschutzabkommen von 1997.
+W | Silizium ist ein Halbleiter. | Es steckt in fast allen Computerchips.
+F | Ein Elektromotor erzeugt Strom aus Bewegung. | Das macht ein Generator.
+W | Wasser ist ein Dipol. | Die Ladung ist ungleich verteilt.
+F | Alkene haben nur Einfachbindungen. | Alkene haben mindestens eine Doppelbindung.
+W | Die Zweitstimme entscheidet über die Sitzverteilung im Bundestag. | Mit ihr wählt man eine Partei.
+F | Die Opposition stellt die Regierung. | Die Opposition sind die Parteien, die nicht regieren.
+W | „opportunity“ heißt „Gelegenheit“. | z. B. „a great opportunity“.
+F | „despite“ steht vor einem ganzen Satz. | „despite“ steht vor einem Nomen, „although“ vor einem Satz.
+`);
+sekVerdMore(9, `
+Wer schrieb den Briefroman über die Leiden des jungen Werther? | Goethe
+Welcher Autor schrieb den Roman Effi Briest? | Theodor Fontane
+Wer schrieb das Drama Die Physiker? | Friedrich Dürrenmatt
+Welcher Autor schrieb Die Blechtrommel? | Günter Grass
+Wie heißt das Drama über einen schlesischen Weberaufstand? | Die Weber
+Wie nennt man eine Figur, die allein auf der Bühne spricht? | Monolog
+Wie heißt der Gegenspieler der Hauptfigur? | Antagonist
+Wie nennt man ein Drama mit unglücklichem Ende? | Tragödie
+Wie nennt man ein wiederkehrendes Motiv in einem Werk? | Leitmotiv
+Wie heißt die Epoche um Goethe und Schiller in Weimar? | Weimarer Klassik
+Wie nennt man die Literatur geflohener Autoren in der NS-Zeit? | Exilliteratur
+Welches Stilmittel sagt das Gegenteil des Gemeinten? | Ironie
+Wie heißt eine bewertende Buchbesprechung? | Rezension
+Welche Literaturepoche bildet die Wirklichkeit ungeschönt ab? | Naturalismus
+Wie nennt man die Überkreuzstellung von Satzgliedern? | Chiasmus
+Was bedeutet das englische Wort society? | Gesellschaft
+Was bedeutet das englische Wort opportunity? | Gelegenheit
+Wie heißt der englische Lebenslauf abgekürzt? | CV
+Wie nennt man die USA als Schmelztiegel der Kulturen? | Melting Pot
+Welche Bürgerrechtlerin weigerte sich, im Bus aufzustehen? | Rosa Parks
+Wer wurde nach der Apartheid Präsident Südafrikas? | Nelson Mandela
+Wie heißt das Unterhaus des britischen Parlaments? | House of Commons
+Was bedeutet die Redewendung to make ends meet? | über die Runden kommen
+Wie viele Chromosomen hat eine menschliche Keimzelle? | Dreiundzwanzig
+Welche Geschlechtschromosomen besitzt ein Mann? | XY
+Wie nennt man das äußere Erscheinungsbild eines Lebewesens? | Phänotyp
+Welche Zellorganellen stellen Proteine her? | Ribosomen
+Wie nennt man das Umschreiben der DNA in mRNA? | Transkription
+Wie heißt das Übersetzen der mRNA in ein Protein? | Translation
+Wie nennt man die Bausteine der Proteine? | Aminosäuren
+Was bedeutet es, wenn Antibiotika nicht mehr wirken? | Resistenz
+Wie heißt das Erzeugen genetisch gleicher Lebewesen? | Klonen
+Wie nennt man ein stabiles inneres Gleichgewicht im Körper? | Homöostase
+Welches Virus schwächt das menschliche Immunsystem? | HIV
+Welche Schutzbarriere schützt das Gehirn vor Stoffen im Blut? | Blut-Hirn-Schranke
+Wie nennt man die Lehre von veränderter Genaktivität ohne DNA-Änderung? | Epigenetik
+Wie heißt der Weltklimarat abgekürzt? | IPCC
+Wie heißen die siebzehn Nachhaltigkeitsziele der Vereinten Nationen? | Agenda zweitausenddreißig
+Wie nennt man Armenviertel am Rand großer Städte? | Slums
+Wie heißt die Verdrängung alter Bewohner aus aufgewerteten Vierteln? | Gentrifizierung
+Wie nennt man Metalle, die für Elektronik wichtig sind? | Seltene Erden
+Wie heißt der Nadelwaldgürtel im Norden Russlands? | Taiga
+Wie nennt man eine Wirtschaft, die Rohstoffe wiederverwendet? | Kreislaufwirtschaft
+Wie heißt die Schwelle, ab der Klimaveränderungen unumkehrbar sind? | Kipppunkt
+Wie heißt das Maß für die Ungleichheit von Einkommen? | Gini-Koeffizient
+Wie nennt man den wachsenden Dienstleistungssektor? | Tertiärisierung
+Wie hieß das erste internationale Klimaschutzabkommen? | Kyoto-Protokoll
+In welchem Jahr wurde die DDR gegründet? | Neunzehnhundertneunundvierzig
+Wie hieß die Währung der Bundesrepublik vor dem Euro? | D-Mark
+Welche Stadt war Hauptstadt der Bundesrepublik bis neunzehnhundertneunzig? | Bonn
+Wie hieß die Geheimpolizei der DDR? | Stasi
+Wo fanden die Prozesse gegen die Hauptkriegsverbrecher statt? | Nürnberg
+Wie nannte man den schnellen Aufschwung der Bundesrepublik? | Wirtschaftswunder
+Welcher Kanzler kniete neunzehnhundertsiebzig in Warschau nieder? | Willy Brandt
+Wer war Staatschef der DDR bis neunzehnhundertneunundachtzig? | Erich Honecker
+Wie hieß die Ausschaltung aller unabhängigen Organisationen im NS-Staat? | Gleichschaltung
+Welche Schlacht gilt als Wendepunkt im Zweiten Weltkrieg? | Stalingrad
+Wie nennt man die Studentenproteste der späten Sechzigerjahre? | Achtundsechziger-Bewegung
+Wie nennt man den Umbruch in der DDR neunzehnhundertneunundachtzig? | Wende
+Welches Gesetz gab Hitler neunzehnhundertdreiunddreißig unbeschränkte Macht? | Ermächtigungsgesetz
+Wie lautet die Formel der Schwefelsäure? | H zwei S O vier
+Wie nennt man ein elektrisch geladenes Atom? | Ion
+In welcher Einheit misst man die Frequenz? | Hertz
+Wie nennt man Strom, der ständig die Richtung wechselt? | Wechselstrom
+Welches Gerät wandelt Bewegung in elektrische Energie um? | Generator
+Welcher Stoff ist der wichtigste Halbleiter für Computerchips? | Silizium
+Wie nennt man die Zerlegung eines Stoffes durch Strom? | Elektrolyse
+Wie heißen Kohlenwasserstoffe mit einer Doppelbindung? | Alkene
+Wie nennt man das Verhältnis von Nutzenergie zu zugeführter Energie? | Wirkungsgrad
+Welches Bauteil speichert elektrische Ladung? | Kondensator
+Wie nennt man ein Molekül mit ungleich verteilter Ladung? | Dipol
+Welche Zelle erzeugt Strom aus Wasserstoff und Sauerstoff? | Brennstoffzelle
+Wie nennt man die Herstellung von Seife aus Fett und Lauge? | Verseifung
+Welche Strahlung besteht aus Heliumkernen? | Alphastrahlung
+Wie nennt man die Herrschaft einer Person ohne freie Wahlen? | Diktatur
+Wie nennt man die Parteien im Parlament, die nicht regieren? | Opposition
+Wie heißt die Stimme für einen Direktkandidaten? | Erststimme
+Wie nennt man eine Abstimmung der Bürger über ein Gesetz? | Volksentscheid
+Wie nennt man den Mut, sich für andere einzusetzen? | Zivilcourage
+Wie heißt der gesetzlich niedrigste Stundenlohn? | Mindestlohn
+Welcher Artikel des Grundgesetzes schützt politisch Verfolgte? | Artikel sechzehn a
+Wie nennt man die gegenseitige Kontrolle der Staatsgewalten? | Checks and Balances
+Welches Gremium schlichtet Streit zwischen Bundestag und Bundesrat? | Vermittlungsausschuss
+Wie heißt die Regierung der Europäischen Union? | Europäische Kommission
+Welche Demokratie schützt sich gegen ihre Feinde? | Wehrhafte Demokratie
+Was ist die Wurzel aus einhundertsechsundneunzig? | Vierzehn
+Wie lautet der Satz des Pythagoras? | a Quadrat plus b Quadrat gleich c Quadrat
+Wie nennt man eine Funktion mit der Gleichung y gleich m x plus b? | Lineare Funktion
+Wie heißt die Steigung einer linearen Funktion? | m
+Wie nennt man den Graphen einer quadratischen Funktion? | Parabel
+Wie viel ist zwei hoch zehn? | Eintausendvierundzwanzig
+Wie berechnet man das Volumen eines Zylinders? | Grundfläche mal Höhe
+Wie heißt die Wahrscheinlichkeit für Kopf beim Münzwurf? | Ein Halb
+Wie nennt man die längste Seite im rechtwinkligen Dreieck? | Hypotenuse
+Wie nennt man die beiden kürzeren Seiten im rechtwinkligen Dreieck? | Katheten
+Wie heißen die Lösungen einer quadratischen Gleichung? | Nullstellen
+Was bedeutet die Abkürzung NATO? | Nordatlantikvertrag-Organisation
+Wie heißt das Kinderhilfswerk der Vereinten Nationen? | UNICEF
+Welche Organisation verleiht jedes Jahr den Friedensnobelpreis? | Norwegisches Nobelkomitee
+Wer gründete das Rote Kreuz? | Henry Dunant
+Wie heißt die Weltgesundheitsorganisation abgekürzt? | WHO
+Welches Land hat die meisten Einwohner der Welt? | Indien
+Wie heißt die Hauptstadt von Kanada? | Ottawa
+Wie heißt die Hauptstadt der Türkei? | Ankara
+Welcher Kontinent hat die meisten Länder? | Afrika
+Wie heißt die Hauptstadt von Südafrika, in der die Regierung sitzt? | Pretoria
+Wie heißt die Hauptstadt von Argentinien? | Buenos Aires
+Welcher Wissenschaftler formulierte die Relativitätstheorie? | Albert Einstein
+Welche Stadt ist Sitz des Internationalen Strafgerichtshofs? | Den Haag
+Wie heißt das Forschungszentrum mit dem großen Teilchenbeschleuniger bei Genf? | CERN
+`);
+sekWorteMore(9, `
+TRAGÖDIE | Drama mit unglücklichem Ende
+KOMÖDIE | Heiteres Drama mit gutem Ende
+MONOLOG | Eine Figur spricht allein
+ANTAGONIST | Gegenspieler der Hauptfigur
+LEITMOTIV | Wiederkehrendes Motiv in einem Werk
+KLASSIK | Epoche von Goethe und Schiller in Weimar
+NATURALISMUS | Epoche der ungeschönten Wirklichkeit
+EXILLITERATUR | Werke geflohener Autoren in der NS-Zeit
+IRONIE | Man sagt das Gegenteil von dem, was man meint
+REZENSION | Bewertende Buch- oder Filmkritik
+CHIASMUS | Überkreuzstellung von Satzgliedern
+INVERSION | Umstellung der normalen Wortfolge
+SYMBOLIK | Dinge stehen für etwas Größeres
+ROMAN | Lange Erzählung in Prosa
+ERÖRTERUNG | Text, der Pro und Kontra abwägt
+SOCIETY | Englisch: Gesellschaft
+OPPORTUNITY | Englisch: Gelegenheit
+IMMIGRANT | Englisch: Einwanderer
+GOVERNMENT | Englisch: Regierung
+EMPLOYMENT | Englisch: Beschäftigung
+COMMONWEALTH | Staatenbund aus dem früheren britischen Empire
+APARTHEID | Rassentrennung in Südafrika
+SEGREGATION | Englisch: Trennung nach Hautfarbe in den USA
+PHÄNOTYP | Äußeres Erscheinungsbild
+GENOTYP | Erbanlagen eines Lebewesens
+RIBOSOM | Hier werden Proteine gebaut
+TRANSKRIPTION | DNA wird in mRNA umgeschrieben
+TRANSLATION | mRNA wird in Protein übersetzt
+AMINOSÄURE | Baustein der Proteine
+RESISTENZ | Antibiotika wirken nicht mehr
+HOMÖOSTASE | Stabiles inneres Gleichgewicht
+EPIGENETIK | Genaktivität ändert sich ohne DNA-Änderung
+KLONEN | Erzeugen genetisch gleicher Lebewesen
+SELEKTION | Natürliche Auslese
+STAMMBAUM | Zeigt die Vererbung in einer Familie
+IMMUNSCHWÄCHE | Folge einer HIV-Infektion
+ANTIGEN | Merkmal eines Erregers, das erkannt wird
+HORMONSYSTEM | Steuert den Körper über Botenstoffe
+GENTRIFIZIERUNG | Verdrängung alter Bewohner durch Aufwertung eines Viertels
+TAIGA | Nadelwaldgürtel im Norden
+KREISLAUFWIRTSCHAFT | Rohstoffe werden wiederverwendet
+WERTSCHÖPFUNGSKETTE | Alle Schritte vom Rohstoff bis zum Produkt
+FREIHANDEL | Handel ohne Zölle
+MASSENTOURISMUS | Sehr viele Reisende an wenigen Orten
+KLIMASCHUTZ | Maßnahmen gegen die Erderwärmung
+KIPPPUNKT | Ab hier wird der Klimawandel unumkehrbar
+EMISSIONEN | Ausstoß von Schadstoffen
+MEERESSPIEGEL | Steigt durch die Erderwärmung
+PENDLER | Fährt täglich zur Arbeit in eine andere Stadt
+DIKTATUR | Herrschaft ohne freie Wahlen
+GLEICHSCHALTUNG | Ausschaltung aller unabhängigen Gruppen im NS-Staat
+HOLOCAUST | Mord an den europäischen Juden
+WIDERSTAND | Kampf gegen das NS-Regime
+STALINGRAD | Wendepunkt im Zweiten Weltkrieg
+BESATZUNGSZONE | Deutschland wurde 1945 in vier davon geteilt
+WÄHRUNGSREFORM | Einführung der D-Mark 1948
+WIRTSCHAFTSWUNDER | Aufschwung der Bundesrepublik in den 1950ern
+MAUERBAU | 13. August 1961
+OSTPOLITIK | Annäherung an den Ostblock unter Willy Brandt
+STASI | Geheimpolizei der DDR
+MONTAGSDEMONSTRATION | Friedliche Proteste in Leipzig 1989
+MAUERFALL | 9. November 1989
+EINIGUNGSVERTRAG | Regelte 1990 den Beitritt der DDR
+STAATENVERBUND | So nennt man die Europäische Union
+ION | Geladenes Atom
+ELEKTROLYSE | Zerlegung durch Strom
+HALBLEITER | Leitet Strom nur unter bestimmten Bedingungen
+SILIZIUM | Wichtigster Stoff für Computerchips
+GENERATOR | Wandelt Bewegung in Strom
+ELEKTROMOTOR | Wandelt Strom in Bewegung
+SPULE | Gewickelter Draht, der ein Magnetfeld erzeugt
+KONDENSATOR | Speichert elektrische Ladung
+WECHSELSTROM | Strom, der ständig die Richtung wechselt
+WIRKUNGSGRAD | Nutzenergie durch zugeführte Energie
+ALPHASTRAHLUNG | Besteht aus Heliumkernen
+KETTENREAKTION | Neutronen spalten immer weitere Kerne
+KOHLENWASSERSTOFF | Verbindung aus C und H
+ALKAN | Kohlenwasserstoff mit Einfachbindungen
+ALKEN | Kohlenwasserstoff mit Doppelbindung
+ETHANOL | Trinkalkohol
+DIPOL | Molekül mit ungleich verteilter Ladung
+BRENNSTOFFZELLE | Strom aus Wasserstoff und Sauerstoff
+VERSEIFUNG | So entsteht Seife
+SCHWEFELSÄURE | H₂SO₄
+LICHTGESCHWINDIGKEIT | Etwa 300.000 km pro Sekunde
+OPPOSITION | Parteien, die nicht regieren
+EXEKUTIVE | Ausführende Gewalt
+LEGISLATIVE | Gesetzgebende Gewalt
+JUDIKATIVE | Rechtsprechende Gewalt
+GRUNDRECHTE | Artikel 1 bis 19 des Grundgesetzes
+ERSTSTIMME | Für den Direktkandidaten
+ZWEITSTIMME | Für eine Partei
+VOLKSENTSCHEID | Bürger stimmen über ein Gesetz ab
+ZIVILCOURAGE | Mut, sich für andere einzusetzen
+MENSCHENRECHTE | Stehen allen Menschen zu
+GEWERKSCHAFT | Vertritt Arbeitnehmer
+MINDESTLOHN | Niedrigster erlaubter Stundenlohn
+SOZIALSTAAT | Sorgt für soziale Sicherheit
+ASYLRECHT | Schutz für politisch Verfolgte
+VERMITTLUNGSAUSSCHUSS | Schlichtet zwischen Bundestag und Bundesrat
+PYTHAGORAS | a² + b² = c²
+NORMALPARABEL | Graph von y = x²
+NULLSTELLE | Hier schneidet der Graph die x-Achse
+STEIGUNG | Das m in y = mx + b
+KATHETE | Kürzere Seite im rechtwinkligen Dreieck
+ZYLINDER | Körper mit kreisförmiger Grundfläche
+POTENZ | Zum Beispiel 2 hoch 5
+QUADRATWURZEL | Wurzel aus 144 ist 12
+EXPONENTIELL | Wachstum, das sich immer wieder verdoppelt
+WAHLGEHEIMNIS | Niemand darf erfahren, wen man wählt
+`);
+sekBlitzMore(9, `
+Wer schrieb „Effi Briest“? | Fontane
+Wer schrieb „Die Physiker“? | Dürrenmatt
+Wer schrieb „Die Blechtrommel“? | Günter Grass
+Wer schrieb „Nathan der Weise“? | Lessing
+Wer schrieb „Kabale und Liebe“? | Schiller
+Wer schrieb „Die Weber“? | Gerhart Hauptmann
+Wer schrieb „Der Besuch der alten Dame“? | Dürrenmatt
+Drama mit gutem Ende? | Komödie
+Drama mit schlimmem Ende? | Tragödie
+Gegenspieler der Hauptfigur? | Antagonist
+Eine Figur spricht allein? | Monolog
+Bewertende Buchkritik? | Rezension
+Epoche um 1880–1900? | Naturalismus
+Epoche um 1770 mit dem jungen Goethe? | Sturm und Drang
+Stilmittel: „Ich kam, sah und siegte“? | Klimax
+Stilmittel: „entschlafen“ statt „sterben“? | Euphemismus
+Englisch für „Gesellschaft“? | society
+Englisch für „Arbeitslosigkeit“? | unemployment
+Englisch für „Regierung“? | government
+Englisch für „verbessern“? | to improve
+Englisch für „Gelegenheit“? | opportunity
+Englisch für „Lebenslauf“ (Abkürzung)? | CV
+Unterhaus des britischen Parlaments? | House of Commons
+Kämpfer gegen die Apartheid? | Nelson Mandela
+Bürgerrechtlerin im Bus 1955? | Rosa Parks
+Ende der Sklaverei in den USA? | 1865
+Chromosomen in einer Keimzelle? | 23
+Geschlechtschromosomen der Frau? | XX
+Geschlechtschromosomen des Mannes? | XY
+Äußeres Erscheinungsbild? | Phänotyp
+Gesamtheit der Erbanlagen? | Genotyp
+Ort der Proteinherstellung? | Ribosom
+DNA → mRNA heißt? | Transkription
+mRNA → Protein heißt? | Translation
+Bausteine der Proteine? | Aminosäuren
+Botenstoff an Synapsen? | Neurotransmitter
+Basen der DNA (Anzahl)? | 4
+Base, die nur in RNA vorkommt? | Uracil
+Begründer der Evolutionstheorie? | Darwin
+Erste Mendelsche Regel? | Uniformitätsregel
+Weltklimarat? | IPCC
+Nadelwaldgürtel im Norden? | Taiga
+Erstes Klimaabkommen (1997)? | Kyoto-Protokoll
+Pariser Klimaziel? | unter 2 °C (möglichst 1,5 °C)
+Treibhausgas aus der Rinderhaltung? | Methan
+Ausbreitung von Wüsten? | Desertifikation
+Aufwertung und Verdrängung im Stadtviertel? | Gentrifizierung
+Größter Kontinent nach Einwohnern? | Asien
+Wichtigster Halbleiter? | Silizium
+Gründung der DDR? | 1949
+Erster Bundespräsident? | Theodor Heuss
+Hauptstadt der BRD bis 1990? | Bonn
+Volksaufstand in der DDR? | 17. Juni 1953
+NATO-Beitritt der BRD? | 1955
+Mauerbau? | 13. August 1961
+Mauerfall? | 9. November 1989
+Tag der Deutschen Einheit? | 3. Oktober
+Euro als Bargeld? | 2002
+Machtübernahme der Nationalsozialisten? | 1933
+Kriegsende in Europa? | 8. Mai 1945
+Pogromnacht? | 9. November 1938
+Wendepunkt im Zweiten Weltkrieg? | Stalingrad
+Attentat auf Hitler 1944 durch? | Stauffenberg
+Kniefall von Warschau durch? | Willy Brandt
+Letzter Staatschef der UdSSR? | Gorbatschow
+DDR-Staatschef bis 1989? | Honecker
+Geheimpolizei der DDR? | Stasi
+Militärbündnis des Ostblocks? | Warschauer Pakt
+Raketenkrise 1962? | Kubakrise
+Formel von Salzsäure? | HCl
+Formel von Schwefelsäure? | H₂SO₄
+Formel von Natronlauge? | NaOH
+Formel von Ethanol? | C₂H₅OH
+Einheit der Frequenz? | Hertz
+Einheit der Stoffmenge? | Mol
+Ladung eines Neutrons? | keine
+Strahlung aus Heliumkernen? | Alphastrahlung
+Zerlegung durch Strom? | Elektrolyse
+Speichert Ladung? | Kondensator
+Wandelt Bewegung in Strom? | Generator
+Kohlenwasserstoffe mit Doppelbindung? | Alkene
+Kinetische Energie? | ½ · m · v²
+Lageenergie? | m · g · h
+Sitz des Bundesrats? | Berlin
+Gesetzgebende Gewalt? | Legislative
+Ausführende Gewalt? | Exekutive
+Stimme für die Partei? | Zweitstimme
+Stimme für den Direktkandidaten? | Erststimme
+Parteien, die nicht regieren? | Opposition
+Mut, sich einzumischen? | Zivilcourage
+Grundrechte im GG? | Artikel 1–19
+Asylrecht im GG? | Artikel 16a
+Wahlalter Bundestagswahl? | 18
+Sitz des Europäischen Parlaments? | Straßburg (und Brüssel)
+EU-Mitglieder (2025)? | 27
+Ständige Mitglieder im UN-Sicherheitsrat? | 5
+UN-Kinderhilfswerk? | UNICEF
+√196? | 14
+17²? | 289
+2 hoch 10? | 1024
+Hypotenuse bei 6 und 8? | 10
+Steigung in y = 3x + 2? | 3
+y-Achsenabschnitt in y = 3x + 2? | 2
+Graph einer quadratischen Funktion? | Parabel
+Wahrscheinlichkeit für eine 6 beim Würfeln? | 1/6
+Zinsen für 1.000 € bei 3 % (1 Jahr)? | 30 €
+Volumen eines Würfels mit 3 cm Kante? | 27 cm³
+Wer formulierte die Relativitätstheorie? | Einstein
+Abkürzung der Weltgesundheitsorganisation? | WHO
+Gründer des Roten Kreuzes? | Henry Dunant
+`);
+sekDuellMore(9, `
+Nenne etwas, das man für den Führerschein braucht! | Fahrstunden 30; Theorieprüfung 24; Geld 18; Sehtest 12; Erste-Hilfe-Kurs 10; Passfoto 6
+Nenne einen Grund, warum Jugendliche einen Nebenjob haben! | Geld verdienen 40; Führerschein bezahlen 18; Erfahrung sammeln 14; Unabhängigkeit 12; Sparen für Urlaub 10; Langeweile 6
+Nenne einen Studiengang! | Medizin 26; Jura 22; Informatik 18; Lehramt 14; BWL 12; Psychologie 8
+Nenne ein Streaming-Angebot für Serien und Filme! | Netflix 40; Disney+ 18; Amazon Prime 18; YouTube 12; Apple TV 6; Joyn 6
+Nenne ein Thema, das in den Nachrichten oft vorkommt! | Krieg 28; Klima 24; Wirtschaft 18; Wahlen 14; Migration 10; Unwetter 6
+Nenne eine Möglichkeit, Strom zu sparen! | Licht ausmachen 32; Geräte ganz ausschalten 22; LED-Lampen 16; Kürzer duschen 12; Wäsche an der Luft trocknen 10; Weniger zocken 8
+Nenne ein Land, das zur EU gehört! | Frankreich 26; Italien 22; Spanien 18; Österreich 14; Polen 12; Niederlande 8
+Nenne eine Eigenschaft, die Arbeitgeber suchen! | Zuverlässigkeit 30; Pünktlichkeit 24; Teamfähigkeit 18; Motivation 12; Freundlichkeit 10; Fleiß 6
+Nenne ein Social-Media-Problem! | Cybermobbing 30; Fake News 22; Sucht 18; Datenmissbrauch 14; Schönheitsideale 10; Hass-Kommentare 6
+Nenne eine berühmte Person der Weltgeschichte! | Napoleon 24; Einstein 22; Gandhi 18; Kolumbus 14; Martin Luther King 12; Kleopatra 10
+Nenne eine Partei im Deutschen Bundestag! | CDU 28; SPD 24; Grüne 18; AfD 14; Linke 10; CSU 6
+Nenne etwas, das man bei einem Praktikum lernt! | Arbeitsalltag 30; Pünktlichkeit 20; Neue Aufgaben 18; Berufswunsch prüfen 14; Teamarbeit 10; Kaffee kochen 8
+Nenne eine Folge des Klimawandels! | Hitze 26; Dürre 22; Überschwemmungen 18; Meeresspiegelanstieg 14; Gletscherschmelze 12; Artensterben 8
+Nenne eine Großstadt in Asien! | Tokio 30; Peking 22; Shanghai 14; Mumbai 12; Seoul 12; Bangkok 10
+Nenne etwas, das bei einer Party nicht fehlen darf! | Musik 34; Freunde 22; Getränke 18; Essen 12; Gute Laune 8; Lichter 6
+Nenne einen Grund, die Schule zu wechseln! | Umzug 34; Mobbing 22; Schlechte Noten 16; Anderer Abschluss 14; Lehrer 8; Freunde 6
+Nenne einen Beruf mit Zukunft! | IT / Informatik 32; Pflege 22; Elektrotechnik 16; Lehrkraft 12; Erneuerbare Energien 10; Medizin 8
+Nenne etwas, das man in einer Bewerbung erwähnt! | Schulabschluss 28; Praktika 22; Stärken 18; Hobbys 14; Sprachkenntnisse 10; Motivation 8
+Nenne eine Erfindung des 20. Jahrhunderts! | Computer 30; Internet 26; Handy 18; Fernseher 12; Flugzeug 8; Penicillin 6
+Nenne ein Land, aus dem viele Menschen nach Deutschland kamen! | Türkei 32; Syrien 22; Polen 16; Italien 12; Ukraine 10; Russland 8
+Nenne eine Musikerin oder einen Musiker, der weltweit bekannt ist! | Taylor Swift 30; Ed Sheeran 22; Beyoncé 16; Michael Jackson 14; Billie Eilish 10; Drake 8
+Nenne ein Grundrecht! | Meinungsfreiheit 32; Würde des Menschen 22; Religionsfreiheit 16; Gleichberechtigung 12; Pressefreiheit 10; Versammlungsfreiheit 8
+Nenne einen Grund für Stress bei Jugendlichen! | Schule 36; Prüfungen 20; Eltern 14; Zukunftsangst 12; Social Media 10; Liebeskummer 8
+Nenne eine Sportart bei den Olympischen Winterspielen! | Skifahren 32; Eishockey 20; Skispringen 16; Biathlon 14; Eiskunstlauf 10; Snowboard 8
+Nenne ein Wort, das man mit „Klima“ verbindet! | Wandel 34; Schutz 22; Erwärmung 18; Gipfel 12; Krise 8; Anlage 6
+Nenne etwas, das man nach dem Abschluss feiert! | Abschlussball 34; Abifahrt 22; Party 18; Zeugnisübergabe 14; Urlaub 8; Familienessen 4
+Nenne einen Konflikt oder Krieg der letzten Jahrzehnte! | Ukraine 34; Syrien 20; Nahost 18; Afghanistan 14; Irak 10; Jugoslawien 4
+Nenne eine Möglichkeit, Geld zu sparen! | Weniger einkaufen 30; Selbst kochen 22; Fahrrad statt Auto 18; Sparbuch 12; Gebraucht kaufen 10; Abos kündigen 8
+Nenne ein Organ, über das man im Biologieunterricht spricht! | Herz 30; Gehirn 24; Lunge 18; Leber 12; Niere 10; Haut 6
+Nenne eine Eigenschaft einer Demokratie! | Freie Wahlen 34; Meinungsfreiheit 22; Gewaltenteilung 18; Rechtsstaat 12; Pressefreiheit 8; Mehrparteiensystem 6
+Nenne einen Grund, warum man wählen gehen sollte! | Mitbestimmen 36; Demokratie stärken 22; Pflichtgefühl 14; Zukunft gestalten 12; Protest 10; Weil andere es nicht tun 6
+Nenne ein Fach, das in der Oberstufe wichtig ist! | Mathe 30; Deutsch 26; Englisch 18; Biologie 10; Geschichte 8; Physik 8
+Nenne etwas, das man online kauft! | Kleidung 34; Elektronik 22; Bücher 14; Schuhe 12; Lebensmittel 10; Tickets 8
+Nenne einen Ort für ein erstes Date! | Kino 32; Café 24; Restaurant 16; Park 12; Eisdiele 10; Bowling 6
+Nenne einen Grund, warum Menschen auswandern! | Arbeit 32; Krieg 22; Liebe 16; Klima 12; Bessere Bildung 10; Abenteuer 8
+Nenne etwas, das zu einer gesunden Ernährung gehört! | Obst 30; Gemüse 28; Wasser 16; Vollkorn 12; Wenig Zucker 8; Nüsse 6
+Nenne ein Smartphone-Problem! | Akku leer 34; Display kaputt 26; Zu wenig Speicher 16; Kein Netz 12; Zu langsam 8; Verloren 4
+Nenne eine Sehenswürdigkeit in Berlin! | Brandenburger Tor 38; Reichstag 20; Fernsehturm 16; Mauer-Gedenkstätte 12; Checkpoint Charlie 8; Museumsinsel 6
+Nenne ein Thema im Ethik- oder Religionsunterricht! | Gerechtigkeit 26; Glück 20; Tod 18; Freundschaft 14; Weltreligionen 12; Gewissen 10
+Nenne eine Eigenschaft eines guten Politikers! | Ehrlichkeit 34; Kompetenz 20; Bürgernähe 16; Durchsetzungsvermögen 14; Verlässlichkeit 10; Charisma 6
+Nenne etwas, das man bei einer Debatte braucht! | Argumente 36; Respekt 20; Zuhören 16; Fakten 14; Rhetorik 8; Mut 6
+Nenne ein Ziel, das man bis 30 erreichen möchte! | Eigene Wohnung 26; Guter Job 24; Familie 18; Reisen 14; Führerschein 10; Reich sein 8
+Nenne ein Laster oder eine schlechte Angewohnheit! | Zu viel Handy 32; Rauchen 22; Zu spät kommen 16; Fast Food 12; Nägelkauen 10; Aufschieben 8
+Nenne eine Automarke aus Deutschland! | VW 30; BMW 24; Mercedes 22; Audi 14; Porsche 6; Opel 4
+Nenne ein großes Unternehmen aus den USA! | Apple 32; Google 22; Amazon 18; Microsoft 14; Tesla 8; Meta 6
+Nenne einen Bereich, in dem KI eingesetzt wird! | Chatbots 30; Medizin 20; Autos 18; Übersetzungen 14; Bilder 10; Schule 8
+Nenne eine Pflicht, die man mit 18 hat! | Steuern zahlen 26; Verträge einhalten 22; Voll strafmündig 18; Eigene Versicherung 14; Arbeiten 12; Für Schäden selbst haften 8
+Nenne ein Ereignis, das die Welt verändert hat! | Mauerfall 26; Mondlandung 22; Weltkriege 18; Erfindung des Internets 16; Corona-Pandemie 12; 11. September 6
+Nenne eine Eigenschaft eines guten Lebenslaufs! | Übersichtlich 34; Lückenlos 22; Aktuell 16; Fehlerfrei 14; Mit Foto 8; Kurz 6
+Nenne ein Land in Afrika! | Ägypten 30; Südafrika 22; Kenia 16; Nigeria 12; Marokko 12; Ghana 8
+Nenne eine bekannte Universität! | Harvard 32; Oxford 26; Cambridge 14; Heidelberg 12; Stanford 10; MIT 6
+Nenne ein Medikament oder Mittel aus der Hausapotheke! | Schmerztabletten 34; Pflaster 22; Nasenspray 14; Hustensaft 12; Fieberthermometer 10; Salbe 8
+Nenne einen Grund für einen Streit mit den Eltern! | Ausgehzeiten 30; Handy 24; Schule 18; Zimmer 12; Geld 10; Freunde 6
+Nenne etwas, das man im Erste-Hilfe-Kurs lernt! | Stabile Seitenlage 34; Herzdruckmassage 26; Notruf absetzen 16; Verband anlegen 12; Unfallstelle sichern 8; Beatmung 4
+Nenne einen Grund, warum Menschen Vegetarier werden! | Tierschutz 36; Gesundheit 22; Klima 20; Geschmack 10; Religion 8; Geld 4
+Nenne eine Stadt, in der ein Fußball-WM-Finale stattfand! | Rio de Janeiro 26; Berlin 22; Moskau 16; Paris 14; Lusail (Katar) 12; Rom 10
+Nenne einen Gegenstand aus der Zeit der DDR! | Trabant 36; Ampelmännchen 20; Sandmännchen 14; Mauer 12; FDJ-Hemd 10; Spreewaldgurke 8
+Nenne ein großes Problem in Großstädten! | Wohnungsnot 30; Verkehr 24; Luftverschmutzung 18; Lärm 12; Armut 10; Kriminalität 6
+Nenne etwas, das man bei der Berufswahl beachtet! | Interessen 32; Gehalt 22; Stärken 18; Arbeitszeiten 12; Zukunftschancen 10; Ort 6
+Nenne einen Begriff aus der Wirtschaft! | Inflation 26; Aktie 22; Steuern 18; Gehalt 14; Export 12; Bank 8
+Nenne ein Spiel, das man auf Partys spielt! | Wahrheit oder Pflicht 34; Flaschendrehen 22; Uno 16; Werwolf 12; Activity 10; Twister 6
+Nenne einen Weg zur Schule oder Arbeit! | Bus 30; Fahrrad 24; Auto 18; Zu Fuß 14; Bahn 10; E-Scooter 4
+Nenne ein Ereignis aus der deutschen Geschichte nach 1945! | Mauerfall 36; Wiedervereinigung 22; Mauerbau 16; Währungsreform 10; WM-Sieg 1954 10; Luftbrücke 6
+Nenne etwas, das man in der Oberstufe anders macht als vorher! | Kurse wählen 32; Klausuren schreiben 24; Mehr lernen 16; Facharbeit 12; Freistunden 10; Selbstständiger arbeiten 6
+Nenne einen Gegenstand, den man für eine eigene Wohnung braucht! | Bett 30; Kühlschrank 22; Tisch 18; Herd 12; Sofa 10; Waschmaschine 8
+Nenne etwas, das Influencer bewerben! | Kosmetik 30; Kleidung 26; Fitnessprodukte 16; Apps 12; Reisen 10; Essen 6
+Nenne eine Fähigkeit, die man im Leben braucht! | Kommunikation 28; Geld verwalten 22; Kochen 18; Teamarbeit 14; Geduld 10; Zeitmanagement 8
+Nenne einen Bereich, in dem es Ungleichheit gibt! | Einkommen 30; Bildung 22; Gleichberechtigung 18; Gesundheit 12; Wohnen 10; Chancen 8
+Nenne eine Folge von zu viel Handynutzung! | Schlafmangel 30; Konzentrationsprobleme 22; Kopfschmerzen 16; Augenprobleme 12; Sucht 12; Weniger Bewegung 8
+Nenne eine bekannte deutsche Firma! | Volkswagen 28; Siemens 20; Adidas 18; SAP 12; BMW 12; Bosch 10
+Nenne etwas, das man in einem Labor im Chemieunterricht beachtet! | Schutzbrille 36; Kittel 20; Nicht essen 16; Abzug benutzen 12; Haare zusammenbinden 10; Anweisungen befolgen 6
+Nenne eine Art, Strom zu erzeugen! | Wind 30; Sonne 26; Kohle 16; Wasser 12; Atom 10; Gas 6
+Nenne einen Wochentag, an dem es oft Partys gibt! | Samstag 46; Freitag 40; Donnerstag 6; Sonntag 4; Mittwoch 2; Montag 2
+Nenne etwas, das sich durch Corona verändert hat! | Masken 28; Homeschooling 24; Homeoffice 18; Abstand 14; Testen 10; Impfungen 6
+Nenne einen Ort, an den man nach dem Abitur reist! | Australien 26; Thailand 20; USA 18; Spanien 14; Neuseeland 12; Kanada 10
+Nenne einen Grund, ein Freiwilliges Soziales Jahr zu machen! | Erfahrung 30; Orientierung 26; Helfen 18; Pause vom Lernen 12; Lebenslauf 8; Wartezeit 6
+Nenne einen Grund, warum Menschen protestieren! | Klimaschutz 30; Krieg 22; Ungerechtigkeit 18; Preise 12; Rechte 10; Löhne 8
+Nenne ein Medium, über das man Nachrichten bekommt! | Internet 30; Social Media 24; Fernsehen 18; Radio 12; Zeitung 10; Podcast 6
+Nenne eine Eigenschaft von Fake News! | Falsch 30; Reißerisch 22; Ohne Quelle 18; Emotional 12; Schnell verbreitet 10; Manipulativ 8
+Nenne einen Grund für Artensterben! | Lebensraumverlust 34; Klimawandel 22; Umweltgift 16; Jagd 12; Plastik im Meer 10; Monokulturen 6
+Nenne ein Merkmal einer Diktatur! | Keine freien Wahlen 32; Zensur 22; Geheimpolizei 16; Unterdrückung 14; Ein Führer 10; Propaganda 6
+Nenne etwas, das man bei einer Präsentation vermeiden sollte! | Ablesen 34; Zu schnell reden 22; Zu viel Text 18; Leise sprechen 12; Nervosität 8; Überziehen 6
+Nenne etwas, das man an einer Universität macht! | Studieren 30; Vorlesungen besuchen 24; Prüfungen 18; Feiern 12; Lernen in der Bibliothek 10; Forschen 6
+Nenne einen Grund, warum man Fremdsprachen lernt! | Reisen 30; Beruf 26; Kommunikation 18; Schule 12; Kultur 8; Auslandsjahr 6
+Nenne eine Gefahr im Straßenverkehr! | Handy am Steuer 30; Zu schnell fahren 24; Alkohol 18; Glätte 12; Toter Winkel 10; Müdigkeit 6
+Nenne einen Gegenstand mit großem CO₂-Fußabdruck! | Flugreise 32; Auto 26; Fleisch 18; Smartphone 10; Kleidung 8; Heizung 6
+Nenne etwas, das man mit 16 schon darf! | Bier/Wein trinken 26; Bis 24 Uhr ausgehen 24; Rollerführerschein 18; Wählen (Kommunal, je nach Land) 14; Arbeiten 10; Allein verreisen 8
+Nenne ein Gericht, das Studierende oft kochen! | Nudeln 46; Tiefkühlpizza 18; Rührei 12; Reis 10; Fertigsuppe 8; Toast 6
+Nenne eine bekannte Organisation, die hilft! | Rotes Kreuz 34; UNICEF 22; Ärzte ohne Grenzen 16; Greenpeace 12; Caritas 10; Tafel 6
+Nenne einen Begriff aus der Genetik! | DNA 34; Gen 22; Chromosom 18; Erbgut 12; Mutation 8; Vererbung 6
+Nenne etwas, das in einen Koffer für eine Abschlussfahrt gehört! | Kleidung 30; Kulturbeutel 22; Ladekabel 18; Ausweis 14; Badesachen 10; Sonnenbrille 6
+Nenne einen Ort, an dem man Menschen kennenlernt! | Schule 26; Verein 22; Party 18; Arbeit 14; Internet 12; Urlaub 8
+Nenne einen bekannten Film oder eine Filmreihe! | Harry Potter 30; Star Wars 22; Avengers 18; Herr der Ringe 14; Fast & Furious 10; Titanic 6
+Nenne etwas, das man vom ersten Gehalt kauft! | Kleidung 26; Handy 22; Auto sparen 18; Urlaub 14; Essen gehen 12; Geschenk für Eltern 8
+Nenne eine Erfindung, ohne die man heute nicht leben möchte! | Handy 38; Internet 26; Strom 14; Kühlschrank 10; Auto 6; Heizung 6
+Nenne einen Grund, warum man ein Tagebuch schreibt! | Gedanken ordnen 32; Erinnerungen 26; Gefühle verarbeiten 18; Geheimnisse 12; Kreativität 8; Langeweile 4
+Nenne etwas, das man in einem Bewerbungsgespräch gefragt wird! | Stärken und Schwächen 34; Warum diese Stelle? 22; Erzählen Sie von sich 18; Hobbys 12; Ziele 8; Noten 6
+Nenne einen Beruf, für den man eine Ausbildung macht! | Mechatroniker/-in 24; Kaufmann/-frau 22; Pflegefachkraft 18; Elektriker/-in 14; Friseur/-in 12; Tischler/-in 10
+Nenne eine Situation, in der man Zivilcourage zeigt! | Mobbing beenden 32; Hilfe holen 22; Belästigung stoppen 18; Bei Unfall helfen 14; Widersprechen 8; Polizei rufen 6
+Nenne eine Partei-Farbe in Deutschland! | Rot 28; Schwarz 24; Grün 22; Gelb 14; Blau 8; Lila 4
+Nenne etwas, das man im Sommerurlaub am Meer macht! | Baden 32; Sonnen 22; Surfen 14; Strandspaziergang 12; Volleyball 10; Tauchen 10
+Nenne eine Art von Kunst! | Malerei 32; Musik 22; Fotografie 16; Bildhauerei 12; Tanz 10; Street-Art 8
+Nenne eine Eigenschaft der Generation Z! | Digital 34; Klimabewusst 20; Kritisch 16; Kreativ 12; Ungeduldig 10; Tolerant 8
+Nenne einen Grund, warum Menschen in die Stadt ziehen! | Arbeit 34; Studium 22; Freizeitangebote 16; Bessere Verkehrsanbindung 12; Kultur 10; Freunde 6
+Nenne etwas, das man bei einem Vorstellungsgespräch anzieht! | Hemd / Bluse 30; Blazer 24; Saubere Schuhe 18; Anzug 14; Stoffhose 8; Dezenter Schmuck 6
+Nenne einen Begriff aus der Politik! | Wahl 30; Partei 22; Regierung 18; Demokratie 14; Gesetz 10; Koalition 6
+Nenne etwas, das man mit 18 endlich alleine darf! | Autofahren 36; Wählen 22; Verträge unterschreiben 16; Ausziehen 12; Alkohol kaufen 8; Tattoo 6
+`);
+sekReihMore(9, `
+Weg in den Zweiten Weltkrieg | Machtübernahme (1933) > Nürnberger Gesetze (1935) > Pogromnacht (1938) > Überfall auf Polen (1939)
+Zweiter Weltkrieg | Überfall auf Polen > Angriff auf die Sowjetunion > Stalingrad > Kapitulation
+Nachkriegsdeutschland | Besatzungszonen > Währungsreform > Gründung von BRD und DDR > NATO-Beitritt der BRD
+DDR-Geschichte | Gründung der DDR > Volksaufstand 17. Juni > Mauerbau > Mauerfall
+Kalter Krieg | Berlin-Blockade > Koreakrieg > Kubakrise > Ende der Sowjetunion
+Bundeskanzler – von früh nach spät | Adenauer > Brandt > Kohl > Merkel
+Europäische Einigung | Montanunion > EWG > Maastricht > Euro-Bargeld
+Literaturepochen | Barock > Aufklärung > Sturm und Drang > Klassik
+Literaturepochen II | Romantik > Realismus > Naturalismus > Expressionismus
+Dramenaufbau nach Freytag | Exposition > Steigende Handlung > Höhepunkt > Fallende Handlung
+Erörterung | Einleitung > Pro-Argumente > Kontra-Argumente > Fazit
+Analyse eines Gedichts | Erster Eindruck > Inhalt > Form und Sprache > Deutung
+Vom Gen zum Merkmal | DNA > mRNA > Protein > Merkmal
+Proteinbiosynthese | Transkription im Zellkern > mRNA verlässt den Kern > Translation am Ribosom > Protein faltet sich
+Meiose – vereinfacht | Chromosomen verdoppeln sich > Erste Teilung > Zweite Teilung > Vier Keimzellen
+Impfung und Immunität | Impfung > Antikörperbildung > Gedächtniszellen > Schutz bei echtem Erreger
+Erregungsleitung | Reiz > Sinneszelle > Nervenbahn > Gehirn
+Evolution des Menschen (vereinfacht) | Australopithecus > Homo habilis > Homo erectus > Homo sapiens
+Biologische Ordnung – von groß nach klein | Reich > Klasse > Gattung > Art
+Klimawandel-Ursachenkette | Verbrennung fossiler Stoffe > Mehr CO₂ > Stärkerer Treibhauseffekt > Erwärmung
+Wirtschaftssektoren – historische Reihenfolge | Landwirtschaft > Industrie > Dienstleistung > Information
+Wertschöpfungskette eines T-Shirts | Baumwollanbau > Spinnen und Weben > Nähen > Verkauf
+Bevölkerungsreichste Länder | Indien > China > USA > Indonesien
+Städte nach Einwohnern – von groß nach klein | Berlin > Hamburg > München > Köln
+Atommodelle – historisch | Dalton > Thomson > Rutherford > Bohr
+Elektrische Energie im Haus | Kraftwerk > Umspannwerk > Hausanschluss > Steckdose
+Kernkraftwerk | Kernspaltung > Wärme > Wasserdampf > Turbine und Generator
+Elektromagnetisches Spektrum – Wellenlänge von lang nach kurz | Radiowellen > Mikrowellen > Sichtbares Licht > Röntgenstrahlung
+Alkane nach Kettenlänge | Methan > Ethan > Propan > Butan
+Siedetemperaturen – von niedrig nach hoch | Sauerstoff > Ethanol > Wasser > Eisen
+Gleichung lösen: 3(x − 2) = 12 | 3(x − 2) = 12 > 3x − 6 = 12 > 3x = 18 > x = 6
+Pythagoras anwenden (a = 3, b = 4) | a² + b² = c² > 9 + 16 = c² > 25 = c² > c = 5
+Potenzen – von klein nach groß | 2³ > 3² > 2⁴ > 5²
+Wurzeln – von klein nach groß | √16 > √49 > √81 > √144
+Wahrscheinlichkeiten – von unwahrscheinlich nach sicher | Lottogewinn > Eine 6 würfeln > Kopf beim Münzwurf > Morgen geht die Sonne auf
+Gesetzgebung in Deutschland | Gesetzentwurf > Bundestag beschließt > Bundesrat > Bundespräsident > Verkündung
+Bundestagswahl | Wahlkampf > Wahltag > Auszählung > Kanzlerwahl im Bundestag
+Bewerbungsprozess | Stelle suchen > Bewerbung schicken > Vorstellungsgespräch > Arbeitsvertrag
+Lebensweg | Schulabschluss > Ausbildung oder Studium > Berufseinstieg > Rente
+Kommunikation – historisch | Brief > Telefon > E-Mail > Messenger
+Medien – historisch | Zeitung > Radio > Fernsehen > Internet
+Englische Bedingungssätze | If I see him, I’ll tell him. > If I saw him, I’d tell him. > If I had seen him, I’d have told him.
+US-Geschichte | Unabhängigkeitserklärung (1776) > Ende der Sklaverei (1865) > Bürgerrechtsbewegung > Erster schwarzer Präsident (2009)
+Apartheid in Südafrika | Rassentrennung beginnt (1948) > Mandela in Haft > Mandela frei (1990) > Mandela Präsident (1994)
+Großbritannien und die EU | Beitritt (1973) > Referendum (2016) > Austritt (2020) > Neue Handelsabkommen
+`);
+sekZuordMore(9, `
+NS-Zeit oder DDR? | NS-Zeit / DDR | Gestapo=1; Hitlerjugend=1; Reichstagsbrand=1; Ermächtigungsgesetz=1; Stasi=2; FDJ=2; SED=2; Mauerbau=2
+Weimarer Republik oder Bundesrepublik? | Weimarer Republik / Bundesrepublik | Reichspräsident=1; Hyperinflation 1923=1; Friedrich Ebert=1; Notverordnungen=1; Grundgesetz=2; Bundeskanzler Adenauer=2; D-Mark=2; Wirtschaftswunder=2
+West oder Ost im Kalten Krieg? | Westblock / Ostblock | NATO=1; USA=1; Marshallplan=1; Bundesrepublik=1; Warschauer Pakt=2; Sowjetunion=2; DDR=2; Comecon=2
+Aufklärung oder Romantik? | Aufklärung / Romantik | Lessing=1; Kant=1; Vernunft=1; Toleranz=1; Eichendorff=2; Novalis=2; Blaue Blume=2; Sehnsucht=2
+Epik oder Dramatik? | Epik / Dramatik | Roman=1; Novelle=1; Kurzgeschichte=1; Erzähler=1; Akt=2; Szene=2; Monolog=2; Regieanweisung=2
+Mitose oder Meiose? | Mitose / Meiose | Wachstum=1; Zwei Tochterzellen=1; Gleicher Chromosomensatz=1; Hautzellen=1; Keimzellen=2; Vier Tochterzellen=2; Halber Chromosomensatz=2; Crossing-over=2
+Genotyp oder Phänotyp? | Genotyp / Phänotyp | Allele=1; DNA-Sequenz=1; Erbanlagen=1; aa oder AA=1; Augenfarbe=2; Körpergröße=2; Blütenfarbe=2; Haarfarbe=2
+Virus oder Bakterium? | Virus / Bakterium | HIV=1; Grippe=1; Corona=1; Masern=1; Salmonellen=2; Tuberkulose=2; Tetanus=2; Scharlach=2
+Zellkern oder Ribosom? | Zellkern / Ribosom | DNA=1; Chromosomen=1; Transkription=1; Kernmembran=1; Translation=2; Proteinbau=2; Aminosäuren verknüpfen=2; mRNA ablesen=2
+Primärer oder tertiärer Sektor? | Landwirtschaft und Rohstoffe / Dienstleistung | Bauer=1; Fischer=1; Bergmann=1; Förster=1; Lehrerin=2; Arzt=2; Bankkauffrau=2; Friseur=2
+Industrieland oder Schwellenland? | Industrieland / Schwellenland | Japan=1; Kanada=1; Schweden=1; Australien=1; Indien=2; Brasilien=2; Indonesien=2; Mexiko=2
+Mitigation oder Anpassung? | Klimaschutz / Anpassung an Folgen | Windkraft=1; Weniger fliegen=1; Wärmepumpe=1; Bahn statt Auto=1; Deiche erhöhen=2; Hitzeschutzpläne=2; Dürreresistente Pflanzen=2; Stadtbäume für Schatten=2
+Megastadt | Asien / Amerika | Tokio=1; Delhi=1; Shanghai=1; Dhaka=1; Mexiko-Stadt=2; São Paulo=2; New York=2; Buenos Aires=2
+Säure oder Base? | Säure / Base | HCl=1; H₂SO₄=1; HNO₃=1; Essigsäure=1; NaOH=2; KOH=2; Ammoniak=2; Calciumhydroxid=2
+Organische oder anorganische Chemie? | Organisch (Kohlenstoffverbindungen) / Anorganisch | Methan=1; Ethanol=1; Zucker=1; Kunststoff=1; Kochsalz=2; Wasser=2; Schwefelsäure=2; Kalk=2
+Elektromotor oder Generator? | Elektromotor / Generator | Strom → Bewegung=1; Bohrmaschine=1; E-Auto-Antrieb=1; Ventilator=1; Bewegung → Strom=2; Windrad=2; Fahrraddynamo=2; Kraftwerk=2
+Kernspaltung oder Kernfusion? | Kernspaltung / Kernfusion | Uran=1; Atomkraftwerk=1; Kettenreaktion=1; Atomkerne werden geteilt=1; Sonne=2; Wasserstoff zu Helium=2; Kerne verschmelzen=2; Forschungsreaktor ITER=2
+Gewaltenteilung | Exekutive / Judikative | Bundesregierung=1; Polizei=1; Ministerien=1; Bundeskanzler=1; Bundesverfassungsgericht=2; Richter=2; Amtsgericht=2; Urteil=2
+Bund oder Land zuständig? | Bund / Länder | Verteidigung=1; Außenpolitik=1; Währung=1; Bundesautobahnen=1; Schule=2; Polizei=2; Kultur=2; Hochschulen=2
+EU-Organ | Europäisches Parlament / Europäische Kommission | Abgeordnete=1; Direkt gewählt=1; Straßburg=1; Beschließt Gesetze mit=1; Schlägt Gesetze vor=2; Kommissare=2; Präsidentin=2; Hüterin der Verträge=2
+Grundrecht | Freiheitsrecht / Gleichheitsrecht | Meinungsfreiheit=1; Religionsfreiheit=1; Versammlungsfreiheit=1; Berufsfreiheit=1; Gleichberechtigung=2; Diskriminierungsverbot=2; Gleiches Wahlrecht=2; Gleichheit vor dem Gesetz=2
+Lineare oder quadratische Funktion? | Linear / Quadratisch | y = 2x + 1=1; y = −x=1; y = 0,5x − 3=1; y = 4=1; y = x²=2; y = x² − 4=2; y = 2x² + x=2; y = (x − 1)²=2
+Potenz größer oder kleiner als 100? | Kleiner als 100 / Größer als 100 | 2⁶=1; 3⁴=1; 9²=1; 4³=1; 2⁷=2; 5³=2; 11²=2; 10³=2
+Englisch: Conditional | Typ I / Typ III | If it rains, we’ll stay in.=1; If you study, you’ll pass.=1; If she calls, I’ll answer.=1; If we hurry, we’ll make it.=1; If I had known, I’d have come.=2; If he had asked, she’d have helped.=2; If we had left earlier, we wouldn’t have missed it.=2; If it had snowed, we’d have gone skiing.=2
+Englisch: Gerund oder Infinitiv nach dem Verb? | + -ing / + to … | enjoy=1; avoid=1; finish=1; mind=1; want=2; decide=2; hope=2; plan=2
+Englischsprachige Länder | Europa / Übersee | England=1; Irland=1; Schottland=1; Wales=1; USA=2; Kanada=2; Australien=2; Neuseeland=2
+Stilmittel | Klangebene / Bedeutungsebene | Alliteration=1; Assonanz=1; Lautmalerei=1; Reim=1; Metapher=2; Ironie=2; Euphemismus=2; Oxymoron=2
+Erste oder zweite Hälfte des 20. Jahrhunderts? | 1900–1949 / 1950–1999 | Erster Weltkrieg=1; Weimarer Republik=1; Weltwirtschaftskrise=1; Zweiter Weltkrieg=1; Mondlandung=2; Mauerbau=2; Mauerfall=2; Kubakrise=2
+Menschenrechte – wo festgehalten? | Vereinte Nationen / Grundgesetz | Allgemeine Erklärung der Menschenrechte 1948=1; Vereinte Nationen=1; Weltweit gültig=1; New York=1; Artikel 1 GG=2; 1949=2; Bundesverfassungsgericht=2; Deutschland=2
+Gesellschaft | Demokratie / Diktatur | Freie Wahlen=1; Pressefreiheit=1; Opposition=1; Unabhängige Gerichte=1; Zensur=2; Geheimpolizei=2; Einheitspartei=2; Propaganda=2
+`);
+
+/* =====================================================================
    QUIZZLYBOARD – Fragen-Pools für das Wissens-Quiz (und Die Mauer)
    - Jedes Feld (Kategorie × Punktstufe) hat bis zu 10 Fragen: die erste aus data.js (JEO),
      der Rest aus quiz_more.js (QUIZ_MORE).
@@ -5539,9 +7815,9 @@ function renderTop(gameId, grade) {
   // Dreispaltig (links | Titel | rechts), damit der Titel immer genau in der Mitte steht
   const t = $("#top"); t.replaceChildren();
   const spick = location.hash === "#spickzettel"; // Handy-Spickzettel: keine Modus-Knöpfe
-  const areaBtn = h("button", { class: "btn small topmode area", title: "Bereich wechseln (alleine / Grundschule / weiterführende Schule)", onclick: () => { sekUnlocked = false; store.set("qb_area", null); home(); } }, "⇄", h("span", { class: "tml" }, " Bereich"));
+  const areaBtn = h("button", { class: "btn small topmode area", title: "Bereich wechseln (alleine / Grundschule / weiterführende Schule)", onclick: () => { store.set("qb_area", null); home(); } }, "⇄", h("span", { class: "tml" }, " Bereich"));
   const left = h("div", { class: "tside" }, gameId ? h("button", { class: "btn small", onclick: () => home() }, "🏠 Start")
-    : spick || !curArea ? null : curArea === "solo" || (curArea === "wf" && !sekUnlocked) ? areaBtn : [areaBtn, h("button", { class: "btn small topmode duel", title: "Duell-Modus: Das Glücksrad wählt die Spiele", onclick: () => { ac(); duelSetup(); } }, "⚔️", h("span", { class: "tml" }, " Duell-Modus")),
+    : spick || !curArea ? null : curArea === "solo" ? areaBtn : [areaBtn, h("button", { class: "btn small topmode duel", title: "Duell-Modus: Das Glücksrad wählt die Spiele", onclick: () => { ac(); duelSetup(); } }, "⚔️", h("span", { class: "tml" }, " Duell-Modus")),
        h("button", { class: "btn small topmode split", title: sekWords("Kinder zufällig auf die Teams verteilen"), onclick: () => { ac(); teamSplit(); } }, "👥", h("span", { class: "tml" }, " Teams einteilen")),
        h("button", { class: "btn small topmode buzz", title: "Großer Buzzer in Teamfarbe", onclick: () => { ac(); buzzer(); } }, buzzIcon(), h("span", { class: "tml" }, " Buzzer"))]);
   const right = h("div", { class: "tside right" });
@@ -5691,14 +7967,11 @@ function landing() {
       card("solo", "🎮", "Ich spiele alleine", "Allein üben und Sterne sammeln", "solo"),
       card("gs", "🏫", "Wir sind eine Grundschule", "Quiz-Show für die ganze Klasse · Klasse 1–4", "gs",
         h("span", { class: "akl" }, [1, 2, 3, 4].map(k => h("i", null, k)))),
-      card("wf", "🎓", "Wir sind eine weiterführende Schule", "Klasse 5–10", "wf", h("span", { class: "asoon" }, "🚧 in Arbeit"))),
+      card("wf", "🎓", "Wir sind eine weiterführende Schule", "Klasse 5–10", "wf")),
     legalFooter());
   show(view, "", 0); hideScore();
 }
-/* ---------- Weiterführende Schule (Klasse 5–10): hinter einer PIN, solange der Bereich im Aufbau ist ----------
-   Kein echter Schutz (die Seite ist öffentlich), hält aber Neugierige fern. Die PIN wird bei jedem Öffnen abgefragt. */
-let sekUnlocked = false;
-const SEK_PIN = "4c425d5b"; // vkey("qb-sek:" + PIN)
+/* ---------- Weiterführende Schule (Klasse 5–10) ---------- */
 const SEK_IDS = ["jeopardy", "verdreht", "abc", "wf", "hoehe", "mauer", "reihe", "wortsalat", "zuordnen", "duell", "reaktion", "bombe"];
 const SEK_LOOK = { jeopardy: ["#2563eb", "#1e3a8a"], verdreht: ["#0891b2", "#164e63"], wortsalat: ["#a21caf", "#4a044e"], abc: ["#d97706", "#92400e"], wf: ["#059669", "#065f46"], hoehe: ["#0284c7", "#0c4a6e"], mauer: ["#16a34a", "#14532d"],
   reihe: ["#7c3aed", "#3b0764"], zuordnen: ["#0d9488", "#134e4a"], duell: ["#dc2626", "#7f1d1d"], reaktion: ["#db2777", "#701a75"], bombe: ["#475569", "#0f172a"] };
@@ -5706,7 +7979,6 @@ const SEK_RULE1 = { reaktion: "Zwei Spieler stehen nebeneinander an der Tafel �
 const SEK_DESC = { wortsalat: "Staffel: Jede Person tippt einen Buchstaben. Schafft ihr den Fachbegriff?", reaktion: "Zwei Spieler, ein geteiltes Board – wer tippt zuerst richtig?", wf: "Stimmt die Aussage? Links wahr, rechts falsch.", hoehe: "Mehr oder weniger? Baut die längste Kette!" };
 function wfHome() {
   curArea = "wf";
-  if (!sekUnlocked) return sekPin();
   const wrap = h("div", { class: "home sekhome" }, makeLogo("Klasse 5–10 · Such dir ein Spiel aus"));
   const cards = ids => h("div", { class: "games" }, ids.map(id => {
     const g = GAMES.find(x => x.id === id), [c1, c2] = SEK_LOOK[id];
@@ -5726,31 +7998,6 @@ function wfHome() {
       h("div", null, sec("⚔️ 1 gegen 1", "Zwei treten gegeneinander an."), cards(["reaktion", "bombe"]))),
     legalFooter());
   show(wrap, "", 0);
-}
-function sekPin() {
-  let code = "";
-  const dots = h("div", { class: "pindots" });
-  const msg = h("div", { class: "pinmsg" }, "Dieser Bereich ist noch im Aufbau.");
-  const draw = () => dots.replaceChildren(...[0, 1, 2, 3].map(i => h("span", { class: i < code.length ? "on" : "" })));
-  const press = d => {
-    if (code.length >= 4) return;
-    code += d; sfx.tick(); draw();
-    if (code.length === 4) setTimeout(() => {
-      if (vkey("qb-sek:" + code) === SEK_PIN) { sekUnlocked = true; sfx.ok(); removeEventListener("keydown", onKey); wfHome(); return; }
-      sfx.bad(); msg.textContent = "Falsche PIN – bitte noch einmal."; dots.classList.remove("shake"); void dots.offsetWidth; dots.classList.add("shake"); code = ""; draw();
-    }, 180);
-  };
-  const back = () => { if (code) { code = code.slice(0, -1); draw(); } };
-  const onKey = e => { if (!document.querySelector(".pinpad")) return removeEventListener("keydown", onKey); if (/^[0-9]$/.test(e.key)) press(e.key); else if (e.key === "Backspace") back(); };
-  addEventListener("keydown", onKey);
-  draw();
-  const view = h("div", { class: "home wfpage" }, makeLogo("Weiterführende Schule · Klasse 5–10"),
-    h("div", { class: "wfcard pincard" }, h("div", { class: "wfico" }, "🔒"), h("h2", null, "PIN eingeben"), msg, dots,
-      h("div", { class: "pinpad" }, ["1", "2", "3", "4", "5", "6", "7", "8", "9", "⌫", "0", ""].map(d => d === "" ? h("span") :
-        h("button", { class: "pinkey", "aria-label": d === "⌫" ? "Löschen" : d, onclick: () => d === "⌫" ? back() : press(d) }, d))),
-      h("button", { class: "btn ghost", onclick: () => { removeEventListener("keydown", onKey); store.set("qb_area", null); home(); } }, "⇄ Anderen Bereich wählen")),
-    legalFooter());
-  show(view, "", 0); hideScore();
 }
 function gsHome() {
   curArea = "gs";
@@ -6144,17 +8391,23 @@ const SPICK = [
   { id: "bombe", label: "💣 Tick-Tack-Bumm", note: "Rechenaufgaben haben keine Nummer – die Lösung steht auf dem Board unter „👁“.", items: k => BLITZ[k].map(([q, a], i) => ({ nr: spickNr(k, i), q, a })) }
 ];
 const norm = s => String(s).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+/* Spickzettel: Grundschule 1–4 und weiterführende Schule 5/6, 7/8, 9/10 (nur die Spiele, die es dort gibt) */
+const SPICK_K = [1, 2, 3, 4, 5, 7, 9];
+const spickHas = (s, k) => k < 5 || SEK_IDS.includes(s.id);
 function spickzettel() {
-  const st = { game: null, k: store.get("qb_spick_k", 1), q: "", open: null };
+  const st = { game: null, k: SPICK_K.includes(store.get("qb_spick_k", 1)) ? store.get("qb_spick_k", 1) : 1, q: "", open: null };
   const page = h("div", { class: "spick" });
-  const kp = () => h("div", { class: "kpills" }, [1, 2, 3, 4].map(x => h("button", { class: "kp" + (x === st.k ? " on" : ""), onclick: () => { st.k = x; st.open = null; store.set("qb_spick_k", x); draw(); } }, x + ". Klasse")));
+  const pill = x => h("button", { class: "kp" + (x === st.k ? " on" : ""), "data-k": x, onclick: () => { st.k = x; st.open = null; store.set("qb_spick_k", x); if (st.game && !spickHas(st.game, x)) st.game = null; draw(); } }, gradeLabel(x));
+  const kp = () => h("div", { class: "spk" },
+    h("div", { class: "kpills" }, h("small", { class: "spklab" }, "Grundschule"), [1, 2, 3, 4].map(pill)),
+    h("div", { class: "kpills" }, h("small", { class: "spklab" }, "Klasse 5–10"), [5, 7, 9].map(pill)));
   function draw() {
     if (!st.game) {
       page.replaceChildren(
         h("h2", null, "📱 Spickzettel"),
         h("p", { class: "hintline" }, "Nur für dich – nicht casten! Wähle Klasse und Spiel."),
         kp(),
-        h("div", { class: "sgames" }, SPICK.map(s => h("button", { class: "sgame", onclick: () => { st.game = s; st.q = ""; st.open = null; draw(); } },
+        h("div", { class: "sgames" }, SPICK.filter(s => spickHas(s, st.k)).map(s => h("button", { class: "sgame", onclick: () => { st.game = s; st.q = ""; st.open = null; draw(); } },
           h("b", null, s.label), h("small", null, s.items(st.k).length + " Fragen")))),
         h("div", { class: "row" }, h("button", { class: "btn ghost small", onclick: () => { try { history.replaceState(null, "", location.pathname + location.search); } catch (e) {} home(); } }, "🏠 Zur Startseite")));
       return;
@@ -6178,10 +8431,10 @@ function spickzettel() {
       const digits = q.replace(/\s+/g, "");
       // Reine Zahl = Nummernsuche über ALLE Klassen (die Klasse steckt in der Nummer); sonst Volltextsuche
       if (/^\d+$/.test(digits)) {
-        const all = [1, 2, 3, 4].flatMap(k => st.game.items(k).map(it => Object.assign({}, it, { k, grp: k + ". Klasse" + (it.grp ? " · " + it.grp : "") })));
+        const all = SPICK_K.filter(k => spickHas(st.game, k)).flatMap(k => st.game.items(k).map(it => Object.assign({}, it, { k, grp: gradeLabel(k) + (it.grp ? " · " + it.grp : "") })));
         const exact = all.filter(it => it.nr === digits);
         items = exact.length ? exact : all.filter(it => it.nr.startsWith(digits)).slice(0, 60);
-        if (exact.length === 1 && exact[0].k !== st.k) { st.k = exact[0].k; store.set("qb_spick_k", st.k); $$(".spick .kp").forEach((b, i) => b.classList.toggle("on", i + 1 === st.k)); }
+        if (exact.length === 1 && exact[0].k !== st.k) { st.k = exact[0].k; store.set("qb_spick_k", st.k); $$(".spick .kp").forEach(b => b.classList.toggle("on", +b.dataset.k === st.k)); }
       }
       else if (q) items = items.filter(it => norm(it.q + " " + it.a + " " + (it.grp || "")).includes(q));
       list.replaceChildren();
@@ -10487,10 +12740,14 @@ function mauer(g) {
     const ansBox = h("div", { class: "mans" });
     panel.replaceChildren(teamHead(),
       h("div", { class: "mmeta" }, cat + " · " + p + " P" + (nr ? " · Nr. " + nr : " · 🎲")), h("div", { class: "mq" }, q), ansBox,
-      h("div", { class: "row mctrl" },
-        h("button", { class: "btn ghost", onclick: () => { ansBox.textContent = ansBox.textContent ? "" : a; } }, "👁 Antwort"),
-        h("button", { class: "btn green big", onclick: () => drop(true) }, "✓ Richtig → 🟢"),
-        h("button", { class: "btn pink big", onclick: () => drop(false) }, "✗ Falsch → 🔴")));
+      h("div", { class: "mctrl" },
+        h("div", { class: "row" },
+          h("button", { class: "btn ghost readbtn", onclick: () => speak(q) }, "🔊 Vorlesen"),
+          h("button", { class: "btn ghost", onclick: () => { ansBox.textContent = ansBox.textContent ? "" : a; } }, "👁 Antwort")),
+        h("div", { class: "row" },
+          h("button", { class: "btn green big", onclick: () => { stopSpeech(); drop(true); } }, "✓ Richtig → 🟢"),
+          h("button", { class: "btn pink big", onclick: () => { stopSpeech(); drop(false); } }, "✗ Falsch → 🔴"))));
+    if (S.autoRead) setTimeout(() => speak(q), 300); // Klasse 1–4: wie im Wissens-Quiz automatisch vorlesen (im Bereich 5–10 stumm)
   }
   const teamHead = () => h("div", { class: "mteam", style: "--c:" + COLORS[order[turn]] }, "🎯 " + teams[order[turn]].name, h("small", null, `Kugel ${turn + 1} von ${order.length}`));
   function nextTurn() {
